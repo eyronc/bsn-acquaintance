@@ -17,7 +17,7 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
   const getSeatColor = (status) => {
     switch (status) {
       case 'selected':
-        return 'bg-enchant-sage hover:bg-opacity-80';
+        return 'bg-emerald-400 hover:bg-emerald-500 shadow-lg';
       case 'confirmed':
         return 'bg-enchant-pink bg-opacity-60 cursor-not-allowed';
       case 'reserved':
@@ -43,7 +43,7 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
           <span className="text-enchant-plum">Available</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-enchant-sage rounded"></div>
+          <div className="w-6 h-6 bg-emerald-400 rounded"></div>
           <span className="text-enchant-plum">Your Selection</span>
         </div>
         <div className="flex items-center gap-2">

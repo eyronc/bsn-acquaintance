@@ -10,7 +10,7 @@ function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   
   // Demo mode: Show dashboard directly (toggle to false to see login)
-  const DEMO_MODE = true;
+  const DEMO_MODE = false;
 
   if (DEMO_MODE) {
     return <StudentDashboard 
