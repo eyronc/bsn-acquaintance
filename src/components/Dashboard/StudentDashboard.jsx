@@ -66,32 +66,39 @@ export function StudentDashboard({ user, onLogout }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-enchant-cream via-enchant-pink via-enchant-lavender to-enchant-sage flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-enchant-pink border-t-enchant-lavender rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-enchant-plum font-semibold">Loading the magic...</p>
+      <div className="min-h-screen bg-[#f7e5ee] flex items-center justify-center">
+        <div className="text-center neu-flat p-8 rounded-3xl">
+          <div className="w-12 h-12 border-4 border-rose-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[#3b1427] font-semibold">Loading seat map...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-enchant-cream via-enchant-pink via-enchant-lavender to-enchant-sage">
-      {/* Header */}
-      <header className="bg-white bg-opacity-90 backdrop-blur border-b border-enchant-gold border-opacity-30 sticky top-0 z-40 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center gap-4">
-          <div className="min-w-0 flex-1">
-            <h1 className="text-xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-enchant-pink to-enchant-lavender font-enchant truncate">
-              BSN 2026
-            </h1>
-            <p className="text-enchant-gold text-xs md:text-sm truncate">Welcome, {user.fullname}!</p>
+    <div className="min-h-screen bg-[#f7e5ee] text-[#3b1427]">
+      {/* Header - Tactile Extruded Top Bar */}
+      <header className="neu-flat sticky top-0 z-40 mx-2 md:mx-6 my-2 rounded-2xl">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3.5 flex justify-between items-center gap-4">
+          <div className="flex items-center gap-3.5 min-w-0">
+            <img 
+              src="/uclmnursing.svg" 
+              alt="UCLM Nursing Emblem" 
+              className="w-11 h-11 md:w-12 md:h-12 rounded-full neu-avatar object-contain p-1 flex-shrink-0"
+            />
+            <div className="min-w-0">
+              <h1 className="text-lg md:text-2xl font-extrabold text-[#3b1427] font-heading truncate tracking-tight">
+                BSN 2026 <span className="text-rose-600 font-extrabold text-sm md:text-base ml-1">Acquaintance Party</span>
+              </h1>
+              <p className="text-slate-500 text-xs md:text-sm truncate font-medium">Welcome, {user.fullname}!</p>
+            </div>
           </div>
 
           <button
             onClick={onLogout}
-            className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 bg-enchant-pink text-white rounded-lg hover:bg-opacity-90 transition-all font-semibold text-sm md:text-base whitespace-nowrap"
+            className="neu-button px-3.5 md:px-5 py-2 text-[#3b1427] hover:text-rose-600 font-semibold rounded-xl text-xs md:text-sm flex items-center gap-2"
           >
-            <LogOut size={16} className="md:w-[18px]" />
+            <LogOut size={16} />
             <span className="hidden sm:inline">Logout</span>
             <span className="sm:hidden">Log</span>
           </button>
@@ -99,27 +106,27 @@ export function StudentDashboard({ user, onLogout }) {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-12">
+      <main className="max-w-7xl mx-auto px-4 py-6 md:py-10">
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-lg text-red-700">
+          <div className="mb-6 p-4 neu-pressed rounded-2xl text-rose-600 text-sm font-semibold">
             Error: {error}
           </div>
         )}
 
         {isConfirmed ? (
           // Confirmed State
-          <div className="text-center space-y-6">
-            <div className="p-8 bg-white bg-opacity-90 rounded-3xl border-4 border-dashed border-enchant-gold shadow-lg">
-              <h2 className="text-4xl font-bold text-enchant-pink font-enchant mb-4">
+          <div className="text-center space-y-8">
+            <div className="p-8 max-w-xl mx-auto neu-flat-lg rounded-3xl">
+              <h2 className="text-2xl md:text-4xl font-extrabold text-rose-600 font-heading mb-4">
                 Your Seat is Confirmed!
               </h2>
-              <div className="bg-enchant-light p-6 rounded-2xl mb-6 inline-block">
-                <p className="text-enchant-plum mb-2">Your Reserved Seat:</p>
-                <p className="text-3xl font-bold text-enchant-pink font-enchant">
+              <div className="neu-pressed px-6 py-4 rounded-2xl mb-6 inline-block">
+                <p className="text-slate-500 text-sm mb-1 font-medium">Your Reserved Seat</p>
+                <p className="text-2xl md:text-3xl font-extrabold text-rose-600 font-heading">
                   Table {userSeat.table_number} • Seat {userSeat.seat_number}
                 </p>
               </div>
-              <p className="text-enchant-gold text-lg">
+              <p className="text-slate-600 text-base md:text-lg font-medium">
                 See you at the BSN Acquaintance Party 2026!
               </p>
             </div>
@@ -140,13 +147,13 @@ export function StudentDashboard({ user, onLogout }) {
         )}
       </main>
 
-      {/* Sticky "Choose this seat" button - top right with gap from header */}
+      {/* Sticky "Choose this seat" button */}
       {selectedSeat && !isConfirmed && (
         <button
           onClick={() => setShowConfirmModal(true)}
-          className="fixed top-[85px] md:top-[110px] right-4 z-30 px-6 py-3 bg-gradient-to-r from-enchant-pink to-enchant-lavender text-white font-bold rounded-lg hover:shadow-lg transition-all duration-200 shadow-md text-sm md:text-base animate-in fade-in slide-in-from-top-2 duration-300"
+          className="fixed bottom-6 right-6 z-30 px-6 py-3.5 neu-button-primary text-white font-bold rounded-2xl text-sm md:text-base animate-in fade-in slide-in-from-bottom-3 duration-300"
         >
-          Choose This Seat
+          Choose This Seat (Table {selectedSeat.table_number} • Seat {selectedSeat.seat_number})
         </button>
       )}
 

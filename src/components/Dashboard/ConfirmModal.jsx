@@ -26,44 +26,54 @@ export function ConfirmModal({ isOpen, seat, onConfirm, onCancel, loading }) {
       ]}
     >
       {/* Seat Info */}
-      <div className="mb-4 md:mb-6 p-4 md:p-5 bg-gradient-to-br from-enchant-light to-enchant-cream rounded-lg border-2 border-enchant-gold border-opacity-40 shadow-sm">
-        <p className="text-enchant-plum font-semibold mb-2 text-sm md:text-base">Your Selected Seat:</p>
-        <p className="text-xl md:text-2xl font-bold text-enchant-pink font-enchant">
+      <div className="mb-5 p-5 neu-pressed rounded-2xl bg-gradient-to-br from-[#f9eaf1] to-[#fce7f3] border border-pink-200/60 transition-all duration-300">
+        <p className="text-slate-500 font-semibold mb-1 text-xs md:text-sm">Your Selected Seat</p>
+        <p className="text-2xl md:text-3xl font-extrabold text-pink-600 font-heading">
           Table {seat?.table_number} • Seat {seat?.seat_number}
         </p>
       </div>
 
       {/* Caution Warning */}
-      <div className="mb-5 md:mb-6 p-4 md:p-5 bg-yellow-50 rounded-lg border-2 border-yellow-200 flex gap-3">
-        <AlertCircle className="text-yellow-600 flex-shrink-0 mt-0.5" size={20} />
+      <div className="mb-5 p-4 rounded-2xl bg-amber-500/10 border border-amber-300/60 flex gap-3 transition-all duration-300">
+        <AlertCircle className="text-amber-600 flex-shrink-0 mt-0.5" size={20} />
         <div>
-          <p className="font-semibold text-yellow-900 mb-2 text-sm md:text-base">Important Notice</p>
-          <p className="text-xs md:text-sm text-yellow-800 leading-relaxed">
+          <p className="font-bold text-amber-900 mb-1 text-xs md:text-sm">Important Notice</p>
+          <p className="text-xs text-amber-800 leading-relaxed font-medium">
             Once confirmed, <strong>this seat cannot be changed</strong>. Please review your selection carefully before proceeding.
           </p>
         </div>
       </div>
 
       {/* Acknowledgment Checkbox */}
-      <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-enchant-light transition-all duration-200 mb-4">
+      <label className={`flex items-start gap-3 cursor-pointer p-4 neu-flat rounded-2xl transition-all duration-300 ease-out select-none ${
+        agreed 
+          ? 'bg-[#fce7f3] border-2 border-pink-400 shadow-md scale-[1.01]' 
+          : 'bg-[#f9eaf1] border border-pink-200/50 hover:border-pink-300'
+      }`}>
         <input
           type="checkbox"
           checked={agreed}
           onChange={(e) => setAgreed(e.target.checked)}
-          className="mt-1 w-5 h-5 rounded accent-enchant-pink cursor-pointer flex-shrink-0 transition-all duration-200"
+          className="mt-0.5 w-5 h-5 rounded accent-pink-600 cursor-pointer flex-shrink-0 transition-transform duration-200 active:scale-90"
         />
-        <span className="text-xs md:text-sm text-enchant-plum leading-relaxed">
+        <span className="text-xs md:text-sm text-[#3b1427] leading-relaxed font-medium">
           I understand that this seat selection is <strong>final and cannot be changed</strong> after confirmation.
         </span>
       </label>
 
-      {/* Confirmation Message - Smooth entrance */}
-      {agreed && (
-        <div className="animate-in fade-in slide-in-from-top-2 duration-300 p-3 bg-green-50 rounded-lg border-2 border-green-200 flex items-center gap-3">
-          <Check size={20} className="text-green-600 flex-shrink-0" />
-          <p className="text-sm text-green-700 font-medium">Ready to confirm!</p>
+      {/* Smooth Expanding/Collapsing Confirmation Banner */}
+      <div 
+        className={`grid transition-all duration-300 ease-out overflow-hidden ${
+          agreed ? 'grid-rows-[1fr] opacity-100 mt-4' : 'grid-rows-[0fr] opacity-0 mt-0'
+        }`}
+      >
+        <div className="min-h-0">
+          <div className="p-3.5 neu-pressed rounded-xl flex items-center gap-3 bg-emerald-500/10 border border-emerald-300/60 shadow-sm">
+            <Check size={20} className="text-emerald-600 flex-shrink-0 animate-bounce" />
+            <p className="text-xs md:text-sm text-emerald-700 font-bold">Ready to confirm!</p>
+          </div>
         </div>
-      )}
+      </div>
     </Modal>
   );
 }

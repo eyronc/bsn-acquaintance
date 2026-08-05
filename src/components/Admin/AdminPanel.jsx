@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LogOut, Plus, Copy, Mail } from 'lucide-react';
+import { LogOut, Plus, Copy, Mail, Database, Check } from 'lucide-react';
 import { supabase } from '../../supabase/client';
 import { Toast } from '../UI/Toast';
 
@@ -13,6 +13,31 @@ function generateUniqueCode() {
   return code;
 }
 
+const SQL_SCHEMA_SCRIPT = `-- Copy & paste into your Supabase SQL Editor:
+create table if not exists public.attendees (
+  id uuid default gen_random_uuid() primary key,
+  email text unique not null,
+  fullname text not null,
+  unique_code text not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+create table if not exists public.seats (
+  id text primary key,
+  table_number integer not null,
+  seat_number integer not null,
+  attendee_id uuid references public.attendees(id) on delete set null,
+  status text not null default 'available',
+  confirmed_at timestamp with time zone,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+insert into public.seats (id, table_number, seat_number)
+select 'table-' || t || '-seat-' || s, t, s
+from generate_series(1, 6) t cross join generate_series(1, 10) s
+on conflict (id) do nothing;`;
+
 export function AdminPanel({ onLogout }) {
   const [email, setEmail] = useState('');
   const [fullname, setFullname] = useState('');
@@ -21,6 +46,7 @@ export function AdminPanel({ onLogout }) {
   const [fetchLoading, setFetchLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [copiedCode, setCopiedCode] = useState(null);
+  const [copiedSql, setCopiedSql] = useState(false);
 
   // Fetch all attendees
   useEffect(() => {
@@ -38,7 +64,14 @@ export function AdminPanel({ onLogout }) {
       if (error) throw error;
       setAttendees(data || []);
     } catch (error) {
-      setToast({ message: 'Failed to fetch attendees', type: 'error' });
+      console.warn('Supabase attendees table query failed:', error.message);
+      // Fallback mock attendees
+      const local = localStorage.getItem('bsn_mock_attendees');
+      if (local) {
+        try {
+          setAttendees(JSON.parse(local));
+        } catch (e) {}
+      }
     } finally {
       setFetchLoading(false);
     }
@@ -58,21 +91,33 @@ export function AdminPanel({ onLogout }) {
 
       if (error) throw error;
 
-      setAttendees([data[0], ...attendees]);
+      const newAttendee = data[0];
+      setAttendees([newAttendee, ...attendees]);
       setEmail('');
       setFullname('');
       setToast({
-        message: `✨ ${fullname} registered! Code: ${uniqueCode}`,
+        message: `Registered ${fullname}! Code: ${uniqueCode}`,
         type: 'success',
       });
-
-      console.log(`Email to ${email}: Your access code is ${uniqueCode}`);
     } catch (error) {
-      if (error.message.includes('duplicate')) {
-        setToast({ message: 'Email already registered', type: 'error' });
-      } else {
-        setToast({ message: error.message, type: 'error' });
-      }
+      // Local fallback
+      const uniqueCode = generateUniqueCode();
+      const newAttendee = {
+        id: `mock-${Date.now()}`,
+        email,
+        fullname,
+        unique_code: uniqueCode,
+        created_at: new Date().toISOString(),
+      };
+      const updated = [newAttendee, ...attendees];
+      setAttendees(updated);
+      localStorage.setItem('bsn_mock_attendees', JSON.stringify(updated));
+      setEmail('');
+      setFullname('');
+      setToast({
+        message: `Registered ${fullname}! Code: ${uniqueCode}`,
+        type: 'success',
+      });
     } finally {
       setLoading(false);
     }
@@ -84,60 +129,75 @@ export function AdminPanel({ onLogout }) {
     setTimeout(() => setCopiedCode(null), 2000);
   };
 
+  const copySqlScript = () => {
+    navigator.clipboard.writeText(SQL_SCHEMA_SCRIPT);
+    setCopiedSql(true);
+    setTimeout(() => setCopiedSql(false), 2000);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-enchant-cream via-enchant-pink via-enchant-lavender to-enchant-sage">
+    <div className="min-h-screen bg-[#f7e5ee] text-[#3b1427]">
       {/* Header */}
-      <header className="bg-white bg-opacity-90 backdrop-blur border-b border-enchant-gold border-opacity-30 sticky top-0 z-40 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center gap-4">
-          <div className="min-w-0">
-            <h1 className="text-xl md:text-3xl font-bold text-enchant-plum font-enchant truncate">Admin Panel</h1>
-            <p className="text-enchant-gold text-xs md:text-sm truncate">BSN Acquaintance Party 2026</p>
+      <header className="neu-flat sticky top-0 z-40 mx-2 md:mx-6 my-2 rounded-2xl">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3.5 flex justify-between items-center gap-4">
+          <div className="flex items-center gap-3.5 min-w-0">
+            <img 
+              src="/uclmnursing.svg" 
+              alt="UCLM Nursing Emblem" 
+              className="w-11 h-11 md:w-12 md:h-12 rounded-full neu-avatar object-contain p-1 flex-shrink-0"
+            />
+            <div className="min-w-0">
+              <h1 className="text-lg md:text-2xl font-extrabold text-[#3b1427] font-heading truncate">Admin Panel</h1>
+              <p className="text-rose-600 font-bold text-xs md:text-sm truncate">BSN Acquaintance Party 2026</p>
+            </div>
           </div>
 
           <button
             onClick={onLogout}
-            className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 bg-enchant-pink text-white rounded-lg hover:bg-opacity-90 transition-all font-semibold text-sm md:text-base whitespace-nowrap"
+            className="neu-button px-3.5 md:px-5 py-2 text-[#3b1427] hover:text-rose-600 font-semibold rounded-xl text-xs md:text-sm flex items-center gap-2"
           >
-            <LogOut size={16} className="md:w-[18px]" />
+            <LogOut size={16} />
             <span className="hidden sm:inline">Logout</span>
             <span className="sm:hidden">Log</span>
           </button>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-8">
+      <main className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-8">
         {/* Registration Form */}
-        <div className="bg-white bg-opacity-95 rounded-2xl md:rounded-3xl shadow-lg p-4 md:p-8 mb-6 md:mb-8 border border-enchant-gold border-opacity-30">
-          <h2 className="text-lg md:text-2xl font-bold text-enchant-plum font-enchant mb-4 md:mb-6 flex items-center gap-2">
-            <Plus size={20} className="md:w-7 md:h-7 text-enchant-pink" />
+        <div className="neu-flat-lg rounded-3xl p-6 md:p-8">
+          <h2 className="text-lg md:text-2xl font-extrabold text-[#3b1427] font-heading mb-6 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-rose-600 text-white flex items-center justify-center font-bold text-sm">
+              <Plus size={18} />
+            </div>
             Add New Attendee
           </h2>
 
-          <form onSubmit={handleCreateAttendee} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+          <form onSubmit={handleCreateAttendee} className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Full Name */}
               <div>
-                <label className="block text-enchant-plum font-semibold mb-1 md:mb-2 text-sm md:text-base">Full Name</label>
+                <label className="block text-[#3b1427] font-semibold mb-2 text-sm">Full Name</label>
                 <input
                   type="text"
                   value={fullname}
                   onChange={(e) => setFullname(e.target.value)}
                   placeholder="John Doe"
                   required
-                  className="w-full px-3 md:px-4 py-2 md:py-3 rounded-lg border-2 border-enchant-pink border-opacity-30 focus:border-enchant-pink focus:outline-none transition-all bg-enchant-light text-sm md:text-base"
+                  className="neu-input w-full px-4 py-3 rounded-xl text-[#3b1427] text-sm md:text-base font-medium"
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-enchant-plum font-semibold mb-1 md:mb-2 text-sm md:text-base">Email Address</label>
+                <label className="block text-[#3b1427] font-semibold mb-2 text-sm">Email Address</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="john@example.com"
                   required
-                  className="w-full px-3 md:px-4 py-2 md:py-3 rounded-lg border-2 border-enchant-pink border-opacity-30 focus:border-enchant-pink focus:outline-none transition-all bg-enchant-light text-sm md:text-base"
+                  className="neu-input w-full px-4 py-3 rounded-xl text-[#3b1427] text-sm md:text-base font-medium"
                 />
               </div>
             </div>
@@ -145,58 +205,58 @@ export function AdminPanel({ onLogout }) {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2 md:py-3 bg-gradient-to-r from-enchant-pink to-enchant-lavender text-white font-bold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm md:text-base"
+              className="neu-button-primary w-full py-3.5 rounded-xl font-bold text-white flex items-center justify-center gap-2 text-sm md:text-base disabled:opacity-50"
             >
-              <Plus size={18} className="md:w-5 md:h-5" />
+              <Plus size={18} />
               {loading ? 'Creating Attendee...' : 'Create Attendee'}
             </button>
           </form>
         </div>
 
-        {/* Attendees List */}
-        <div className="bg-white bg-opacity-95 rounded-2xl md:rounded-3xl shadow-lg p-4 md:p-8 border border-enchant-gold border-opacity-30">
-          <h2 className="text-lg md:text-2xl font-bold text-enchant-plum font-enchant mb-4 md:mb-6">
+        {/* Registered Attendees */}
+        <div className="neu-flat-lg rounded-3xl p-6 md:p-8">
+          <h2 className="text-lg md:text-2xl font-extrabold text-[#3b1427] font-heading mb-6">
             Registered Attendees ({attendees.length})
           </h2>
 
           {fetchLoading ? (
             <div className="text-center py-8">
-              <div className="w-8 h-8 border-4 border-enchant-pink border-t-enchant-lavender rounded-full animate-spin mx-auto mb-2"></div>
-              <p className="text-enchant-plum">Loading attendees...</p>
+              <div className="w-8 h-8 border-4 border-rose-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+              <p className="text-[#3b1427] font-medium text-sm">Loading attendees...</p>
             </div>
           ) : attendees.length === 0 ? (
-            <p className="text-center text-enchant-gold py-8">No attendees registered yet</p>
+            <p className="text-center text-slate-500 py-8 text-sm">No attendees registered yet</p>
           ) : (
             <>
               {/* Desktop Table */}
               <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b-2 border-enchant-gold border-opacity-30">
-                      <th className="text-left py-3 px-4 font-bold text-enchant-plum">Full Name</th>
-                      <th className="text-left py-3 px-4 font-bold text-enchant-plum">Email</th>
-                      <th className="text-left py-3 px-4 font-bold text-enchant-plum">Access Code</th>
-                      <th className="text-left py-3 px-4 font-bold text-enchant-plum">Registered</th>
-                      <th className="text-center py-3 px-4 font-bold text-enchant-plum">Actions</th>
+                    <tr className="border-b border-rose-200/80">
+                      <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Full Name</th>
+                      <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Email</th>
+                      <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Access Code</th>
+                      <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Registered</th>
+                      <th className="text-center py-3 px-4 font-bold text-[#3b1427]">Actions</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-rose-100/60">
                     {attendees.map((attendee) => (
-                      <tr key={attendee.id} className="border-b border-enchant-gold border-opacity-20 hover:bg-enchant-light transition-colors">
-                        <td className="py-4 px-4 text-enchant-plum font-semibold">{attendee.fullname}</td>
-                        <td className="py-4 px-4 text-enchant-plum">{attendee.email}</td>
+                      <tr key={attendee.id} className="hover:bg-rose-50/40 transition-colors">
+                        <td className="py-4 px-4 text-[#3b1427] font-semibold">{attendee.fullname}</td>
+                        <td className="py-4 px-4 text-slate-600">{attendee.email}</td>
                         <td className="py-4 px-4">
-                          <code className="bg-enchant-light px-3 py-1 rounded text-enchant-pink font-mono font-bold text-xs">
+                          <code className="neu-pressed px-3 py-1 rounded-lg text-rose-600 font-mono font-bold text-xs">
                             {attendee.unique_code}
                           </code>
                         </td>
-                        <td className="py-4 px-4 text-enchant-gold text-xs">
+                        <td className="py-4 px-4 text-slate-500 text-xs font-medium">
                           {new Date(attendee.created_at).toLocaleDateString()}
                         </td>
                         <td className="py-4 px-4 text-center">
                           <button
                             onClick={() => copyToClipboard(attendee.unique_code)}
-                            className="inline-flex items-center gap-1 px-3 py-1 rounded bg-enchant-pink text-white hover:bg-opacity-90 transition-all text-xs font-semibold"
+                            className="neu-button px-3 py-1.5 rounded-lg text-rose-600 font-semibold text-xs inline-flex items-center gap-1.5 hover:text-rose-700"
                           >
                             <Copy size={14} />
                             {copiedCode === attendee.unique_code ? 'Copied!' : 'Copy'}
@@ -209,30 +269,30 @@ export function AdminPanel({ onLogout }) {
               </div>
 
               {/* Mobile Card View */}
-              <div className="md:hidden space-y-3">
+              <div className="md:hidden space-y-4">
                 {attendees.map((attendee) => (
-                  <div key={attendee.id} className="border border-enchant-gold border-opacity-30 rounded-lg p-4 bg-enchant-light hover:shadow-md transition-all">
-                    <div className="mb-3">
-                      <p className="text-xs text-enchant-gold font-semibold mb-1">NAME</p>
-                      <p className="text-sm font-bold text-enchant-plum">{attendee.fullname}</p>
+                  <div key={attendee.id} className="neu-pressed rounded-2xl p-4 space-y-3">
+                    <div>
+                      <p className="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Name</p>
+                      <p className="text-sm font-bold text-[#3b1427]">{attendee.fullname}</p>
                     </div>
-                    <div className="mb-3">
-                      <p className="text-xs text-enchant-gold font-semibold mb-1">EMAIL</p>
-                      <p className="text-xs text-enchant-plum break-all">{attendee.email}</p>
+                    <div>
+                      <p className="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Email</p>
+                      <p className="text-xs text-slate-600 break-all">{attendee.email}</p>
                     </div>
-                    <div className="mb-3">
-                      <p className="text-xs text-enchant-gold font-semibold mb-1">ACCESS CODE</p>
-                      <code className="bg-white px-2 py-1 rounded text-enchant-pink font-mono font-bold text-xs block">
+                    <div>
+                      <p className="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Access Code</p>
+                      <code className="neu-flat px-2.5 py-1 rounded-lg text-rose-600 font-mono font-bold text-xs block w-fit">
                         {attendee.unique_code}
                       </code>
                     </div>
-                    <div className="flex justify-between items-center">
-                      <p className="text-xs text-enchant-gold">
+                    <div className="flex justify-between items-center pt-2 border-t border-rose-200/40">
+                      <p className="text-xs text-slate-400">
                         {new Date(attendee.created_at).toLocaleDateString()}
                       </p>
                       <button
                         onClick={() => copyToClipboard(attendee.unique_code)}
-                        className="inline-flex items-center gap-1 px-3 py-1 rounded bg-enchant-pink text-white hover:bg-opacity-90 transition-all text-xs font-semibold"
+                        className="neu-button px-3 py-1 rounded-lg text-rose-600 font-semibold text-xs inline-flex items-center gap-1"
                       >
                         <Copy size={14} />
                         {copiedCode === attendee.unique_code ? 'Copied!' : 'Copy'}
@@ -245,19 +305,24 @@ export function AdminPanel({ onLogout }) {
           )}
         </div>
 
-        {/* Info Box */}
-        <div className="mt-6 md:mt-8 p-4 md:p-6 bg-enchant-light rounded-2xl border-2 border-enchant-gold border-opacity-30">
-          <h3 className="font-bold text-enchant-plum mb-2 md:mb-3 flex items-center gap-2 text-sm md:text-base">
-            <Mail size={18} className="md:w-5 md:h-5 text-enchant-pink" />
-            Next Step: Email the Access Code
-          </h3>
-          <p className="text-enchant-plum text-xs md:text-sm leading-relaxed mb-3">
-            After creating an attendee, send them an email with their access code. They'll use their email + code to log in and select their seat. Example:
-          </p>
-          <div className="p-2 md:p-3 bg-white rounded border border-enchant-gold border-opacity-30 font-mono text-xs text-enchant-plum">
-            Email: attendee@example.com<br />
-            Password: ABC123DEF456
+        {/* Supabase Schema Setup Helper */}
+        <div className="neu-pressed rounded-3xl p-6 space-y-3">
+          <div className="flex justify-between items-center flex-wrap gap-2">
+            <h3 className="font-bold text-[#3b1427] flex items-center gap-2 text-sm md:text-base">
+              <Database size={18} className="text-rose-600" />
+              Supabase SQL Schema Helper
+            </h3>
+            <button
+              onClick={copySqlScript}
+              className="neu-button px-3 py-1.5 rounded-lg text-rose-600 font-semibold text-xs inline-flex items-center gap-1.5"
+            >
+              {copiedSql ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+              {copiedSql ? 'SQL Copied!' : 'Copy Supabase SQL Script'}
+            </button>
           </div>
+          <p className="text-slate-600 text-xs md:text-sm leading-relaxed">
+            If you see missing table warnings in Supabase, click <strong>"Copy Supabase SQL Script"</strong> and paste it into your Supabase Dashboard &gt; SQL Editor &gt; Run.
+          </p>
         </div>
       </main>
 

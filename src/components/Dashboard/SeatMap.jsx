@@ -1,4 +1,46 @@
-import React from 'react';
+import React, { memo } from 'react';
+
+const SeatButton = memo(({ seat, index, status, isSelected, onSeatSelect }) => {
+  const angle = (index / 10) * Math.PI * 2;
+  const radiusPct = 36.5;
+  const xPct = Math.cos(angle) * radiusPct;
+  const yPct = Math.sin(angle) * radiusPct;
+
+  const isClickable = status === 'available' || isSelected;
+
+  let classes = 'neu-seat-available font-extrabold cursor-pointer';
+  
+  if (isSelected || status === 'selected') {
+    classes = 'bg-emerald-500 text-white font-extrabold ring-4 ring-emerald-300 scale-125 z-20 shadow-xl shadow-emerald-500/30';
+  } else if (status === 'confirmed') {
+    classes = 'neu-pressed text-pink-600 cursor-not-allowed font-bold opacity-80';
+  } else if (status === 'reserved') {
+    classes = 'neu-pressed text-purple-400 cursor-not-allowed opacity-60';
+  }
+
+  return (
+    <button
+      onClick={() => {
+        if (isSelected) {
+          onSeatSelect(null);
+        } else if (isClickable) {
+          onSeatSelect(seat);
+        }
+      }}
+      style={{
+        position: 'absolute',
+        left: `calc(50% + ${xPct}%)`,
+        top: `calc(50% + ${yPct}%)`,
+        transform: 'translate(-50%, -50%)',
+      }}
+      className={`w-8 xs:w-9 sm:w-11 md:w-12 h-8 xs:h-9 sm:h-11 md:h-12 rounded-xl text-xs sm:text-sm flex items-center justify-center active:scale-95 ${classes}`}
+      disabled={!isClickable && !isSelected}
+      title={`Table ${seat.table_number} • Seat ${seat.seat_number} (${status})`}
+    >
+      {seat.seat_number}
+    </button>
+  );
+});
 
 export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
   // Group seats by table (6 tables × 10 seats)
@@ -14,109 +56,76 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
     return 'available';
   };
 
-  const getSeatColor = (status) => {
-    switch (status) {
-      case 'selected':
-        return 'bg-green-300 hover:bg-green-400 shadow-md border-0';
-      case 'confirmed':
-        return 'bg-enchant-pink bg-opacity-60 cursor-not-allowed border-0';
-      case 'reserved':
-        return 'bg-enchant-lavender bg-opacity-50 cursor-not-allowed border-0';
-      default:
-        return 'bg-white hover:bg-enchant-sage hover:shadow-md border-2 border-enchant-pink';
-    }
-  };
-
   return (
-    <div className="space-y-6 md:space-y-12 py-4 md:py-8">
-      <div className="text-center mb-4 md:mb-8 px-4">
-        <h2 className="text-xl md:text-3xl font-bold text-enchant-plum font-enchant mb-2">
-          Select Your Enchanted Seat
+    <div className="space-y-8 md:space-y-12 py-4 md:py-8">
+      <div className="text-center mb-6 px-4">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-[#3b1427] font-heading mb-2">
+          Select Your Seat
         </h2>
-        <p className="text-enchant-gold text-sm md:text-base">Click a white seat to reserve, then confirm your choice</p>
+        <p className="text-slate-600 text-sm md:text-base font-medium">Click an available seat around the table, then confirm your selection</p>
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap justify-center gap-3 md:gap-6 mb-6 md:mb-8 text-xs md:text-sm px-4">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-white border-2 border-enchant-pink rounded"></div>
-          <span className="text-enchant-plum">Available</span>
+      <div className="flex flex-wrap justify-center gap-4 md:gap-8 mb-8 text-xs md:text-sm px-4">
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 neu-seat-available rounded-lg"></div>
+          <span className="text-[#3b1427] font-semibold">Available</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-green-300 rounded"></div>
-          <span className="text-enchant-plum">Your Selection</span>
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 bg-emerald-500 rounded-lg shadow-sm"></div>
+          <span className="text-[#3b1427] font-semibold">Selected</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-enchant-lavender bg-opacity-50 rounded"></div>
-          <span className="text-enchant-plum">Reserved</span>
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 neu-pressed rounded-lg"></div>
+          <span className="text-[#3b1427] font-semibold">Reserved</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-enchant-pink bg-opacity-60 rounded"></div>
-          <span className="text-enchant-plum">Confirmed</span>
+        <div className="flex items-center gap-2.5">
+          <div className="w-6 h-6 neu-pressed text-pink-600 rounded-lg flex items-center justify-center font-bold text-xs">✓</div>
+          <span className="text-[#3b1427] font-semibold">Confirmed</span>
         </div>
       </div>
 
-      {/* Tables */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 max-w-6xl mx-auto px-2 md:px-4">
+      {/* Tables Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 max-w-6xl mx-auto px-2 md:px-4">
         {[1, 2, 3, 4, 5, 6].map((tableNum) => (
           <div key={tableNum} className="flex flex-col items-center">
-            {/* Table Center */}
-            <div className="relative">
-              {/* Seats Circle - Much larger container to separate seats from table */}
-              <div className="relative w-80 sm:w-96 md:w-[28rem] h-80 sm:h-96 md:h-[28rem] flex items-center justify-center">
-                {/* Table Visual - Keep it small in the center */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="absolute w-56 sm:w-64 md:w-72 h-56 sm:h-64 md:h-72 bg-gradient-to-br from-enchant-gold to-enchant-gold bg-opacity-20 rounded-full border-4 border-dashed border-enchant-gold border-opacity-40 flex items-center justify-center">
-                    <div className="text-center">
-                      <p className="text-enchant-plum font-bold text-lg sm:text-xl md:text-2xl font-enchant">Table {tableNum}</p>
-                      <p className="text-enchant-gold text-xs">Banquet</p>
-                    </div>
-                  </div>
+            {/* Table Container */}
+            <div className="relative w-[300px] xs:w-[350px] sm:w-[400px] md:w-[440px] h-[300px] xs:h-[350px] sm:h-[400px] md:h-[440px] flex items-center justify-center">
+              
+              {/* Table Center Circle */}
+              <div className="absolute w-[50%] h-[50%] neu-circle rounded-full flex items-center justify-center">
+                <div className="text-center p-3">
+                  <p className="text-[#3b1427] font-extrabold text-lg sm:text-xl md:text-2xl font-heading">
+                    Table {tableNum}
+                  </p>
+                  <p className="text-pink-600 font-bold text-xs sm:text-sm mt-0.5">
+                    BSN Banquet
+                  </p>
                 </div>
-
-                {/* Seats positioned in outer circle - Much more radius */}
-                {tableSeats[tableNum].map((seat, index) => {
-                  const angle = (index / 10) * Math.PI * 2;
-                  // Much larger radius to separate from table
-                  const radius = 160;
-                  const x = Math.cos(angle) * radius;
-                  const y = Math.sin(angle) * radius;
-                  const status = getSeatStatus(seat);
-                  const isSelected = selectedSeat?.id === seat.id;
-                  const isClickable = status === 'available' || isSelected;
-
-                  return (
-                    <button
-                      key={seat.id}
-                      onClick={() => {
-                        // Allow deselection if seat is already selected
-                        if (isSelected) {
-                          onSeatSelect(null);
-                        } else if (isClickable) {
-                          onSeatSelect(seat);
-                        }
-                      }}
-                      style={{
-                        position: 'absolute',
-                        left: '50%',
-                        top: '50%',
-                        transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
-                      }}
-                      className={`w-8 sm:w-10 md:w-12 h-8 sm:h-10 md:h-12 rounded-lg font-bold text-xs sm:text-sm font-enchant transition-all duration-200 active:scale-95 ${getSeatColor(status)} ${isClickable ? 'cursor-pointer' : 'cursor-not-allowed'}`}
-                      disabled={!isClickable && !isSelected}
-                      title={`${status === 'confirmed' ? 'Confirmed' : status === 'reserved' ? 'Reserved' : 'Available'}`}
-                    >
-                      {seat.seat_number}
-                    </button>
-                  );
-                })}
               </div>
+
+              {/* Seats positioned circularly */}
+              {tableSeats[tableNum].map((seat, index) => {
+                const status = getSeatStatus(seat);
+                const isSelected = selectedSeat?.id === seat.id;
+
+                return (
+                  <SeatButton
+                    key={seat.id}
+                    seat={seat}
+                    index={index}
+                    status={status}
+                    isSelected={isSelected}
+                    onSeatSelect={onSeatSelect}
+                  />
+                );
+              })}
             </div>
 
-            {/* Table Label */}
-            <p className="mt-4 text-enchant-plum text-xs opacity-70">
+            {/* Table Confirmed Stats */}
+            <div className="mt-3 neu-pressed px-4 py-1.5 rounded-full text-xs text-pink-600 font-bold">
               {tableSeats[tableNum].filter((s) => s.status === 'confirmed').length}/10 Confirmed
-            </p>
+            </div>
           </div>
         ))}
       </div>

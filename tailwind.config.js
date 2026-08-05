@@ -8,37 +8,26 @@ export default {
     extend: {
       colors: {
         enchant: {
-          pink: '#FFB6D9',      // Soft pastel pink
-          lavender: '#E6D4F7',  // Lavender
-          sage: '#C8E6D1',      // Sage green
-          cream: '#FEF9F3',     // Cream
-          plum: '#4A3F5C',      // Deep plum (text)
-          gold: '#F4D8A6',      // Gold sparkle
-          light: '#FAF5F0',     // Light background
+          pink: '#ec4899',      // Hot vibrant pink
+          rose: '#f43f5e',      // Rose accent
+          lavender: '#d946ef',  // Radiant purple/lavender
+          sage: '#10b981',      // Emerald green (selected seat)
+          cream: '#FEF2F6',     // Soft blush cream
+          plum: '#1e293b',      // Deep slate text
+          gold: '#f59e0b',      // Warm gold accent
+          light: '#FFF5F8',     // Light background tint
         },
       },
       fontFamily: {
-        enchant: ['Poppins', 'Quicksand', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', '"Inter"', 'sans-serif'],
+        heading: ['"Plus Jakarta Sans"', 'sans-serif'],
+        enchant: ['"Plus Jakarta Sans"', '"Inter"', 'sans-serif'],
       },
-      animation: {
-        shimmer: 'shimmer 2s infinite',
-        float: 'float 3s ease-in-out infinite',
-        glow: 'glow 2s ease-in-out infinite',
-      },
-      keyframes: {
-        shimmer: {
-          '0%': { opacity: '0.5' },
-          '50%': { opacity: '1' },
-          '100%': { opacity: '0.5' },
-        },
-        float: {
-          '0%, 100%': { transform: 'translateY(0px)' },
-          '50%': { transform: 'translateY(-10px)' },
-        },
-        glow: {
-          '0%, 100%': { boxShadow: '0 0 5px rgba(255, 182, 217, 0.5)' },
-          '50%': { boxShadow: '0 0 20px rgba(255, 182, 217, 0.8)' },
-        },
+      boxShadow: {
+        'pink-soft': '0 10px 25px -5px rgba(236, 72, 153, 0.15), 0 8px 10px -6px rgba(236, 72, 153, 0.1)',
+        'pink-glow': '0 0 20px rgba(236, 72, 153, 0.35)',
+        'neu-card': '10px 10px 25px rgba(236, 72, 153, 0.08), -10px -10px 25px rgba(255, 255, 255, 0.95)',
+        'neu-pressed': 'inset 3px 3px 6px rgba(219, 112, 147, 0.15), inset -3px -3px 6px #ffffff',
       },
     },
   },
