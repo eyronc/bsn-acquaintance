@@ -18,6 +18,7 @@ function App() {
     ) : (
       <StudentLogin
         onLogin={studentLogin}
+        onSwitchToAdmin={() => setShowAdminLogin(true)}
       />
     );
   }

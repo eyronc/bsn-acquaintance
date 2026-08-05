@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { LogIn } from 'lucide-react';
 import { Toast } from '../UI/Toast';
 
-export function StudentLogin({ onLogin }) {
+export function StudentLogin({ onLogin, onSwitchToAdmin }) {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -78,9 +78,19 @@ export function StudentLogin({ onLogin }) {
         </form>
 
         {/* Footer */}
-        <p className="text-center text-enchant-plum text-xs mt-6 opacity-70">
-          Registration not found? Contact the event organizer
-        </p>
+        <div className="space-y-4 mt-6">
+          <p className="text-center text-enchant-plum text-xs opacity-70">
+            Registration not found? Contact the event organizer
+          </p>
+          
+          {/* Admin Login Link */}
+          <button
+            onClick={onSwitchToAdmin}
+            className="w-full py-2 text-center text-enchant-plum font-semibold hover:bg-enchant-light rounded-lg transition-colors text-sm"
+          >
+            🔐 Admin Login
+          </button>
+        </div>
       </div>
 
       {toast && <Toast {...toast} onClose={() => setToast(null)} />}
