@@ -21,6 +21,18 @@ export function StudentLogin({ onLogin, onSwitchToAdmin }) {
     }
   };
 
+  // Dev mode: Skip login
+  const handleDevSkip = () => {
+    const demoUser = { 
+      id: 'dev-user', 
+      fullname: 'Dev Student', 
+      email: 'dev@example.com', 
+      role: 'student' 
+    };
+    localStorage.setItem('bsn_user', JSON.stringify(demoUser));
+    window.location.reload();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-enchant-cream via-enchant-pink via-enchant-lavender to-enchant-sage flex items-center justify-center p-4">
       {/* Decorative background elements */}
@@ -78,7 +90,7 @@ export function StudentLogin({ onLogin, onSwitchToAdmin }) {
         </form>
 
         {/* Footer */}
-        <div className="space-y-4 mt-6">
+        <div className="space-y-3 mt-6">
           <p className="text-center text-enchant-plum text-xs opacity-70">
             Registration not found? Contact the event organizer
           </p>
@@ -89,6 +101,14 @@ export function StudentLogin({ onLogin, onSwitchToAdmin }) {
             className="w-full py-2 text-center text-enchant-plum font-semibold hover:bg-enchant-light rounded-lg transition-colors text-sm"
           >
             🔐 Admin Login
+          </button>
+
+          {/* Dev Skip Button */}
+          <button
+            onClick={handleDevSkip}
+            className="w-full py-2 text-center text-enchant-gold font-semibold hover:bg-enchant-light rounded-lg transition-colors text-xs border border-dashed border-enchant-gold border-opacity-50"
+          >
+            ⚡ Dev: Skip to Dashboard
           </button>
         </div>
       </div>
