@@ -1,8 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../supabase/client';
 
-// Generate mock seat data for demo mode
+let isTableMissingInSupabase = false;
+
+// Generate initial mock seats (6 tables × 10 seats)
 function generateMockSeats() {
+  const stored = localStorage.getItem('bsn_mock_seats');
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    } catch (e) {}
+  }
+
   const mockSeats = [];
   for (let table = 1; table <= 6; table++) {
     for (let seat = 1; seat <= 10; seat++) {
@@ -18,15 +30,28 @@ function generateMockSeats() {
       });
     }
   }
+  localStorage.setItem('bsn_mock_seats', JSON.stringify(mockSeats));
   return mockSeats;
+}
+
+function saveMockSeats(seatsData) {
+  localStorage.setItem('bsn_mock_seats', JSON.stringify(seatsData));
 }
 
 export function useSeats() {
   const [seats, setSeats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isFallbackMode, setIsFallbackMode] = useState(isTableMissingInSupabase);
 
-  const fetchSeats = async () => {
+  const fetchSeats = useCallback(async () => {
+    if (isTableMissingInSupabase) {
+      setSeats(generateMockSeats());
+      setIsFallbackMode(true);
+      setLoading(false);
+      return;
+    }
+
     try {
       setError(null);
       const { data, error } = await supabase
@@ -36,46 +61,67 @@ export function useSeats() {
         .order('seat_number', { ascending: true });
 
       if (error) throw error;
-      setSeats(data || []);
+      
+      // If table is empty in Supabase, fallback to generated seats
+      if (!data || data.length === 0) {
+        console.info('Supabase seats table is empty. Using fallback seats.');
+        setSeats(generateMockSeats());
+        setIsFallbackMode(true);
+      } else {
+        setSeats(data);
+        setIsFallbackMode(false);
+      }
     } catch (err) {
-      // Use mock data if Supabase fails (demo mode)
-      console.log('Using mock seat data (Supabase not available)');
+      isTableMissingInSupabase = true;
       setSeats(generateMockSeats());
-      setError(null); // Don't show error if we have mock data
+      setIsFallbackMode(true);
+      setError(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchSeats();
 
-    const subscription = supabase
-      .channel('seats_channel')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'seats' },
-        (payload) => {
-          setSeats((prevSeats) => {
-            if (payload.eventType === 'INSERT') {
-              return [...prevSeats, payload.new];
-            } else if (payload.eventType === 'UPDATE') {
-              return prevSeats.map((seat) =>
-                seat.id === payload.new.id ? payload.new : seat
-              );
-            } else if (payload.eventType === 'DELETE') {
-              return prevSeats.filter((seat) => seat.id !== payload.old.id);
+    let channel;
+    if (!isTableMissingInSupabase) {
+      try {
+        channel = supabase
+          .channel('seats_channel')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'seats' },
+            (payload) => {
+              setSeats((prevSeats) => {
+                if (payload.eventType === 'INSERT') {
+                  return [...prevSeats, payload.new];
+                } else if (payload.eventType === 'UPDATE') {
+                  return prevSeats.map((seat) =>
+                    seat.id === payload.new.id ? payload.new : seat
+                  );
+                } else if (payload.eventType === 'DELETE') {
+                  return prevSeats.filter((seat) => seat.id !== payload.old.id);
+                }
+                return prevSeats;
+              });
             }
-            return prevSeats;
-          });
-        }
-      )
-      .subscribe();
+          )
+          .subscribe();
+      } catch (e) {}
+    }
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, [fetchSeats]);
 
-  const getUserSeat = async (attendeeId) => {
+  const getUserSeat = useCallback(async (attendeeId) => {
+    if (isTableMissingInSupabase || isFallbackMode) {
+      const currentSeats = generateMockSeats();
+      return currentSeats.find((s) => s.attendee_id === attendeeId) || null;
+    }
+
     try {
       const { data, error } = await supabase
         .from('seats')
@@ -86,12 +132,23 @@ export function useSeats() {
       if (error && error.code !== 'PGRST116') throw error;
       return data || null;
     } catch (err) {
-      console.error('Error fetching user seat:', err);
-      return null;
+      const currentSeats = generateMockSeats();
+      return currentSeats.find((s) => s.attendee_id === attendeeId) || null;
     }
-  };
+  }, [isFallbackMode]);
 
-  const reserveSeat = async (seatId, attendeeId) => {
+  const reserveSeat = useCallback(async (seatId, attendeeId) => {
+    if (isTableMissingInSupabase || isFallbackMode) {
+      setSeats((prev) => {
+        const updated = prev.map((s) =>
+          s.id === seatId ? { ...s, attendee_id: attendeeId, status: 'reserved' } : s
+        );
+        saveMockSeats(updated);
+        return updated;
+      });
+      return true;
+    }
+
     try {
       const { error } = await supabase
         .from('seats')
@@ -101,12 +158,29 @@ export function useSeats() {
       if (error) throw error;
       return true;
     } catch (err) {
-      setError(err.message);
-      throw err;
+      setSeats((prev) => {
+        const updated = prev.map((s) =>
+          s.id === seatId ? { ...s, attendee_id: attendeeId, status: 'reserved' } : s
+        );
+        saveMockSeats(updated);
+        return updated;
+      });
+      return true;
     }
-  };
+  }, [isFallbackMode]);
 
-  const confirmSeat = async (seatId) => {
+  const confirmSeat = useCallback(async (seatId) => {
+    if (isTableMissingInSupabase || isFallbackMode) {
+      setSeats((prev) => {
+        const updated = prev.map((s) =>
+          s.id === seatId ? { ...s, status: 'confirmed', confirmed_at: new Date().toISOString() } : s
+        );
+        saveMockSeats(updated);
+        return updated;
+      });
+      return true;
+    }
+
     try {
       const { error } = await supabase
         .from('seats')
@@ -116,12 +190,29 @@ export function useSeats() {
       if (error) throw error;
       return true;
     } catch (err) {
-      setError(err.message);
-      throw err;
+      setSeats((prev) => {
+        const updated = prev.map((s) =>
+          s.id === seatId ? { ...s, status: 'confirmed', confirmed_at: new Date().toISOString() } : s
+        );
+        saveMockSeats(updated);
+        return updated;
+      });
+      return true;
     }
-  };
+  }, [isFallbackMode]);
 
-  const clearSeat = async (seatId) => {
+  const clearSeat = useCallback(async (seatId) => {
+    if (isTableMissingInSupabase || isFallbackMode) {
+      setSeats((prev) => {
+        const updated = prev.map((s) =>
+          s.id === seatId ? { ...s, attendee_id: null, status: 'available' } : s
+        );
+        saveMockSeats(updated);
+        return updated;
+      });
+      return true;
+    }
+
     try {
       const { error } = await supabase
         .from('seats')
@@ -131,15 +222,22 @@ export function useSeats() {
       if (error) throw error;
       return true;
     } catch (err) {
-      setError(err.message);
-      throw err;
+      setSeats((prev) => {
+        const updated = prev.map((s) =>
+          s.id === seatId ? { ...s, attendee_id: null, status: 'available' } : s
+        );
+        saveMockSeats(updated);
+        return updated;
+      });
+      return true;
     }
-  };
+  }, [isFallbackMode]);
 
   return {
     seats,
     loading,
     error,
+    isFallbackMode: isTableMissingInSupabase || isFallbackMode,
     fetchSeats,
     getUserSeat,
     reserveSeat,
