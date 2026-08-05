@@ -21,6 +21,18 @@ export function AdminLogin({ onLogin, onSwitchToStudent }) {
     }
   };
 
+  // Dev mode: Skip admin login
+  const handleDevSkip = () => {
+    const adminUser = { 
+      id: 'dev-admin', 
+      fullname: 'Dev Admin', 
+      email: 'dev-admin@example.com', 
+      role: 'admin' 
+    };
+    localStorage.setItem('bsn_user', JSON.stringify(adminUser));
+    window.location.reload();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-enchant-cream via-enchant-pink via-enchant-lavender to-enchant-sage flex items-center justify-center p-4">
       {/* Decorative background elements */}
@@ -67,6 +79,14 @@ export function AdminLogin({ onLogin, onSwitchToStudent }) {
           className="w-full mt-4 py-2 text-enchant-plum font-semibold hover:bg-enchant-light rounded-lg transition-colors"
         >
           Student Login Instead →
+        </button>
+
+        {/* Dev Skip Button */}
+        <button
+          onClick={handleDevSkip}
+          className="w-full mt-3 py-2 text-center text-enchant-gold font-semibold hover:bg-enchant-light rounded-lg transition-colors text-xs border border-dashed border-enchant-gold border-opacity-50"
+        >
+          ⚡ Dev: Skip to Admin Panel
         </button>
       </div>
 
