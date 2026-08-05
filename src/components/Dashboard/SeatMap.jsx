@@ -31,7 +31,7 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
     <div className="space-y-6 md:space-y-12 py-4 md:py-8">
       <div className="text-center mb-4 md:mb-8 px-4">
         <h2 className="text-xl md:text-3xl font-bold text-enchant-plum font-enchant mb-2">
-          ✨ Select Your Enchanted Seat ✨
+          Select Your Enchanted Seat
         </h2>
         <p className="text-enchant-gold text-sm md:text-base">Click a white seat to reserve, then confirm your choice</p>
       </div>
@@ -75,12 +75,8 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
                 {/* Seats positioned in circle */}
                 {tableSeats[tableNum].map((seat, index) => {
                   const angle = (index / 10) * Math.PI * 2;
-                  // Responsive radius based on screen size
-                  const radiusMobile = 75;
-                  const radiusTablet = 90;
-                  const radiusDesktop = 110;
-                  // Use appropriate radius (adjust via CSS media query simulation)
-                  const radius = radiusDesktop;
+                  // Radius larger to place seats OUTSIDE the circle visual
+                  const radius = 140;
                   const x = Math.cos(angle) * radius;
                   const y = Math.sin(angle) * radius;
                   const status = getSeatStatus(seat);

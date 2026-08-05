@@ -24,6 +24,7 @@ export function ConfirmModal({ isOpen, seat, onConfirm, onCancel, loading }) {
           disabled: !agreed || loading,
         },
       ]}
+      sticky={true}
     >
       {/* Seat Info */}
       <div className="mb-4 md:mb-6 p-3 md:p-4 bg-enchant-light rounded-lg border-2 border-enchant-gold border-opacity-30">
@@ -37,7 +38,7 @@ export function ConfirmModal({ isOpen, seat, onConfirm, onCancel, loading }) {
       <div className="mb-4 md:mb-6 p-3 md:p-4 bg-yellow-50 rounded-lg border-2 border-yellow-200 flex gap-2 md:gap-3">
         <AlertCircle className="text-yellow-600 flex-shrink-0 mt-0.5 md:mt-1" size={18} className="md:w-5 md:h-5" />
         <div>
-          <p className="font-semibold text-yellow-900 mb-1 md:mb-2 text-sm md:text-base">Important ⚠️</p>
+          <p className="font-semibold text-yellow-900 mb-1 md:mb-2 text-sm md:text-base">Important</p>
           <p className="text-xs md:text-sm text-yellow-800 leading-relaxed">
             Once you confirm this seat, <strong>you cannot change it</strong>. This selection is final for the event.
             Please make sure you're happy with this choice before confirming.
@@ -62,7 +63,7 @@ export function ConfirmModal({ isOpen, seat, onConfirm, onCancel, loading }) {
       {agreed && (
         <div className="mt-4 p-3 bg-green-50 rounded-lg border-2 border-green-200 flex items-center gap-2">
           <Check size={18} className="text-green-600" />
-          <p className="text-sm text-green-700">Ready to confirm! 🎉</p>
+          <p className="text-sm text-green-700">Ready to confirm!</p>
         </div>
       )}
     </Modal>

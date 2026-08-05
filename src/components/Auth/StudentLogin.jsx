@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { LogIn } from 'lucide-react';
 import { Toast } from '../UI/Toast';
 
-export function StudentLogin({ onLogin, onSwitchToAdmin }) {
+export function StudentLogin({ onLogin }) {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -43,7 +43,7 @@ export function StudentLogin({ onLogin, onSwitchToAdmin }) {
         {/* Header */}
         <div className="text-center mb-6 md:mb-8">
           <h1 className="text-2xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-enchant-pink to-enchant-lavender font-enchant mb-1 md:mb-2">
-            ✨ BSN 2026 ✨
+            BSN 2026
           </h1>
           <p className="text-enchant-plum text-base md:text-lg font-semibold">Acquaintance Party</p>
           <p className="text-enchant-gold text-xs md:text-sm mt-2">Login to Reserve Your Seat</p>
@@ -82,10 +82,10 @@ export function StudentLogin({ onLogin, onSwitchToAdmin }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-6 py-3 bg-gradient-to-r from-enchant-pink to-enchant-lavender text-white font-bold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group"
+            className="w-full mt-6 py-3 bg-gradient-to-r from-enchant-pink to-enchant-lavender text-white font-bold rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            <LogIn size={20} className="group-hover:translate-x-1 transition-transform" />
-            {loading ? 'Logging in...' : 'Enter the Magic'}
+            <LogIn size={20} />
+            {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
@@ -94,21 +94,13 @@ export function StudentLogin({ onLogin, onSwitchToAdmin }) {
           <p className="text-center text-enchant-plum text-xs opacity-70">
             Registration not found? Contact the event organizer
           </p>
-          
-          {/* Admin Login Link */}
-          <button
-            onClick={onSwitchToAdmin}
-            className="w-full py-2 text-center text-enchant-plum font-semibold hover:bg-enchant-light rounded-lg transition-colors text-sm"
-          >
-            🔐 Admin Login
-          </button>
 
           {/* Dev Skip Button */}
           <button
             onClick={handleDevSkip}
             className="w-full py-2 text-center text-enchant-gold font-semibold hover:bg-enchant-light rounded-lg transition-colors text-xs border border-dashed border-enchant-gold border-opacity-50"
           >
-            ⚡ Dev: Skip to Dashboard
+            Dev: Skip to Dashboard
           </button>
         </div>
       </div>

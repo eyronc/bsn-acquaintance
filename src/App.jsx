@@ -7,10 +7,12 @@ import { AdminPanel } from './components/Admin/AdminPanel';
 
 function App() {
   const { user, isAuthenticated, isAdmin, studentLogin, adminLogin, logout } = useAuth();
-  const [showAdminLogin, setShowAdminLogin] = useState(false);
   
   // Demo mode: Show dashboard directly (toggle to false to see login)
   const DEMO_MODE = false;
+
+  // Check if user is trying to access /admin route
+  const isAdminRoute = window.location.pathname === '/admin';
 
   if (DEMO_MODE) {
     return <StudentDashboard 
@@ -19,18 +21,18 @@ function App() {
     />;
   }
 
-  if (!isAuthenticated) {
-    return showAdminLogin ? (
+  // Show admin login if /admin route and not authenticated
+  if (isAdminRoute && !isAuthenticated) {
+    return (
       <AdminLogin
         onLogin={adminLogin}
-        onSwitchToStudent={() => setShowAdminLogin(false)}
-      />
-    ) : (
-      <StudentLogin
-        onLogin={studentLogin}
-        onSwitchToAdmin={() => setShowAdminLogin(true)}
+        onBackToStudent={() => window.location.pathname = '/'}
       />
     );
+  }
+
+  if (!isAuthenticated) {
+    return <StudentLogin onLogin={studentLogin} />;
   }
 
   if (isAdmin) {

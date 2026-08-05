@@ -82,7 +82,7 @@ export function StudentDashboard({ user, onLogout }) {
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center gap-4">
           <div className="min-w-0 flex-1">
             <h1 className="text-xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-enchant-pink to-enchant-lavender font-enchant truncate">
-              ✨ BSN 2026 ✨
+              BSN 2026
             </h1>
             <p className="text-enchant-gold text-xs md:text-sm truncate">Welcome, {user.fullname}!</p>
           </div>

@@ -90,7 +90,7 @@ export function AdminPanel({ onLogout }) {
       <header className="bg-white bg-opacity-90 backdrop-blur border-b border-enchant-gold border-opacity-30 sticky top-0 z-40 shadow-md">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center gap-4">
           <div className="min-w-0">
-            <h1 className="text-xl md:text-3xl font-bold text-enchant-plum font-enchant truncate">🔐 Admin Panel</h1>
+            <h1 className="text-xl md:text-3xl font-bold text-enchant-plum font-enchant truncate">Admin Panel</h1>
             <p className="text-enchant-gold text-xs md:text-sm truncate">BSN Acquaintance Party 2026</p>
           </div>
 
