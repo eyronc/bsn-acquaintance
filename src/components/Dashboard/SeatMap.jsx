@@ -17,7 +17,7 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
   const getSeatColor = (status) => {
     switch (status) {
       case 'selected':
-        return 'bg-emerald-400 hover:bg-emerald-500 shadow-lg';
+        return 'bg-green-300 hover:bg-green-400 shadow-md';
       case 'confirmed':
         return 'bg-enchant-pink bg-opacity-60 cursor-not-allowed';
       case 'reserved':
@@ -43,7 +43,7 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
           <span className="text-enchant-plum">Available</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 bg-emerald-400 rounded"></div>
+          <div className="w-6 h-6 bg-green-300 rounded"></div>
           <span className="text-enchant-plum">Your Selection</span>
         </div>
         <div className="flex items-center gap-2">
@@ -98,7 +98,7 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
                       className={`w-8 sm:w-10 md:w-12 h-8 sm:h-10 md:h-12 rounded-lg font-bold text-xs sm:text-sm font-enchant border-2 border-enchant-pink transition-all duration-300 active:scale-95 ${
                         getSeatColor(status)
                       } ${
-                        isSelected ? 'ring-2 sm:ring-4 ring-enchant-pink ring-opacity-60 scale-110' : ''
+                        isSelected ? 'ring-4 ring-green-400 ring-offset-2 scale-110 shadow-lg' : ''
                       } ${isClickable ? 'cursor-pointer' : 'cursor-not-allowed'} ${
                         status === 'available' ? 'hover:scale-110 hover:shadow-lg' : ''
                       }`}
