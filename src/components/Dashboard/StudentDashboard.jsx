@@ -140,11 +140,11 @@ export function StudentDashboard({ user, onLogout }) {
         )}
       </main>
 
-      {/* Sticky "Choose this seat" button - top right below header */}
+      {/* Sticky "Choose this seat" button - top right with gap from header */}
       {selectedSeat && !isConfirmed && (
         <button
           onClick={() => setShowConfirmModal(true)}
-          className="fixed top-[70px] md:top-[90px] right-4 z-30 px-6 py-3 bg-gradient-to-r from-enchant-pink to-enchant-lavender text-white font-bold rounded-lg hover:shadow-xl transition-all shadow-lg text-sm md:text-base animate-in fade-in slide-in-from-top-2 duration-300"
+          className="fixed top-[85px] md:top-[110px] right-4 z-30 px-6 py-3 bg-gradient-to-r from-enchant-pink to-enchant-lavender text-white font-bold rounded-lg hover:shadow-lg transition-all duration-200 shadow-md text-sm md:text-base animate-in fade-in slide-in-from-top-2 duration-300"
         >
           Choose This Seat
         </button>

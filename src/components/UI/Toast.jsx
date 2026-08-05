@@ -23,11 +23,14 @@ export function Toast({ message, type = 'success', onClose, duration = 3000 }) {
 
   return (
     <div
-      className={`fixed bottom-6 right-6 flex items-center gap-3 px-4 py-3 rounded-lg border ${bgColors[type]} shadow-lg animate-float z-50`}
+      className={`fixed bottom-6 right-6 flex items-center gap-3 px-4 py-3 rounded-lg border ${bgColors[type]} shadow-lg animate-toast-enter z-50`}
     >
       {icons[type]}
-      <span className="text-enchant-plum font-medium">{message}</span>
-      <button onClick={onClose} className="ml-2 hover:opacity-70">
+      <span className="text-enchant-plum font-medium text-sm">{message}</span>
+      <button 
+        onClick={onClose} 
+        className="ml-2 hover:opacity-70 transition-opacity flex-shrink-0"
+      >
         <X size={16} />
       </button>
     </div>

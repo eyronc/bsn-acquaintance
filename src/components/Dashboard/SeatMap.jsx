@@ -17,13 +17,13 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
   const getSeatColor = (status) => {
     switch (status) {
       case 'selected':
-        return 'bg-green-300 hover:bg-green-400 shadow-md';
+        return 'bg-green-300 hover:bg-green-400 shadow-md border-0';
       case 'confirmed':
-        return 'bg-enchant-pink bg-opacity-60 cursor-not-allowed';
+        return 'bg-enchant-pink bg-opacity-60 cursor-not-allowed border-0';
       case 'reserved':
-        return 'bg-enchant-lavender bg-opacity-50 cursor-not-allowed';
+        return 'bg-enchant-lavender bg-opacity-50 cursor-not-allowed border-0';
       default:
-        return 'bg-white hover:bg-enchant-sage hover:shadow-md';
+        return 'bg-white hover:bg-enchant-sage hover:shadow-md border-2 border-enchant-pink';
     }
   };
 
@@ -88,21 +88,22 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
                   return (
                     <button
                       key={seat.id}
-                      onClick={() => isClickable && onSeatSelect(seat)}
+                      onClick={() => {
+                        // Allow deselection if seat is already selected
+                        if (isSelected) {
+                          onSeatSelect(null);
+                        } else if (isClickable) {
+                          onSeatSelect(seat);
+                        }
+                      }}
                       style={{
                         position: 'absolute',
                         left: '50%',
                         top: '50%',
                         transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
                       }}
-                      className={`w-8 sm:w-10 md:w-12 h-8 sm:h-10 md:h-12 rounded-lg font-bold text-xs sm:text-sm font-enchant border-2 border-enchant-pink transition-all duration-300 active:scale-95 ${
-                        getSeatColor(status)
-                      } ${
-                        isSelected ? 'ring-4 ring-green-400 ring-offset-2 scale-110 shadow-lg' : ''
-                      } ${isClickable ? 'cursor-pointer' : 'cursor-not-allowed'} ${
-                        status === 'available' ? 'hover:scale-110 hover:shadow-lg' : ''
-                      }`}
-                      disabled={!isClickable}
+                      className={`w-8 sm:w-10 md:w-12 h-8 sm:h-10 md:h-12 rounded-lg font-bold text-xs sm:text-sm font-enchant transition-all duration-200 active:scale-95 ${getSeatColor(status)} ${isClickable ? 'cursor-pointer' : 'cursor-not-allowed'}`}
+                      disabled={!isClickable && !isSelected}
                       title={`${status === 'confirmed' ? 'Confirmed' : status === 'reserved' ? 'Reserved' : 'Available'}`}
                     >
                       {seat.seat_number}
