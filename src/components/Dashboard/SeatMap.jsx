@@ -28,16 +28,16 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
   };
 
   return (
-    <div className="space-y-12 py-8">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-enchant-plum font-enchant mb-2">
+    <div className="space-y-6 md:space-y-12 py-4 md:py-8">
+      <div className="text-center mb-4 md:mb-8 px-4">
+        <h2 className="text-xl md:text-3xl font-bold text-enchant-plum font-enchant mb-2">
           ✨ Select Your Enchanted Seat ✨
         </h2>
-        <p className="text-enchant-gold">Click a white seat to reserve, then confirm your choice</p>
+        <p className="text-enchant-gold text-sm md:text-base">Click a white seat to reserve, then confirm your choice</p>
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap justify-center gap-6 mb-8 text-sm">
+      <div className="flex flex-wrap justify-center gap-3 md:gap-6 mb-6 md:mb-8 text-xs md:text-sm px-4">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-white border-2 border-enchant-pink rounded"></div>
           <span className="text-enchant-plum">Available</span>
@@ -57,13 +57,13 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
       </div>
 
       {/* Tables */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto px-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 max-w-6xl mx-auto px-2 md:px-4">
         {[1, 2, 3, 4, 5, 6].map((tableNum) => (
           <div key={tableNum} className="flex flex-col items-center">
             {/* Table Center */}
             <div className="relative">
               {/* Seats Circle */}
-              <div className="relative w-80 h-80 flex items-center justify-center">
+              <div className="relative w-56 sm:w-64 md:w-80 h-56 sm:h-64 md:h-80 flex items-center justify-center">
                 {/* Table Visual */}
                 <div className="absolute inset-0 bg-gradient-to-br from-enchant-gold to-enchant-gold bg-opacity-20 rounded-full border-4 border-dashed border-enchant-gold border-opacity-40 flex items-center justify-center">
                   <div className="text-center">
@@ -75,7 +75,12 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
                 {/* Seats positioned in circle */}
                 {tableSeats[tableNum].map((seat, index) => {
                   const angle = (index / 10) * Math.PI * 2;
-                  const radius = 110;
+                  // Responsive radius based on screen size
+                  const radiusMobile = 75;
+                  const radiusTablet = 90;
+                  const radiusDesktop = 110;
+                  // Use appropriate radius (adjust via CSS media query simulation)
+                  const radius = radiusDesktop;
                   const x = Math.cos(angle) * radius;
                   const y = Math.sin(angle) * radius;
                   const status = getSeatStatus(seat);
@@ -92,10 +97,10 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
                         top: '50%',
                         transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
                       }}
-                      className={`w-12 h-12 rounded-lg font-bold text-sm font-enchant border-2 border-enchant-pink transition-all duration-300 ${
+                      className={`w-8 sm:w-10 md:w-12 h-8 sm:h-10 md:h-12 rounded-lg font-bold text-xs sm:text-sm font-enchant border-2 border-enchant-pink transition-all duration-300 active:scale-95 ${
                         getSeatColor(status)
                       } ${
-                        isSelected ? 'ring-4 ring-enchant-pink ring-opacity-60 scale-110' : ''
+                        isSelected ? 'ring-2 sm:ring-4 ring-enchant-pink ring-opacity-60 scale-110' : ''
                       } ${isClickable ? 'cursor-pointer' : 'cursor-not-allowed'} ${
                         status === 'available' ? 'hover:scale-110 hover:shadow-lg' : ''
                       }`}

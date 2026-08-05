@@ -26,19 +26,19 @@ export function ConfirmModal({ isOpen, seat, onConfirm, onCancel, loading }) {
       ]}
     >
       {/* Seat Info */}
-      <div className="mb-6 p-4 bg-enchant-light rounded-lg border-2 border-enchant-gold border-opacity-30">
-        <p className="text-enchant-plum font-semibold mb-2">Your Selected Seat:</p>
-        <p className="text-2xl font-bold text-enchant-pink font-enchant">
+      <div className="mb-4 md:mb-6 p-3 md:p-4 bg-enchant-light rounded-lg border-2 border-enchant-gold border-opacity-30">
+        <p className="text-enchant-plum font-semibold mb-1 md:mb-2 text-sm md:text-base">Your Selected Seat:</p>
+        <p className="text-lg md:text-2xl font-bold text-enchant-pink font-enchant">
           Table {seat?.table_number} • Seat {seat?.seat_number}
         </p>
       </div>
 
       {/* Caution Warning */}
-      <div className="mb-6 p-4 bg-yellow-50 rounded-lg border-2 border-yellow-200 flex gap-3">
-        <AlertCircle className="text-yellow-600 flex-shrink-0 mt-1" size={20} />
+      <div className="mb-4 md:mb-6 p-3 md:p-4 bg-yellow-50 rounded-lg border-2 border-yellow-200 flex gap-2 md:gap-3">
+        <AlertCircle className="text-yellow-600 flex-shrink-0 mt-0.5 md:mt-1" size={18} className="md:w-5 md:h-5" />
         <div>
-          <p className="font-semibold text-yellow-900 mb-2">Important ⚠️</p>
-          <p className="text-sm text-yellow-800 leading-relaxed">
+          <p className="font-semibold text-yellow-900 mb-1 md:mb-2 text-sm md:text-base">Important ⚠️</p>
+          <p className="text-xs md:text-sm text-yellow-800 leading-relaxed">
             Once you confirm this seat, <strong>you cannot change it</strong>. This selection is final for the event.
             Please make sure you're happy with this choice before confirming.
           </p>
@@ -46,14 +46,14 @@ export function ConfirmModal({ isOpen, seat, onConfirm, onCancel, loading }) {
       </div>
 
       {/* Acknowledgment Checkbox */}
-      <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg hover:bg-enchant-light transition-colors">
+      <label className="flex items-start gap-2 md:gap-3 cursor-pointer p-2 md:p-3 rounded-lg hover:bg-enchant-light transition-colors">
         <input
           type="checkbox"
           checked={agreed}
           onChange={(e) => setAgreed(e.target.checked)}
-          className="mt-1 w-5 h-5 rounded accent-enchant-pink cursor-pointer"
+          className="mt-1 w-4 md:w-5 h-4 md:h-5 rounded accent-enchant-pink cursor-pointer flex-shrink-0"
         />
-        <span className="text-sm text-enchant-plum leading-relaxed">
+        <span className="text-xs md:text-sm text-enchant-plum leading-relaxed">
           I understand that this seat selection is <strong>final and cannot be changed</strong> after confirmation.
         </span>
       </label>

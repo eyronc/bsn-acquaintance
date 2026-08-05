@@ -79,20 +79,21 @@ export function StudentDashboard({ user, onLogout }) {
     <div className="min-h-screen bg-gradient-to-br from-enchant-cream via-enchant-pink via-enchant-lavender to-enchant-sage">
       {/* Header */}
       <header className="bg-white bg-opacity-90 backdrop-blur border-b border-enchant-gold border-opacity-30 sticky top-0 z-40 shadow-md">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-enchant-pink to-enchant-lavender font-enchant">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex justify-between items-center gap-4">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-enchant-pink to-enchant-lavender font-enchant truncate">
               ✨ BSN 2026 ✨
             </h1>
-            <p className="text-enchant-gold text-sm">Welcome, {user.fullname}!</p>
+            <p className="text-enchant-gold text-xs md:text-sm truncate">Welcome, {user.fullname}!</p>
           </div>
 
           <button
             onClick={onLogout}
-            className="flex items-center gap-2 px-4 py-2 bg-enchant-pink text-white rounded-lg hover:bg-opacity-90 transition-all font-semibold"
+            className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 bg-enchant-pink text-white rounded-lg hover:bg-opacity-90 transition-all font-semibold text-sm md:text-base whitespace-nowrap"
           >
-            <LogOut size={18} />
-            Logout
+            <LogOut size={16} className="md:w-[18px]" />
+            <span className="hidden sm:inline">Logout</span>
+            <span className="sm:hidden">Log</span>
           </button>
         </div>
       </header>

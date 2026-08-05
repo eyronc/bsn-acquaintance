@@ -34,19 +34,19 @@ export function StudentLogin({ onLogin, onSwitchToAdmin }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-enchant-cream via-enchant-pink via-enchant-lavender to-enchant-sage flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-enchant-cream via-enchant-pink via-enchant-lavender to-enchant-sage flex items-center justify-center p-4 md:p-6">
       {/* Decorative background elements */}
-      <div className="absolute top-10 left-10 w-20 h-20 bg-enchant-gold opacity-20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 right-20 w-32 h-32 bg-enchant-pink opacity-15 rounded-full blur-3xl"></div>
+      <div className="absolute top-5 md:top-10 left-5 md:left-10 w-16 md:w-20 h-16 md:h-20 bg-enchant-gold opacity-20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-10 md:bottom-20 right-5 md:right-20 w-24 md:w-32 h-24 md:h-32 bg-enchant-pink opacity-15 rounded-full blur-3xl"></div>
 
-      <div className="bg-white bg-opacity-95 backdrop-blur rounded-3xl shadow-2xl p-8 max-w-md w-full border border-enchant-gold border-opacity-30">
+      <div className="bg-white bg-opacity-95 backdrop-blur rounded-2xl md:rounded-3xl shadow-2xl p-6 md:p-8 w-full max-w-md border border-enchant-gold border-opacity-30">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-enchant-pink to-enchant-lavender font-enchant mb-2">
+        <div className="text-center mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-enchant-pink to-enchant-lavender font-enchant mb-1 md:mb-2">
             ✨ BSN 2026 ✨
           </h1>
-          <p className="text-enchant-plum text-lg font-semibold">Acquaintance Party</p>
-          <p className="text-enchant-gold text-sm mt-2">Login to Reserve Your Seat</p>
+          <p className="text-enchant-plum text-base md:text-lg font-semibold">Acquaintance Party</p>
+          <p className="text-enchant-gold text-xs md:text-sm mt-2">Login to Reserve Your Seat</p>
         </div>
 
         {/* Form */}
