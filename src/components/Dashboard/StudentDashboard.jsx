@@ -35,11 +35,18 @@ export function StudentDashboard({ user, onLogout }) {
     }
 
     setSelectedSeat(seat);
+    // Auto-open confirm modal when seat is selected
+    setShowConfirmModal(true);
+    
+    // Scroll modal into view
+    setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }, 100);
 
     // Auto-reserve the seat
     try {
       await reserveSeat(seat.id, user.id);
-      setToast({ message: 'Seat reserved! Click "Confirm" to finalize.', type: 'info' });
+      setToast({ message: 'Seat reserved! Confirm to finalize.', type: 'info' });
     } catch (err) {
       setToast({ message: 'Failed to reserve seat', type: 'error' });
     }
@@ -52,7 +59,7 @@ export function StudentDashboard({ user, onLogout }) {
       setUserSeat({ ...selectedSeat, status: 'confirmed' });
       setShowConfirmModal(false);
       setToast({
-        message: '🎉 Your seat is confirmed! See you at the party!',
+        message: 'Your seat is confirmed! See you at the party!',
         type: 'success',
       });
     } catch (err) {
@@ -110,7 +117,6 @@ export function StudentDashboard({ user, onLogout }) {
           // Confirmed State
           <div className="text-center space-y-6">
             <div className="p-8 bg-white bg-opacity-90 rounded-3xl border-4 border-dashed border-enchant-gold shadow-lg">
-              <div className="text-6xl mb-4">🎉</div>
               <h2 className="text-4xl font-bold text-enchant-pink font-enchant mb-4">
                 Your Seat is Confirmed!
               </h2>
@@ -121,7 +127,7 @@ export function StudentDashboard({ user, onLogout }) {
                 </p>
               </div>
               <p className="text-enchant-gold text-lg">
-                See you at the BSN Acquaintance Party 2026! ✨
+                See you at the BSN Acquaintance Party 2026!
               </p>
             </div>
 
@@ -137,18 +143,6 @@ export function StudentDashboard({ user, onLogout }) {
               onSeatSelect={handleSeatSelect}
               userSeat={userSeat}
             />
-
-            {/* Confirm Button */}
-            {selectedSeat && (
-              <div className="flex justify-center mt-12">
-                <button
-                  onClick={() => setShowConfirmModal(true)}
-                  className="px-8 py-4 bg-gradient-to-r from-enchant-pink to-enchant-lavender text-white font-bold rounded-xl hover:shadow-xl transition-all text-lg"
-                >
-                  Confirm This Seat
-                </button>
-              </div>
-            )}
           </>
         )}
       </main>

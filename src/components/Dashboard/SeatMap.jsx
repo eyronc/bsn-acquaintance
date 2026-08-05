@@ -62,21 +62,23 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
           <div key={tableNum} className="flex flex-col items-center">
             {/* Table Center */}
             <div className="relative">
-              {/* Seats Circle */}
-              <div className="relative w-56 sm:w-64 md:w-80 h-56 sm:h-64 md:h-80 flex items-center justify-center">
-                {/* Table Visual */}
-                <div className="absolute inset-0 bg-gradient-to-br from-enchant-gold to-enchant-gold bg-opacity-20 rounded-full border-4 border-dashed border-enchant-gold border-opacity-40 flex items-center justify-center">
-                  <div className="text-center">
-                    <p className="text-enchant-plum font-bold text-xl font-enchant">Table {tableNum}</p>
-                    <p className="text-enchant-gold text-xs">Banquet</p>
+              {/* Seats Circle - Much larger container to separate seats from table */}
+              <div className="relative w-80 sm:w-96 md:w-[28rem] h-80 sm:h-96 md:h-[28rem] flex items-center justify-center">
+                {/* Table Visual - Keep it small in the center */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="absolute w-56 sm:w-64 md:w-72 h-56 sm:h-64 md:h-72 bg-gradient-to-br from-enchant-gold to-enchant-gold bg-opacity-20 rounded-full border-4 border-dashed border-enchant-gold border-opacity-40 flex items-center justify-center">
+                    <div className="text-center">
+                      <p className="text-enchant-plum font-bold text-lg sm:text-xl md:text-2xl font-enchant">Table {tableNum}</p>
+                      <p className="text-enchant-gold text-xs">Banquet</p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Seats positioned in circle */}
+                {/* Seats positioned in outer circle - Much more radius */}
                 {tableSeats[tableNum].map((seat, index) => {
                   const angle = (index / 10) * Math.PI * 2;
-                  // Radius larger to place seats OUTSIDE the circle visual
-                  const radius = 140;
+                  // Much larger radius to separate from table
+                  const radius = 160;
                   const x = Math.cos(angle) * radius;
                   const y = Math.sin(angle) * radius;
                   const status = getSeatStatus(seat);
