@@ -35,18 +35,11 @@ export function StudentDashboard({ user, onLogout }) {
     }
 
     setSelectedSeat(seat);
-    // Auto-open confirm modal when seat is selected
-    setShowConfirmModal(true);
-    
-    // Scroll modal into view
-    setTimeout(() => {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }, 100);
 
     // Auto-reserve the seat
     try {
       await reserveSeat(seat.id, user.id);
-      setToast({ message: 'Seat reserved! Confirm to finalize.', type: 'info' });
+      setToast({ message: 'Seat reserved! Click "Choose this seat" to confirm.', type: 'info' });
     } catch (err) {
       setToast({ message: 'Failed to reserve seat', type: 'error' });
     }
@@ -146,6 +139,18 @@ export function StudentDashboard({ user, onLogout }) {
           </>
         )}
       </main>
+
+      {/* Sticky "Choose this seat" button - appears when seat selected */}
+      {selectedSeat && !isConfirmed && (
+        <div className="fixed top-4 right-4 z-40 animate-in fade-in slide-in-from-top-2 duration-300">
+          <button
+            onClick={() => setShowConfirmModal(true)}
+            className="px-6 py-3 bg-gradient-to-r from-enchant-pink to-enchant-lavender text-white font-bold rounded-lg hover:shadow-xl transition-all shadow-lg text-sm md:text-base whitespace-nowrap"
+          >
+            Choose This Seat
+          </button>
+        </div>
+      )}
 
       {/* Confirmation Modal */}
       <ConfirmModal

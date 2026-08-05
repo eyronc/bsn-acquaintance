@@ -24,7 +24,6 @@ export function ConfirmModal({ isOpen, seat, onConfirm, onCancel, loading }) {
           disabled: !agreed || loading,
         },
       ]}
-      sticky={true}
     >
       {/* Seat Info */}
       <div className="mb-4 md:mb-6 p-3 md:p-4 bg-enchant-light rounded-lg border-2 border-enchant-gold border-opacity-30">
