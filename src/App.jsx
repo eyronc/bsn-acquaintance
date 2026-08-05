@@ -8,6 +8,16 @@ import { AdminPanel } from './components/Admin/AdminPanel';
 function App() {
   const { user, isAuthenticated, isAdmin, studentLogin, adminLogin, logout } = useAuth();
   const [showAdminLogin, setShowAdminLogin] = useState(false);
+  
+  // Demo mode: Show dashboard directly (toggle to false to see login)
+  const DEMO_MODE = true;
+
+  if (DEMO_MODE) {
+    return <StudentDashboard 
+      user={{ id: 'demo-user', fullname: 'Demo Student', email: 'demo@example.com', role: 'student' }} 
+      onLogout={() => window.location.reload()} 
+    />;
+  }
 
   if (!isAuthenticated) {
     return showAdminLogin ? (
