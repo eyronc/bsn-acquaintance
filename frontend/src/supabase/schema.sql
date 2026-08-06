@@ -17,13 +17,13 @@ CREATE TABLE IF NOT EXISTS attendees (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Ensure columns exist if attendees table was created earlier
+-- Ensure all columns exist on attendees table
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS seat_confirmed BOOLEAN DEFAULT FALSE;
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS table_number INT;
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS seat_number INT;
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS seat_confirmed_at TIMESTAMP WITH TIME ZONE;
 
--- 2. Create Seats table (ID is TEXT like "table-1-seat-1")
+-- 2. Create Seats table (id is TEXT format "table-1-seat-1")
 CREATE TABLE IF NOT EXISTS seats (
   id TEXT PRIMARY KEY,
   table_number INT NOT NULL,
@@ -32,11 +32,22 @@ CREATE TABLE IF NOT EXISTS seats (
   status VARCHAR(50) DEFAULT 'available',
   confirmed_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(table_number, seat_number)
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- 3. Populate 60 seats (6 tables × 10 seats) if empty
+-- Ensure unique constraint exists on (table_number, seat_number)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'seats_table_seat_unique'
+  ) THEN
+    ALTER TABLE seats ADD CONSTRAINT seats_table_seat_unique UNIQUE (table_number, seat_number);
+  END IF;
+EXCEPTION
+  WHEN OTHERS THEN NULL;
+END $$;
+
+-- 3. Auto-populate 60 seats (6 tables × 10 seats) if empty
 DO $$
 DECLARE
   t INT;
@@ -48,7 +59,7 @@ BEGIN
       seat_key := 'table-' || t || '-seat-' || s;
       INSERT INTO seats (id, table_number, seat_number, status)
       VALUES (seat_key, t, s, 'available')
-      ON CONFLICT (table_number, seat_number) DO NOTHING;
+      ON CONFLICT (id) DO NOTHING;
     END LOOP;
   END LOOP;
 END $$;
@@ -57,7 +68,7 @@ END $$;
 ALTER TABLE attendees ENABLE ROW LEVEL SECURITY;
 ALTER TABLE seats ENABLE ROW LEVEL SECURITY;
 
--- Drop old policies to prevent duplicates
+-- Drop old restrictive policies
 DROP POLICY IF EXISTS "Allow public read on attendees" ON attendees;
 DROP POLICY IF EXISTS "Allow public insert on attendees" ON attendees;
 DROP POLICY IF EXISTS "Allow public update on attendees" ON attendees;
@@ -71,13 +82,13 @@ DROP POLICY IF EXISTS "Allow public insert on seats" ON seats;
 DROP POLICY IF EXISTS "Allow public update on seats" ON seats;
 DROP POLICY IF EXISTS "Allow public delete on seats" ON seats;
 
--- Create full access policies for attendees table
+-- Create full read/write/update policies for attendees
 CREATE POLICY "Allow public read on attendees" ON attendees FOR SELECT USING (TRUE);
 CREATE POLICY "Allow public insert on attendees" ON attendees FOR INSERT WITH CHECK (TRUE);
 CREATE POLICY "Allow public update on attendees" ON attendees FOR UPDATE USING (TRUE) WITH CHECK (TRUE);
 CREATE POLICY "Allow public delete on attendees" ON attendees FOR DELETE USING (TRUE);
 
--- Create full access policies for seats table
+-- Create full read/write/update policies for seats
 CREATE POLICY "Allow public read on seats" ON seats FOR SELECT USING (TRUE);
 CREATE POLICY "Allow public insert on seats" ON seats FOR INSERT WITH CHECK (TRUE);
 CREATE POLICY "Allow public update on seats" ON seats FOR UPDATE USING (TRUE) WITH CHECK (TRUE);
@@ -86,9 +97,3 @@ CREATE POLICY "Allow public delete on seats" ON seats FOR DELETE USING (TRUE);
 -- 5. Enable Realtime Replication
 ALTER PUBLICATION supabase_realtime ADD TABLE attendees;
 ALTER PUBLICATION supabase_realtime ADD TABLE seats;
-
--- 6. Performance Indexes
-CREATE INDEX IF NOT EXISTS idx_attendees_email ON attendees(email);
-CREATE INDEX IF NOT EXISTS idx_seats_table ON seats(table_number);
-CREATE INDEX IF NOT EXISTS idx_seats_attendee ON seats(attendee_id);
-CREATE INDEX IF NOT EXISTS idx_seats_status ON seats(status);
