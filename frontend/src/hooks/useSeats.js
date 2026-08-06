@@ -25,11 +25,6 @@ function saveMockSeats(seatsData) {
   localStorage.setItem('bsn_mock_seats', JSON.stringify(seatsData));
 }
 
-function isValidUUID(str) {
-  if (typeof str !== 'string') return false;
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
-}
-
 export function useSeats() {
   const [seats, setSeats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,23 +33,43 @@ export function useSeats() {
   const fetchSeats = useCallback(async () => {
     try {
       setError(null);
-      
-      // Start with fresh unbooked seats
       let baseSeats = createFreshBaseSeats();
 
-      // 1. Fetch only ACTIVE confirmed attendees from Supabase
+      // 1. Fetch from seats table in Supabase
+      const { data: seatsData, error: seatsErr } = await supabase
+        .from('seats')
+        .select('*')
+        .order('table_number', { ascending: true })
+        .order('seat_number', { ascending: true });
+
+      if (!seatsErr && seatsData && seatsData.length > 0) {
+        seatsData.forEach((dbSeat) => {
+          baseSeats = baseSeats.map((s) => {
+            if (s.table_number === dbSeat.table_number && s.seat_number === dbSeat.seat_number) {
+              return {
+                ...s,
+                id: dbSeat.id || s.id,
+                attendee_id: dbSeat.attendee_id,
+                status: dbSeat.status || 'available',
+                confirmed_at: dbSeat.confirmed_at,
+              };
+            }
+            return s;
+          });
+        });
+      }
+
+      // 2. Fetch active confirmed attendees from Supabase attendees table
       const { data: attendeesData, error: attendeesError } = await supabase
         .from('attendees')
         .select('id, seat_confirmed, table_number, seat_number, seat_confirmed_at')
         .eq('seat_confirmed', true);
 
-      if (!attendeesError && attendeesData) {
-        // Mark seats confirmed ONLY for attendees that currently exist in Supabase
+      if (!attendeesError && attendeesData && attendeesData.length > 0) {
         const confirmedMap = new Map();
         attendeesData.forEach((att) => {
           if (att.table_number && att.seat_number) {
-            const key = `T${att.table_number}-S${att.seat_number}`;
-            confirmedMap.set(key, att);
+            confirmedMap.set(`T${att.table_number}-S${att.seat_number}`, att);
           }
         });
 
@@ -66,44 +81,17 @@ export function useSeats() {
               ...s,
               attendee_id: att.id,
               status: 'confirmed',
-              confirmed_at: att.seat_confirmed_at || new Date().toISOString(),
+              confirmed_at: att.seat_confirmed_at || s.confirmed_at,
             };
           }
-          return s; // If attendee deleted from Supabase, seat remains 'available'!
+          return s;
         });
       }
-
-      // 2. Fetch from seats table if populated in Supabase
-      try {
-        const { data: seatsData, error: seatsErr } = await supabase
-          .from('seats')
-          .select('*')
-          .order('table_number', { ascending: true })
-          .order('seat_number', { ascending: true });
-
-        if (!seatsErr && seatsData && seatsData.length > 0) {
-          seatsData.forEach((dbSeat) => {
-            baseSeats = baseSeats.map((s) => {
-              if (s.table_number === dbSeat.table_number && s.seat_number === dbSeat.seat_number) {
-                // If seats table row has attendee, double check if attendee is still active
-                return {
-                  ...s,
-                  id: dbSeat.id || s.id,
-                  attendee_id: dbSeat.attendee_id || s.attendee_id,
-                  status: dbSeat.status || s.status,
-                  confirmed_at: dbSeat.confirmed_at || s.confirmed_at,
-                };
-              }
-              return s;
-            });
-          });
-        }
-      } catch (e) {}
 
       setSeats(baseSeats);
       saveMockSeats(baseSeats);
     } catch (err) {
-      console.warn('fetchSeats error:', err.message);
+      console.warn('fetchSeats notice:', err.message);
       setSeats(createFreshBaseSeats());
     } finally {
       setLoading(false);
@@ -119,24 +107,24 @@ export function useSeats() {
 
     try {
       attendeesChannel = supabase
-        .channel('realtime_attendees_changes')
+        .channel('realtime_attendees_sync')
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'attendees' },
           (payload) => {
-            console.log('[Realtime] Attendees table changed:', payload.eventType);
+            console.log('[Realtime] Attendees changed:', payload.eventType);
             fetchSeats();
           }
         )
         .subscribe();
 
       seatsChannel = supabase
-        .channel('realtime_seats_changes')
+        .channel('realtime_seats_sync')
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'seats' },
           (payload) => {
-            console.log('[Realtime] Seats table changed:', payload.eventType);
+            console.log('[Realtime] Seats changed:', payload.eventType);
             fetchSeats();
           }
         )
@@ -184,16 +172,18 @@ export function useSeats() {
       return updated;
     });
 
-    if (isValidUUID(seatId) && isValidUUID(attendeeId)) {
+    const seatRecord = seats.find((s) => s.id === seatId);
+    if (seatRecord) {
       try {
         await supabase
           .from('seats')
           .update({ attendee_id: attendeeId, status: 'reserved' })
-          .eq('id', seatId);
+          .eq('table_number', seatRecord.table_number)
+          .eq('seat_number', seatRecord.seat_number);
       } catch (err) {}
     }
     return true;
-  }, []);
+  }, [seats]);
 
   const confirmSeatWithAttendee = useCallback(
     async (seatId, attendeeId) => {
@@ -212,54 +202,56 @@ export function useSeats() {
         seatNumber = parseInt(parts[3]) || 1;
       }
 
-      console.log(`[Supabase Sync] Updating attendee ${attendeeId} with Table ${tableNumber}, Seat ${seatNumber}`);
+      console.log(`[Supabase Sync] Updating Table ${tableNumber}, Seat ${seatNumber} for attendee ${attendeeId}`);
 
-      // 1. ALWAYS update Supabase attendees table
+      const nowIso = new Date().toISOString();
+
+      // 1. UPDATE attendees table in Supabase
       try {
-        const nowIso = new Date().toISOString();
-        
-        let query = supabase
+        const { data: attData, error: attError } = await supabase
           .from('attendees')
           .update({
             seat_confirmed: true,
             table_number: tableNumber,
             seat_number: seatNumber,
             seat_confirmed_at: nowIso,
-          });
+          })
+          .eq('id', attendeeId)
+          .select();
 
-        if (isValidUUID(attendeeId)) {
-          query = query.eq('id', attendeeId);
+        if (attError) {
+          console.error('[Supabase Attendees Error]:', attError.message);
         } else {
-          query = query.eq('id', attendeeId);
-        }
-
-        const { data: updatedData, error: attendeeError } = await query.select();
-
-        if (attendeeError) {
-          console.error('[Supabase Sync Error] Failed to update attendees table:', attendeeError.message);
-        } else {
-          console.log('[Supabase Sync Success] Attendees table updated:', updatedData);
+          console.log('[Supabase Attendees Success]:', attData);
         }
       } catch (err) {
-        console.error('[Supabase Sync Exception]:', err.message);
+        console.error('[Supabase Attendees Exception]:', err.message);
       }
 
-      // 2. Also try updating seats table if UUID valid
-      if (isValidUUID(seatId) && isValidUUID(attendeeId)) {
-        try {
-          await supabase
-            .from('seats')
-            .update({
-              attendee_id: attendeeId,
-              status: 'confirmed',
-              confirmed_at: new Date().toISOString(),
-            })
-            .eq('id', seatId);
-        } catch (e) {}
+      // 2. UPDATE seats table in Supabase (by table_number & seat_number)
+      try {
+        const { data: seatData, error: seatError } = await supabase
+          .from('seats')
+          .update({
+            attendee_id: attendeeId,
+            status: 'confirmed',
+            confirmed_at: nowIso,
+          })
+          .eq('table_number', tableNumber)
+          .eq('seat_number', seatNumber)
+          .select();
+
+        if (seatError) {
+          console.error('[Supabase Seats Error]:', seatError.message);
+        } else {
+          console.log('[Supabase Seats Success]:', seatData);
+        }
+      } catch (err) {
+        console.error('[Supabase Seats Exception]:', err.message);
       }
 
-      // Re-sync seats state
-      fetchSeats();
+      // Re-fetch to update all local states and trigger real-time broadcasts
+      await fetchSeats();
       return true;
     },
     [seats, fetchSeats]
@@ -274,16 +266,18 @@ export function useSeats() {
       return updated;
     });
 
-    if (isValidUUID(seatId)) {
+    const seatRecord = seats.find((s) => s.id === seatId);
+    if (seatRecord) {
       try {
         await supabase
           .from('seats')
           .update({ attendee_id: null, status: 'available' })
-          .eq('id', seatId);
+          .eq('table_number', seatRecord.table_number)
+          .eq('seat_number', seatRecord.seat_number);
       } catch (err) {}
     }
     return true;
-  }, []);
+  }, [seats]);
 
   return {
     seats,
