@@ -3,11 +3,13 @@
 -- Copy and run this entire script in Supabase SQL Editor
 -- ========================================================
 
--- 1. Create or update Attendees table
+-- 1. Create or update Attendees table (Name, Year, Section, Email, Access Code)
 CREATE TABLE IF NOT EXISTS attendees (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email VARCHAR(255) UNIQUE NOT NULL,
   fullname VARCHAR(255) NOT NULL,
+  year VARCHAR(20) NOT NULL DEFAULT '4th Year',
+  section VARCHAR(10) NOT NULL DEFAULT 'B',
   unique_code VARCHAR(20) UNIQUE NOT NULL,
   seat_confirmed BOOLEAN DEFAULT FALSE,
   table_number INT,
@@ -18,10 +20,19 @@ CREATE TABLE IF NOT EXISTS attendees (
 );
 
 -- Ensure all columns exist on attendees table
+ALTER TABLE attendees ADD COLUMN IF NOT EXISTS year VARCHAR(20) NOT NULL DEFAULT '4th Year';
+ALTER TABLE attendees ADD COLUMN IF NOT EXISTS section VARCHAR(10) NOT NULL DEFAULT 'B';
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS seat_confirmed BOOLEAN DEFAULT FALSE;
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS table_number INT;
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS seat_number INT;
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS seat_confirmed_at TIMESTAMP WITH TIME ZONE;
+
+-- Update any existing attendees without year/section to 4th Year Section B (BSN - 4B)
+UPDATE attendees 
+SET 
+  year = '4th Year',
+  section = 'B'
+WHERE year IS NULL OR section IS NULL OR year = '' OR section = '';
 
 -- 2. Create Seats table (id is TEXT format "table-01-seat-01" for clean sorting)
 CREATE TABLE IF NOT EXISTS seats (

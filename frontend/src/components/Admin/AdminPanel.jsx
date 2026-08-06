@@ -1,8 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { LogOut, Plus, Copy, Check, User, Mail, Key, Armchair, Calendar, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { LogOut, Plus, Copy, Check, User, Mail, Key, Armchair, Calendar, Trash2, Search, Filter, ArrowUpDown, GraduationCap, School } from 'lucide-react';
 import { supabase } from '../../supabase/client';
 import { Toast } from '../UI/Toast';
 import { sendAccessCodeEmail } from '../../services/emailService';
+
+// Year levels and their corresponding valid sections
+const YEAR_OPTIONS = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
+
+const SECTIONS_BY_YEAR = {
+  '1st Year': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'],
+  '2nd Year': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'],
+  '3rd Year': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'],
+  '4th Year': ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+};
 
 // Generate cryptic unique code
 function generateUniqueCode() {
@@ -14,9 +24,21 @@ function generateUniqueCode() {
   return code;
 }
 
+// Format Class Badge (e.g. BSN - 4B)
+function formatClassBadge(year, section) {
+  const numYear = year ? String(year).replace(/\D/g, '') : '4';
+  const sec = section || 'B';
+  return `BSN - ${numYear}${sec}`;
+}
+
 export function AdminPanel({ onLogout }) {
-  const [email, setEmail] = useState('');
+  // Form State
   const [fullname, setFullname] = useState('');
+  const [year, setYear] = useState('4th Year');
+  const [section, setSection] = useState('B');
+  const [email, setEmail] = useState('');
+
+  // Data & UI State
   const [attendees, setAttendees] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
@@ -24,7 +46,23 @@ export function AdminPanel({ onLogout }) {
   const [copiedCode, setCopiedCode] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(null);
 
-  // Fetch all attendees
+  // Search, Filter & Sort State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [yearFilter, setYearFilter] = useState('All');
+  const [sectionFilter, setSectionFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [sortBy, setSortBy] = useState('newest');
+
+  // Handle year change in form to auto-adjust valid section
+  const handleYearChange = (newYear) => {
+    setYear(newYear);
+    const validSections = SECTIONS_BY_YEAR[newYear] || [];
+    if (!validSections.includes(section)) {
+      setSection(validSections[0] || 'A');
+    }
+  };
+
+  // Fetch all attendees on mount
   useEffect(() => {
     fetchAttendees();
   }, []);
@@ -62,7 +100,13 @@ export function AdminPanel({ onLogout }) {
 
       const { data, error } = await supabase
         .from('attendees')
-        .insert([{ email, fullname, unique_code: uniqueCode }])
+        .insert([{ 
+          email, 
+          fullname, 
+          year, 
+          section, 
+          unique_code: uniqueCode 
+        }])
         .select();
 
       if (error) throw error;
@@ -71,13 +115,15 @@ export function AdminPanel({ onLogout }) {
       setAttendees([newAttendee, ...attendees]);
       setEmail('');
       setFullname('');
+      setYear('4th Year');
+      setSection('B');
 
       // Send email with access code
       const emailResult = await sendAccessCodeEmail(newAttendee);
 
       if (emailResult.success) {
         setToast({
-          message: `${fullname} registered! Email sent with access code.`,
+          message: `${fullname} (${formatClassBadge(year, section)}) registered! Email sent with access code.`,
           type: 'success',
         });
       } else {
@@ -94,6 +140,8 @@ export function AdminPanel({ onLogout }) {
         id: `mock-${Date.now()}`,
         email,
         fullname,
+        year,
+        section,
         unique_code: uniqueCode,
         created_at: new Date().toISOString(),
       };
@@ -103,11 +151,11 @@ export function AdminPanel({ onLogout }) {
       setEmail('');
       setFullname('');
 
-      // Try to send email even in fallback
+      // Try sending email even in fallback
       await sendAccessCodeEmail(newAttendee);
 
       setToast({
-        message: `Registered ${fullname}! Code: ${uniqueCode}`,
+        message: `Registered ${fullname} (${formatClassBadge(year, section)})! Code: ${uniqueCode}`,
         type: 'success',
       });
     } finally {
@@ -122,7 +170,6 @@ export function AdminPanel({ onLogout }) {
 
     setDeleteLoading(attendee.id);
     try {
-      // Delete attendee from Supabase
       const { error } = await supabase
         .from('attendees')
         .delete()
@@ -130,7 +177,6 @@ export function AdminPanel({ onLogout }) {
 
       if (error) throw error;
 
-      // Update local state
       setAttendees((prev) => prev.filter((a) => a.id !== attendee.id));
       setToast({
         message: `Deleted ${attendee.fullname}. Their seat is now available.`,
@@ -138,7 +184,6 @@ export function AdminPanel({ onLogout }) {
       });
     } catch (err) {
       console.error('Failed to delete attendee:', err);
-      // Fallback local deletion
       setAttendees((prev) => prev.filter((a) => a.id !== attendee.id));
       setToast({
         message: `Removed ${attendee.fullname}`,
@@ -154,6 +199,52 @@ export function AdminPanel({ onLogout }) {
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
   };
+
+  // Filter & Sort attendees dynamically
+  const filteredAttendees = useMemo(() => {
+    return attendees
+      .filter((att) => {
+        // Search query
+        if (searchQuery.trim() !== '') {
+          const q = searchQuery.toLowerCase();
+          const badge = formatClassBadge(att.year, att.section).toLowerCase();
+          const nameMatch = att.fullname?.toLowerCase().includes(q);
+          const emailMatch = att.email?.toLowerCase().includes(q);
+          const codeMatch = att.unique_code?.toLowerCase().includes(q);
+          const badgeMatch = badge.includes(q);
+          if (!nameMatch && !emailMatch && !codeMatch && !badgeMatch) return false;
+        }
+
+        // Year filter
+        if (yearFilter !== 'All') {
+          if (att.year !== yearFilter && !att.year?.includes(yearFilter.charAt(0))) return false;
+        }
+
+        // Section filter
+        if (sectionFilter !== 'All') {
+          if (att.section !== sectionFilter) return false;
+        }
+
+        // Status filter
+        if (statusFilter === 'Confirmed' && !att.seat_confirmed) return false;
+        if (statusFilter === 'Pending' && att.seat_confirmed) return false;
+
+        return true;
+      })
+      .sort((a, b) => {
+        if (sortBy === 'name') return a.fullname.localeCompare(b.fullname);
+        if (sortBy === 'oldest') return new Date(a.created_at) - new Date(b.created_at);
+        if (sortBy === 'class') {
+          const classA = formatClassBadge(a.year, a.section);
+          const classB = formatClassBadge(b.year, b.section);
+          return classA.localeCompare(classB);
+        }
+        return new Date(b.created_at) - new Date(a.created_at); // default 'newest'
+      });
+  }, [attendees, searchQuery, yearFilter, sectionFilter, statusFilter, sortBy]);
+
+  // Dynamic section options based on selected form year
+  const currentSections = SECTIONS_BY_YEAR[year] || [];
 
   return (
     <div className="min-h-screen bg-[#f7e5ee] text-[#3b1427] pb-12">
@@ -194,9 +285,9 @@ export function AdminPanel({ onLogout }) {
           </h2>
 
           <form onSubmit={handleCreateAttendee} className="space-y-4 sm:space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {/* Full Name */}
-              <div>
+              <div className="sm:col-span-2 lg:col-span-1">
                 <label className="block text-[#3b1427] font-semibold mb-1.5 text-xs sm:text-sm">Full Name</label>
                 <input
                   type="text"
@@ -208,8 +299,38 @@ export function AdminPanel({ onLogout }) {
                 />
               </div>
 
-              {/* Email */}
+              {/* Year Level */}
               <div>
+                <label className="block text-[#3b1427] font-semibold mb-1.5 text-xs sm:text-sm">Year Level</label>
+                <select
+                  value={year}
+                  onChange={(e) => handleYearChange(e.target.value)}
+                  required
+                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#3b1427] text-sm font-semibold bg-white/50"
+                >
+                  {YEAR_OPTIONS.map((y) => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Section */}
+              <div>
+                <label className="block text-[#3b1427] font-semibold mb-1.5 text-xs sm:text-sm">Section</label>
+                <select
+                  value={section}
+                  onChange={(e) => setSection(e.target.value)}
+                  required
+                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#3b1427] text-sm font-semibold bg-white/50"
+                >
+                  {currentSections.map((sec) => (
+                    <option key={sec} value={sec}>Section {sec}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Email Address */}
+              <div className="sm:col-span-2 lg:col-span-1">
                 <label className="block text-[#3b1427] font-semibold mb-1.5 text-xs sm:text-sm">Email Address</label>
                 <input
                   type="email"
@@ -222,26 +343,97 @@ export function AdminPanel({ onLogout }) {
               </div>
             </div>
 
+            {/* Selected Class Preview Badge */}
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-rose-100/60 rounded-xl w-fit text-xs text-rose-800 font-bold">
+              <School size={14} className="text-rose-600" />
+              <span>Assigned Class: <code className="font-mono">{formatClassBadge(year, section)}</code></span>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
               className="neu-button-primary w-full py-3 sm:py-3.5 rounded-xl font-bold text-white flex items-center justify-center gap-2 text-sm sm:text-base disabled:opacity-50 active:scale-[0.99] transition-transform shadow-md"
             >
               <Plus size={18} />
-              {loading ? 'Creating Attendee...' : 'Create Attendee'}
+              {loading ? 'Creating Attendee...' : `Create Attendee (${formatClassBadge(year, section)})`}
             </button>
           </form>
         </div>
 
         {/* Registered Attendees Card */}
-        <div className="neu-flat-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-rose-200/60">
-          <div className="flex justify-between items-center mb-4 sm:mb-6">
-            <h2 className="text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading">
-              Registered Attendees
-            </h2>
-            <span className="px-3 py-1 bg-rose-100 text-rose-800 font-extrabold text-xs sm:text-sm rounded-full neu-flat">
-              {attendees.length} total
+        <div className="neu-flat-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-rose-200/60 space-y-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
+            <div>
+              <h2 className="text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading">
+                Registered Attendees
+              </h2>
+              <p className="text-slate-600 text-xs sm:text-sm font-medium">
+                Showing {filteredAttendees.length} of {attendees.length} total registered guests
+              </p>
+            </div>
+
+            <span className="px-3.5 py-1.5 bg-rose-100 text-rose-800 font-extrabold text-xs sm:text-sm rounded-full neu-flat">
+              {filteredAttendees.length} Shown
             </span>
+          </div>
+
+          {/* Search, Filter & Sort Control Bar */}
+          <div className="bg-white/80 backdrop-blur-sm p-3.5 rounded-2xl border border-rose-200/70 space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
+              {/* Search Bar */}
+              <div className="sm:col-span-2 relative">
+                <Search size={16} className="absolute left-3 top-3 text-rose-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search name, email, code, BSN - 4B..."
+                  className="w-full pl-9 pr-3 py-2 bg-rose-50/50 border border-rose-200/80 rounded-xl text-xs sm:text-sm font-medium text-[#3b1427] focus:outline-none focus:ring-2 focus:ring-rose-400"
+                />
+              </div>
+
+              {/* Year Filter */}
+              <div>
+                <select
+                  value={yearFilter}
+                  onChange={(e) => setYearFilter(e.target.value)}
+                  className="w-full px-3 py-2 bg-rose-50/50 border border-rose-200/80 rounded-xl text-xs sm:text-sm font-semibold text-[#3b1427]"
+                >
+                  <option value="All">All Years</option>
+                  {YEAR_OPTIONS.map((y) => (
+                    <option key={y} value={y}>{y}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Section Filter */}
+              <div>
+                <select
+                  value={sectionFilter}
+                  onChange={(e) => setSectionFilter(e.target.value)}
+                  className="w-full px-3 py-2 bg-rose-50/50 border border-rose-200/80 rounded-xl text-xs sm:text-sm font-semibold text-[#3b1427]"
+                >
+                  <option value="All">All Sections</option>
+                  {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'].map((sec) => (
+                    <option key={sec} value={sec}>Section {sec}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Sort By */}
+              <div>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full px-3 py-2 bg-rose-50/50 border border-rose-200/80 rounded-xl text-xs sm:text-sm font-semibold text-[#3b1427]"
+                >
+                  <option value="newest">Sort: Newest First</option>
+                  <option value="oldest">Sort: Oldest First</option>
+                  <option value="name">Sort: Name (A-Z)</option>
+                  <option value="class">Sort: Class (BSN - 1A)</option>
+                </select>
+              </div>
+            </div>
           </div>
 
           {fetchLoading ? (
@@ -249,10 +441,10 @@ export function AdminPanel({ onLogout }) {
               <div className="w-8 h-8 border-4 border-rose-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
               <p className="text-[#3b1427] font-medium text-sm">Loading attendees...</p>
             </div>
-          ) : attendees.length === 0 ? (
+          ) : filteredAttendees.length === 0 ? (
             <div className="text-center py-8 bg-rose-50/50 rounded-2xl border border-rose-100">
               <User size={32} className="mx-auto text-rose-300 mb-2" />
-              <p className="text-slate-600 font-medium text-sm">No attendees registered yet</p>
+              <p className="text-slate-600 font-medium text-sm">No matching attendees found</p>
             </div>
           ) : (
             <>
@@ -261,7 +453,8 @@ export function AdminPanel({ onLogout }) {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-rose-200/80">
-                      <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Full Name</th>
+                      <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Name</th>
+                      <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Class / Section</th>
                       <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Email</th>
                       <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Access Code</th>
                       <th className="text-center py-3 px-4 font-bold text-[#3b1427]">Status</th>
@@ -271,9 +464,14 @@ export function AdminPanel({ onLogout }) {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-rose-100/60">
-                    {attendees.map((attendee) => (
+                    {filteredAttendees.map((attendee) => (
                       <tr key={attendee.id} className="hover:bg-rose-50/40 transition-colors">
                         <td className="py-4 px-4 text-[#3b1427] font-semibold">{attendee.fullname}</td>
+                        <td className="py-4 px-4">
+                          <span className="font-mono font-bold text-xs px-2.5 py-1 bg-rose-100 text-rose-800 rounded-lg border border-rose-200">
+                            {formatClassBadge(attendee.year, attendee.section)}
+                          </span>
+                        </td>
                         <td className="py-4 px-4 text-slate-600 text-xs">{attendee.email}</td>
                         <td className="py-4 px-4">
                           <code className="neu-pressed px-3 py-1 rounded-lg text-rose-600 font-mono font-bold text-xs">
@@ -330,17 +528,20 @@ export function AdminPanel({ onLogout }) {
 
               {/* Mobile Card View (sm and down) */}
               <div className="md:hidden space-y-3.5">
-                {attendees.map((attendee) => (
+                {filteredAttendees.map((attendee) => (
                   <div 
                     key={attendee.id} 
                     className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-rose-200/70 space-y-3 transition-all"
                   >
-                    {/* Top Row: Full Name + Status Badge */}
+                    {/* Top Row: Full Name + Class Badge + Status */}
                     <div className="flex justify-between items-start gap-2 border-b border-rose-100 pb-2.5">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5 text-rose-600 font-bold text-[10px] uppercase tracking-wider mb-0.5">
                           <User size={12} />
                           <span>Attendee</span>
+                          <span className="font-mono text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded text-[10px] lowercase">
+                            {formatClassBadge(attendee.year, attendee.section)}
+                          </span>
                         </div>
                         <h3 className="text-base font-extrabold text-[#3b1427] truncate leading-snug">
                           {attendee.fullname}
