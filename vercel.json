@@ -1,7 +1,7 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "frontend/dist",
-  "devCommand": "npm run dev",
+  "buildCommand": "npm --prefix frontend run build && node -e \"require('fs').cpSync('frontend/dist', 'dist', {recursive: true})\"",
+  "outputDirectory": "dist",
+  "devCommand": "npm --prefix frontend run dev",
   "rewrites": [
     {
       "source": "/(.*)",
