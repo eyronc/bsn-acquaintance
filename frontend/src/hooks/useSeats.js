@@ -1,20 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../supabase/client';
 
-let isTableMissingInSupabase = false;
-
-// Generate initial mock seats (6 tables × 10 seats)
-function generateMockSeats() {
-  const stored = localStorage.getItem('bsn_mock_seats');
-  if (stored) {
-    try {
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
-      }
-    } catch (e) {}
-  }
-
+// Generate fresh 60 seats (6 tables × 10 seats) with status 'available'
+function createFreshBaseSeats() {
   const mockSeats = [];
   for (let table = 1; table <= 6; table++) {
     for (let seat = 1; seat <= 10; seat++) {
@@ -30,7 +18,6 @@ function generateMockSeats() {
       });
     }
   }
-  localStorage.setItem('bsn_mock_seats', JSON.stringify(mockSeats));
   return mockSeats;
 }
 
@@ -51,34 +38,43 @@ export function useSeats() {
   const fetchSeats = useCallback(async () => {
     try {
       setError(null);
-      let baseSeats = generateMockSeats();
+      
+      // Start with fresh unbooked seats
+      let baseSeats = createFreshBaseSeats();
 
-      // 1. Fetch confirmed seats from attendees table in Supabase
+      // 1. Fetch only ACTIVE confirmed attendees from Supabase
       const { data: attendeesData, error: attendeesError } = await supabase
         .from('attendees')
         .select('id, seat_confirmed, table_number, seat_number, seat_confirmed_at')
         .eq('seat_confirmed', true);
 
-      if (!attendeesError && attendeesData && attendeesData.length > 0) {
+      if (!attendeesError && attendeesData) {
+        // Mark seats confirmed ONLY for attendees that currently exist in Supabase
+        const confirmedMap = new Map();
         attendeesData.forEach((att) => {
           if (att.table_number && att.seat_number) {
-            baseSeats = baseSeats.map((s) => {
-              if (s.table_number === att.table_number && s.seat_number === att.seat_number) {
-                return {
-                  ...s,
-                  attendee_id: att.id,
-                  status: 'confirmed',
-                  confirmed_at: att.seat_confirmed_at || new Date().toISOString(),
-                };
-              }
-              return s;
-            });
+            const key = `T${att.table_number}-S${att.seat_number}`;
+            confirmedMap.set(key, att);
           }
+        });
+
+        baseSeats = baseSeats.map((s) => {
+          const key = `T${s.table_number}-S${s.seat_number}`;
+          const att = confirmedMap.get(key);
+          if (att) {
+            return {
+              ...s,
+              attendee_id: att.id,
+              status: 'confirmed',
+              confirmed_at: att.seat_confirmed_at || new Date().toISOString(),
+            };
+          }
+          return s; // If attendee deleted from Supabase, seat remains 'available'!
         });
       }
 
-      // 2. Fetch from seats table if available
-      if (!isTableMissingInSupabase) {
+      // 2. Fetch from seats table if populated in Supabase
+      try {
         const { data: seatsData, error: seatsErr } = await supabase
           .from('seats')
           .select('*')
@@ -86,10 +82,10 @@ export function useSeats() {
           .order('seat_number', { ascending: true });
 
         if (!seatsErr && seatsData && seatsData.length > 0) {
-          // Merge seats table data
           seatsData.forEach((dbSeat) => {
             baseSeats = baseSeats.map((s) => {
               if (s.table_number === dbSeat.table_number && s.seat_number === dbSeat.seat_number) {
+                // If seats table row has attendee, double check if attendee is still active
                 return {
                   ...s,
                   id: dbSeat.id || s.id,
@@ -102,13 +98,13 @@ export function useSeats() {
             });
           });
         }
-      }
+      } catch (e) {}
 
       setSeats(baseSeats);
       saveMockSeats(baseSeats);
     } catch (err) {
-      console.warn('fetchSeats notice:', err.message);
-      setSeats(generateMockSeats());
+      console.warn('fetchSeats error:', err.message);
+      setSeats(createFreshBaseSeats());
     } finally {
       setLoading(false);
     }
@@ -117,14 +113,30 @@ export function useSeats() {
   useEffect(() => {
     fetchSeats();
 
-    let channel;
+    // Listen to REALTIME changes in Supabase attendees and seats tables
+    let attendeesChannel;
+    let seatsChannel;
+
     try {
-      channel = supabase
-        .channel('attendees_channel')
+      attendeesChannel = supabase
+        .channel('realtime_attendees_changes')
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'attendees' },
-          () => {
+          (payload) => {
+            console.log('[Realtime] Attendees table changed:', payload.eventType);
+            fetchSeats();
+          }
+        )
+        .subscribe();
+
+      seatsChannel = supabase
+        .channel('realtime_seats_changes')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'seats' },
+          (payload) => {
+            console.log('[Realtime] Seats table changed:', payload.eventType);
             fetchSeats();
           }
         )
@@ -132,7 +144,8 @@ export function useSeats() {
     } catch (e) {}
 
     return () => {
-      if (channel) supabase.removeChannel(channel);
+      if (attendeesChannel) supabase.removeChannel(attendeesChannel);
+      if (seatsChannel) supabase.removeChannel(seatsChannel);
     };
   }, [fetchSeats]);
 
@@ -159,9 +172,7 @@ export function useSeats() {
       }
     } catch (e) {}
 
-    // Fallback local check
-    const currentSeats = generateMockSeats();
-    return currentSeats.find((s) => s.attendee_id === attendeeId) || null;
+    return null;
   }, []);
 
   const reserveSeat = useCallback(async (seatId, attendeeId) => {
@@ -247,25 +258,11 @@ export function useSeats() {
         } catch (e) {}
       }
 
-      // 3. Update local state and mock seats
-      setSeats((prev) => {
-        const updated = prev.map((s) =>
-          s.id === seatId
-            ? {
-                ...s,
-                attendee_id: attendeeId,
-                status: 'confirmed',
-                confirmed_at: new Date().toISOString(),
-              }
-            : s
-        );
-        saveMockSeats(updated);
-        return updated;
-      });
-
+      // Re-sync seats state
+      fetchSeats();
       return true;
     },
-    [seats]
+    [seats, fetchSeats]
   );
 
   const clearSeat = useCallback(async (seatId) => {

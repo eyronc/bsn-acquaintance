@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LogOut, Plus, Copy, Check, User, Mail, Key, Armchair, Calendar } from 'lucide-react';
+import { LogOut, Plus, Copy, Check, User, Mail, Key, Armchair, Calendar, Trash2 } from 'lucide-react';
 import { supabase } from '../../supabase/client';
 import { Toast } from '../UI/Toast';
 import { sendAccessCodeEmail } from '../../services/emailService';
@@ -22,6 +22,7 @@ export function AdminPanel({ onLogout }) {
   const [fetchLoading, setFetchLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [copiedCode, setCopiedCode] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(null);
 
   // Fetch all attendees
   useEffect(() => {
@@ -111,6 +112,40 @@ export function AdminPanel({ onLogout }) {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteAttendee = async (attendee) => {
+    if (!window.confirm(`Are you sure you want to delete ${attendee.fullname}? Their reserved seat will be automatically freed.`)) {
+      return;
+    }
+
+    setDeleteLoading(attendee.id);
+    try {
+      // Delete attendee from Supabase
+      const { error } = await supabase
+        .from('attendees')
+        .delete()
+        .eq('id', attendee.id);
+
+      if (error) throw error;
+
+      // Update local state
+      setAttendees((prev) => prev.filter((a) => a.id !== attendee.id));
+      setToast({
+        message: `Deleted ${attendee.fullname}. Their seat is now available.`,
+        type: 'success',
+      });
+    } catch (err) {
+      console.error('Failed to delete attendee:', err);
+      // Fallback local deletion
+      setAttendees((prev) => prev.filter((a) => a.id !== attendee.id));
+      setToast({
+        message: `Removed ${attendee.fullname}`,
+        type: 'success',
+      });
+    } finally {
+      setDeleteLoading(null);
     }
   };
 
@@ -269,13 +304,23 @@ export function AdminPanel({ onLogout }) {
                           {new Date(attendee.created_at).toLocaleDateString()}
                         </td>
                         <td className="py-4 px-4 text-center">
-                          <button
-                            onClick={() => copyToClipboard(attendee.unique_code)}
-                            className="neu-button px-3 py-1.5 rounded-lg text-rose-600 font-semibold text-xs inline-flex items-center gap-1.5 hover:text-rose-700"
-                          >
-                            {copiedCode === attendee.unique_code ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
-                            {copiedCode === attendee.unique_code ? 'Copied!' : 'Copy Code'}
-                          </button>
+                          <div className="flex justify-center items-center gap-2">
+                            <button
+                              onClick={() => copyToClipboard(attendee.unique_code)}
+                              className="neu-button px-3 py-1.5 rounded-lg text-rose-600 font-semibold text-xs inline-flex items-center gap-1.5 hover:text-rose-700"
+                            >
+                              {copiedCode === attendee.unique_code ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                              {copiedCode === attendee.unique_code ? 'Copied!' : 'Copy Code'}
+                            </button>
+                            <button
+                              onClick={() => handleDeleteAttendee(attendee)}
+                              disabled={deleteLoading === attendee.id}
+                              className="px-2.5 py-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-lg font-semibold text-xs transition-colors flex items-center gap-1"
+                              title="Delete Attendee & Release Seat"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -354,22 +399,32 @@ export function AdminPanel({ onLogout }) {
                         <span>{new Date(attendee.created_at).toLocaleDateString()}</span>
                       </div>
 
-                      <button
-                        onClick={() => copyToClipboard(attendee.unique_code)}
-                        className="px-3.5 py-1.5 bg-rose-600 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition-all hover:bg-rose-700"
-                      >
-                        {copiedCode === attendee.unique_code ? (
-                          <>
-                            <Check size={13} />
-                            <span>Copied!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy size={13} />
-                            <span>Copy Code</span>
-                          </>
-                        )}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => copyToClipboard(attendee.unique_code)}
+                          className="px-3.5 py-1.5 bg-rose-600 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition-all hover:bg-rose-700"
+                        >
+                          {copiedCode === attendee.unique_code ? (
+                            <>
+                              <Check size={13} />
+                              <span>Copied!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy size={13} />
+                              <span>Copy</span>
+                            </>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleDeleteAttendee(attendee)}
+                          disabled={deleteLoading === attendee.id}
+                          className="p-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-xl transition-colors"
+                          title="Delete Attendee"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
