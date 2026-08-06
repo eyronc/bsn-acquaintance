@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LogOut, Plus, Copy, Mail, Database, Check } from 'lucide-react';
+import { LogOut, Plus, Copy, Mail, Check } from 'lucide-react';
 import { supabase } from '../../supabase/client';
 import { Toast } from '../UI/Toast';
 import { sendAccessCodeEmail } from '../../services/emailService';
@@ -14,31 +14,6 @@ function generateUniqueCode() {
   return code;
 }
 
-const SQL_SCHEMA_SCRIPT = `-- Copy & paste into your Supabase SQL Editor:
-create table if not exists public.attendees (
-  id uuid default gen_random_uuid() primary key,
-  email text unique not null,
-  fullname text not null,
-  unique_code text not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
-
-create table if not exists public.seats (
-  id text primary key,
-  table_number integer not null,
-  seat_number integer not null,
-  attendee_id uuid references public.attendees(id) on delete set null,
-  status text not null default 'available',
-  confirmed_at timestamp with time zone,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
-  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
-);
-
-insert into public.seats (id, table_number, seat_number)
-select 'table-' || t || '-seat-' || s, t, s
-from generate_series(1, 6) t cross join generate_series(1, 10) s
-on conflict (id) do nothing;`;
-
 export function AdminPanel({ onLogout }) {
   const [email, setEmail] = useState('');
   const [fullname, setFullname] = useState('');
@@ -47,7 +22,6 @@ export function AdminPanel({ onLogout }) {
   const [fetchLoading, setFetchLoading] = useState(true);
   const [toast, setToast] = useState(null);
   const [copiedCode, setCopiedCode] = useState(null);
-  const [copiedSql, setCopiedSql] = useState(false);
 
   // Fetch all attendees
   useEffect(() => {
@@ -102,12 +76,12 @@ export function AdminPanel({ onLogout }) {
 
       if (emailResult.success) {
         setToast({
-          message: `✨ ${fullname} registered! Email sent with access code.`,
+          message: `${fullname} registered! Email sent with access code.`,
           type: 'success',
         });
       } else {
         setToast({
-          message: `✨ ${fullname} registered! Code: ${uniqueCode} (Email: check console)`,
+          message: `${fullname} registered! Code: ${uniqueCode} (Email: check console)`,
           type: 'success',
         });
         console.warn('Email service:', emailResult.message);
@@ -132,7 +106,7 @@ export function AdminPanel({ onLogout }) {
       await sendAccessCodeEmail(newAttendee);
 
       setToast({
-        message: `✨ Registered ${fullname}! Code: ${uniqueCode}`,
+        message: `Registered ${fullname}! Code: ${uniqueCode}`,
         type: 'success',
       });
     } finally {
@@ -144,12 +118,6 @@ export function AdminPanel({ onLogout }) {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
-  };
-
-  const copySqlScript = () => {
-    navigator.clipboard.writeText(SQL_SCHEMA_SCRIPT);
-    setCopiedSql(true);
-    setTimeout(() => setCopiedSql(false), 2000);
   };
 
   return (
@@ -180,7 +148,7 @@ export function AdminPanel({ onLogout }) {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-8">
+      <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-8">
         {/* Registration Form */}
         <div className="neu-flat-lg rounded-3xl p-6 md:p-8">
           <h2 className="text-lg md:text-2xl font-extrabold text-[#3b1427] font-heading mb-6 flex items-center gap-2">
@@ -253,6 +221,8 @@ export function AdminPanel({ onLogout }) {
                       <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Full Name</th>
                       <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Email</th>
                       <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Access Code</th>
+                      <th className="text-center py-3 px-4 font-bold text-[#3b1427]">Seat Confirmed</th>
+                      <th className="text-center py-3 px-4 font-bold text-[#3b1427]">Seat</th>
                       <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Registered</th>
                       <th className="text-center py-3 px-4 font-bold text-[#3b1427]">Actions</th>
                     </tr>
@@ -261,11 +231,31 @@ export function AdminPanel({ onLogout }) {
                     {attendees.map((attendee) => (
                       <tr key={attendee.id} className="hover:bg-rose-50/40 transition-colors">
                         <td className="py-4 px-4 text-[#3b1427] font-semibold">{attendee.fullname}</td>
-                        <td className="py-4 px-4 text-slate-600">{attendee.email}</td>
+                        <td className="py-4 px-4 text-slate-600 text-xs">{attendee.email}</td>
                         <td className="py-4 px-4">
                           <code className="neu-pressed px-3 py-1 rounded-lg text-rose-600 font-mono font-bold text-xs">
                             {attendee.unique_code}
                           </code>
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          {attendee.seat_confirmed ? (
+                            <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg font-bold text-xs">
+                              Yes
+                            </span>
+                          ) : (
+                            <span className="inline-block px-3 py-1 bg-slate-100 text-slate-600 rounded-lg font-bold text-xs">
+                              No
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-4 px-4 text-center">
+                          {attendee.seat_confirmed && attendee.table_number ? (
+                            <span className="font-mono font-bold text-[#3b1427] text-sm">
+                              T{attendee.table_number} • S{attendee.seat_number}
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 text-xs">—</span>
+                          )}
                         </td>
                         <td className="py-4 px-4 text-slate-500 text-xs font-medium">
                           {new Date(attendee.created_at).toLocaleDateString()}
@@ -303,7 +293,25 @@ export function AdminPanel({ onLogout }) {
                         {attendee.unique_code}
                       </code>
                     </div>
-                    <div className="flex justify-between items-center pt-2 border-t border-rose-200/40">
+                    <div className="grid grid-cols-2 gap-3 py-2 border-t border-b border-rose-200/40">
+                      <div>
+                        <p className="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Seat Confirmed</p>
+                        {attendee.seat_confirmed ? (
+                          <p className="text-xs font-bold text-emerald-600">Yes</p>
+                        ) : (
+                          <p className="text-xs font-bold text-slate-400">No</p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Seat</p>
+                        {attendee.seat_confirmed && attendee.table_number ? (
+                          <p className="text-xs font-mono font-bold text-[#3b1427]">T{attendee.table_number} • S{attendee.seat_number}</p>
+                        ) : (
+                          <p className="text-xs text-slate-400">—</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center pt-2">
                       <p className="text-xs text-slate-400">
                         {new Date(attendee.created_at).toLocaleDateString()}
                       </p>
@@ -320,26 +328,6 @@ export function AdminPanel({ onLogout }) {
               </div>
             </>
           )}
-        </div>
-
-        {/* Supabase Schema Setup Helper */}
-        <div className="neu-pressed rounded-3xl p-6 space-y-3">
-          <div className="flex justify-between items-center flex-wrap gap-2">
-            <h3 className="font-bold text-[#3b1427] flex items-center gap-2 text-sm md:text-base">
-              <Database size={18} className="text-rose-600" />
-              Supabase SQL Schema Helper
-            </h3>
-            <button
-              onClick={copySqlScript}
-              className="neu-button px-3 py-1.5 rounded-lg text-rose-600 font-semibold text-xs inline-flex items-center gap-1.5"
-            >
-              {copiedSql ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
-              {copiedSql ? 'SQL Copied!' : 'Copy Supabase SQL Script'}
-            </button>
-          </div>
-          <p className="text-slate-600 text-xs md:text-sm leading-relaxed">
-            If you see missing table warnings in Supabase, click <strong>"Copy Supabase SQL Script"</strong> and paste it into your Supabase Dashboard &gt; SQL Editor &gt; Run.
-          </p>
         </div>
       </main>
 
