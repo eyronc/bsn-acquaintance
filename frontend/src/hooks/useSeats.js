@@ -1,13 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../supabase/client';
 
-// Generate fresh 60 seats (6 tables × 10 seats) with status 'available'
+// Zero-padded seat ID formatter for clean DB sorting (e.g. table-01-seat-01)
+function formatSeatId(tableNumber, seatNumber) {
+  const tPad = String(tableNumber).padStart(2, '0');
+  const sPad = String(seatNumber).padStart(2, '0');
+  return `table-${tPad}-seat-${sPad}`;
+}
+
+// Generate fresh 60 seats (6 tables × 10 seats)
 function createFreshBaseSeats() {
   const mockSeats = [];
   for (let table = 1; table <= 6; table++) {
     for (let seat = 1; seat <= 10; seat++) {
       mockSeats.push({
-        id: `table-${table}-seat-${seat}`,
+        id: formatSeatId(table, seat),
         table_number: table,
         seat_number: seat,
         attendee_id: null,
@@ -111,8 +118,7 @@ export function useSeats() {
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'attendees' },
-          (payload) => {
-            console.log('[Realtime] Attendees changed:', payload.eventType);
+          () => {
             fetchSeats();
           }
         )
@@ -123,8 +129,7 @@ export function useSeats() {
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'seats' },
-          (payload) => {
-            console.log('[Realtime] Seats changed:', payload.eventType);
+          () => {
             fetchSeats();
           }
         )
@@ -150,7 +155,7 @@ export function useSeats() {
 
       if (attendeeData && attendeeData.seat_confirmed && attendeeData.table_number) {
         return {
-          id: `table-${attendeeData.table_number}-seat-${attendeeData.seat_number}`,
+          id: formatSeatId(attendeeData.table_number, attendeeData.seat_number),
           table_number: attendeeData.table_number,
           seat_number: attendeeData.seat_number,
           attendee_id: attendeeId,
@@ -202,13 +207,13 @@ export function useSeats() {
         seatNumber = parseInt(parts[3]) || 1;
       }
 
-      console.log(`[Supabase Sync] Updating Table ${tableNumber}, Seat ${seatNumber} for attendee ${attendeeId}`);
-
       const nowIso = new Date().toISOString();
+
+      console.log(`[Supabase Sync] Confirming Table ${tableNumber}, Seat ${seatNumber} for attendee ${attendeeId}`);
 
       // 1. UPDATE attendees table in Supabase
       try {
-        const { data: attData, error: attError } = await supabase
+        const { error: attError } = await supabase
           .from('attendees')
           .update({
             seat_confirmed: true,
@@ -216,13 +221,10 @@ export function useSeats() {
             seat_number: seatNumber,
             seat_confirmed_at: nowIso,
           })
-          .eq('id', attendeeId)
-          .select();
+          .eq('id', attendeeId);
 
         if (attError) {
           console.error('[Supabase Attendees Error]:', attError.message);
-        } else {
-          console.log('[Supabase Attendees Success]:', attData);
         }
       } catch (err) {
         console.error('[Supabase Attendees Exception]:', err.message);
@@ -230,7 +232,7 @@ export function useSeats() {
 
       // 2. UPDATE seats table in Supabase (by table_number & seat_number)
       try {
-        const { data: seatData, error: seatError } = await supabase
+        const { error: seatError } = await supabase
           .from('seats')
           .update({
             attendee_id: attendeeId,
@@ -238,19 +240,18 @@ export function useSeats() {
             confirmed_at: nowIso,
           })
           .eq('table_number', tableNumber)
-          .eq('seat_number', seatNumber)
-          .select();
+          .eq('seat_number', seatNumber);
 
         if (seatError) {
           console.error('[Supabase Seats Error]:', seatError.message);
         } else {
-          console.log('[Supabase Seats Success]:', seatData);
+          console.log('[Supabase Seats Success] Updated seats table in Supabase!');
         }
       } catch (err) {
         console.error('[Supabase Seats Exception]:', err.message);
       }
 
-      // Re-fetch to update all local states and trigger real-time broadcasts
+      // Re-fetch to synchronize all clients
       await fetchSeats();
       return true;
     },
@@ -271,7 +272,7 @@ export function useSeats() {
       try {
         await supabase
           .from('seats')
-          .update({ attendee_id: null, status: 'available' })
+          .update({ attendee_id: null, status: 'available', confirmed_at: null })
           .eq('table_number', seatRecord.table_number)
           .eq('seat_number', seatRecord.seat_number);
       } catch (err) {}
