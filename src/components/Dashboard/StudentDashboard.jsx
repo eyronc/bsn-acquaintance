@@ -6,7 +6,7 @@ import { ConfirmModal } from './ConfirmModal';
 import { Toast } from '../UI/Toast';
 
 export function StudentDashboard({ user, onLogout }) {
-  const { seats, loading, error, getUserSeat, reserveSeat, confirmSeat } = useSeats();
+  const { seats, loading, error, getUserSeat, reserveSeat, confirmSeat, clearSeat } = useSeats();
   const [userSeat, setUserSeat] = useState(null);
   const [selectedSeat, setSelectedSeat] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -32,6 +32,38 @@ export function StudentDashboard({ user, onLogout }) {
     if (userSeat?.status === 'confirmed') {
       setToast({ message: 'Your seat is already confirmed!', type: 'info' });
       return;
+    }
+
+    // Deselecting seat
+    if (!seat) {
+      if (selectedSeat) {
+        const prevId = selectedSeat.id;
+        setSelectedSeat(null);
+        try {
+          await clearSeat(prevId);
+          setToast({ message: 'Seat selection cleared.', type: 'info' });
+        } catch (err) {}
+      }
+      return;
+    }
+
+    const prevSeatId = selectedSeat?.id;
+
+    // Toggling the same seat off
+    if (prevSeatId === seat.id) {
+      setSelectedSeat(null);
+      try {
+        await clearSeat(seat.id);
+        setToast({ message: 'Seat selection cleared.', type: 'info' });
+      } catch (err) {}
+      return;
+    }
+
+    // Clear previous seat if switching to a new seat
+    if (prevSeatId && prevSeatId !== seat.id) {
+      try {
+        await clearSeat(prevSeatId);
+      } catch (err) {}
     }
 
     setSelectedSeat(seat);
@@ -132,7 +164,7 @@ export function StudentDashboard({ user, onLogout }) {
             </div>
 
             {/* Show seat map in read-only mode */}
-            <SeatMap seats={seats} selectedSeat={null} onSeatSelect={() => {}} userSeat={userSeat} />
+            <SeatMap seats={seats} selectedSeat={null} onSeatSelect={() => {}} userSeat={userSeat} currentUserId={user?.id} />
           </div>
         ) : (
           // Seat Selection State
@@ -142,6 +174,7 @@ export function StudentDashboard({ user, onLogout }) {
               selectedSeat={selectedSeat}
               onSeatSelect={handleSeatSelect}
               userSeat={userSeat}
+              currentUserId={user?.id}
             />
           </>
         )}
