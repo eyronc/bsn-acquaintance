@@ -306,7 +306,7 @@ export function AdminPanel({ onLogout }) {
                   value={year}
                   onChange={(e) => handleYearChange(e.target.value)}
                   required
-                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#3b1427] text-sm font-semibold bg-white/50"
+                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#3b1427] text-sm font-semibold"
                 >
                   {YEAR_OPTIONS.map((y) => (
                     <option key={y} value={y}>{y}</option>
@@ -321,7 +321,7 @@ export function AdminPanel({ onLogout }) {
                   value={section}
                   onChange={(e) => setSection(e.target.value)}
                   required
-                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#3b1427] text-sm font-semibold bg-white/50"
+                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#3b1427] text-sm font-semibold"
                 >
                   {currentSections.map((sec) => (
                     <option key={sec} value={sec}>Section {sec}</option>
