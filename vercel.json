@@ -1,7 +1,7 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "devCommand": "npm run dev",
+  "buildCommand": "npm run build --prefix frontend",
+  "outputDirectory": "frontend/dist",
+  "devCommand": "npm run dev --prefix frontend",
   "env": {
     "VITE_RESEND_API_KEY": "@resend_api_key"
   }

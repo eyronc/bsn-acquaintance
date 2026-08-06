@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { LogOut, Plus, Copy, Mail, Check } from 'lucide-react';
+import { LogOut, Plus, Copy, Check, User, Mail, Key, Armchair, Calendar } from 'lucide-react';
 import { supabase } from '../../supabase/client';
 import { Toast } from '../UI/Toast';
 import { sendAccessCodeEmail } from '../../services/emailService';
@@ -121,68 +121,68 @@ export function AdminPanel({ onLogout }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7e5ee] text-[#3b1427]">
-      {/* Header */}
-      <header className="neu-flat sticky top-0 z-40 mx-2 md:mx-6 my-2 rounded-2xl">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3.5 flex justify-between items-center gap-4">
-          <div className="flex items-center gap-3.5 min-w-0">
+    <div className="min-h-screen bg-[#f7e5ee] text-[#3b1427] pb-12">
+      {/* Responsive Header */}
+      <header className="neu-flat sticky top-0 z-40 mx-2 md:mx-6 my-2 rounded-2xl border border-rose-200/50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex justify-between items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
             <img 
               src="/uclmnursing.svg" 
               alt="UCLM Nursing Emblem" 
-              className="w-11 h-11 md:w-12 md:h-12 rounded-full neu-avatar object-contain p-1 flex-shrink-0"
+              className="w-9 h-9 sm:w-12 sm:h-12 rounded-full neu-avatar object-contain p-1 flex-shrink-0"
             />
             <div className="min-w-0">
-              <h1 className="text-lg md:text-2xl font-extrabold text-[#3b1427] font-heading truncate">Admin Panel</h1>
-              <p className="text-rose-600 font-bold text-xs md:text-sm truncate">BSN Acquaintance Party 2026</p>
+              <h1 className="text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading truncate leading-tight">Admin Panel</h1>
+              <p className="text-rose-600 font-bold text-[11px] sm:text-sm truncate">BSN Party 2026</p>
             </div>
           </div>
 
           <button
             onClick={onLogout}
-            className="neu-button px-3.5 md:px-5 py-2 text-[#3b1427] hover:text-rose-600 font-semibold rounded-xl text-xs md:text-sm flex items-center gap-2"
+            className="neu-button px-3 sm:px-5 py-2 text-rose-700 hover:text-rose-900 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 shrink-0 border border-rose-300/40 active:scale-95 transition-transform"
+            aria-label="Logout"
           >
-            <LogOut size={16} />
-            <span className="hidden sm:inline">Logout</span>
-            <span className="sm:hidden">Log</span>
+            <LogOut size={16} className="text-rose-600" />
+            <span className="font-bold">Logout</span>
           </button>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10 space-y-8">
-        {/* Registration Form */}
-        <div className="neu-flat-lg rounded-3xl p-6 md:p-8">
-          <h2 className="text-lg md:text-2xl font-extrabold text-[#3b1427] font-heading mb-6 flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-rose-600 text-white flex items-center justify-center font-bold text-sm">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-6 sm:space-y-8">
+        {/* Registration Form Card */}
+        <div className="neu-flat-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-rose-200/60">
+          <h2 className="text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading mb-4 sm:mb-6 flex items-center gap-2.5">
+            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-rose-600 text-white flex items-center justify-center font-bold text-xs sm:text-sm shadow-sm">
               <Plus size={18} />
             </div>
             Add New Attendee
           </h2>
 
-          <form onSubmit={handleCreateAttendee} className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleCreateAttendee} className="space-y-4 sm:space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               {/* Full Name */}
               <div>
-                <label className="block text-[#3b1427] font-semibold mb-2 text-sm">Full Name</label>
+                <label className="block text-[#3b1427] font-semibold mb-1.5 text-xs sm:text-sm">Full Name</label>
                 <input
                   type="text"
                   value={fullname}
                   onChange={(e) => setFullname(e.target.value)}
                   placeholder="John Doe"
                   required
-                  className="neu-input w-full px-4 py-3 rounded-xl text-[#3b1427] text-sm md:text-base font-medium"
+                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#3b1427] text-sm font-medium"
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-[#3b1427] font-semibold mb-2 text-sm">Email Address</label>
+                <label className="block text-[#3b1427] font-semibold mb-1.5 text-xs sm:text-sm">Email Address</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="john@example.com"
                   required
-                  className="neu-input w-full px-4 py-3 rounded-xl text-[#3b1427] text-sm md:text-base font-medium"
+                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#3b1427] text-sm font-medium"
                 />
               </div>
             </div>
@@ -190,7 +190,7 @@ export function AdminPanel({ onLogout }) {
             <button
               type="submit"
               disabled={loading}
-              className="neu-button-primary w-full py-3.5 rounded-xl font-bold text-white flex items-center justify-center gap-2 text-sm md:text-base disabled:opacity-50"
+              className="neu-button-primary w-full py-3 sm:py-3.5 rounded-xl font-bold text-white flex items-center justify-center gap-2 text-sm sm:text-base disabled:opacity-50 active:scale-[0.99] transition-transform shadow-md"
             >
               <Plus size={18} />
               {loading ? 'Creating Attendee...' : 'Create Attendee'}
@@ -198,11 +198,16 @@ export function AdminPanel({ onLogout }) {
           </form>
         </div>
 
-        {/* Registered Attendees */}
-        <div className="neu-flat-lg rounded-3xl p-6 md:p-8">
-          <h2 className="text-lg md:text-2xl font-extrabold text-[#3b1427] font-heading mb-6">
-            Registered Attendees ({attendees.length})
-          </h2>
+        {/* Registered Attendees Card */}
+        <div className="neu-flat-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-rose-200/60">
+          <div className="flex justify-between items-center mb-4 sm:mb-6">
+            <h2 className="text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading">
+              Registered Attendees
+            </h2>
+            <span className="px-3 py-1 bg-rose-100 text-rose-800 font-extrabold text-xs sm:text-sm rounded-full neu-flat">
+              {attendees.length} total
+            </span>
+          </div>
 
           {fetchLoading ? (
             <div className="text-center py-8">
@@ -210,10 +215,13 @@ export function AdminPanel({ onLogout }) {
               <p className="text-[#3b1427] font-medium text-sm">Loading attendees...</p>
             </div>
           ) : attendees.length === 0 ? (
-            <p className="text-center text-slate-500 py-8 text-sm">No attendees registered yet</p>
+            <div className="text-center py-8 bg-rose-50/50 rounded-2xl border border-rose-100">
+              <User size={32} className="mx-auto text-rose-300 mb-2" />
+              <p className="text-slate-600 font-medium text-sm">No attendees registered yet</p>
+            </div>
           ) : (
             <>
-              {/* Desktop Table */}
+              {/* Desktop Table View (md and up) */}
               <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -221,7 +229,7 @@ export function AdminPanel({ onLogout }) {
                       <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Full Name</th>
                       <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Email</th>
                       <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Access Code</th>
-                      <th className="text-center py-3 px-4 font-bold text-[#3b1427]">Seat Confirmed</th>
+                      <th className="text-center py-3 px-4 font-bold text-[#3b1427]">Status</th>
                       <th className="text-center py-3 px-4 font-bold text-[#3b1427]">Seat</th>
                       <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Registered</th>
                       <th className="text-center py-3 px-4 font-bold text-[#3b1427]">Actions</th>
@@ -239,19 +247,19 @@ export function AdminPanel({ onLogout }) {
                         </td>
                         <td className="py-4 px-4 text-center">
                           {attendee.seat_confirmed ? (
-                            <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg font-bold text-xs">
-                              Yes
+                            <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-xs">
+                              Confirmed
                             </span>
                           ) : (
-                            <span className="inline-block px-3 py-1 bg-slate-100 text-slate-600 rounded-lg font-bold text-xs">
-                              No
+                            <span className="inline-block px-3 py-1 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-xs">
+                              Pending
                             </span>
                           )}
                         </td>
                         <td className="py-4 px-4 text-center">
                           {attendee.seat_confirmed && attendee.table_number ? (
-                            <span className="font-mono font-bold text-[#3b1427] text-sm">
-                              T{attendee.table_number} • S{attendee.seat_number}
+                            <span className="font-mono font-bold text-[#3b1427] text-xs px-2.5 py-1 bg-rose-100/60 rounded-lg">
+                              Table {attendee.table_number} • Seat {attendee.seat_number}
                             </span>
                           ) : (
                             <span className="text-slate-400 text-xs">—</span>
@@ -265,8 +273,8 @@ export function AdminPanel({ onLogout }) {
                             onClick={() => copyToClipboard(attendee.unique_code)}
                             className="neu-button px-3 py-1.5 rounded-lg text-rose-600 font-semibold text-xs inline-flex items-center gap-1.5 hover:text-rose-700"
                           >
-                            <Copy size={14} />
-                            {copiedCode === attendee.unique_code ? 'Copied!' : 'Copy'}
+                            {copiedCode === attendee.unique_code ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                            {copiedCode === attendee.unique_code ? 'Copied!' : 'Copy Code'}
                           </button>
                         </td>
                       </tr>
@@ -275,52 +283,92 @@ export function AdminPanel({ onLogout }) {
                 </table>
               </div>
 
-              {/* Mobile Card View */}
-              <div className="md:hidden space-y-4">
+              {/* Mobile Card View (sm and down) */}
+              <div className="md:hidden space-y-3.5">
                 {attendees.map((attendee) => (
-                  <div key={attendee.id} className="neu-pressed rounded-2xl p-4 space-y-3">
-                    <div>
-                      <p className="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Name</p>
-                      <p className="text-sm font-bold text-[#3b1427]">{attendee.fullname}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Email</p>
-                      <p className="text-xs text-slate-600 break-all">{attendee.email}</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Access Code</p>
-                      <code className="neu-flat px-2.5 py-1 rounded-lg text-rose-600 font-mono font-bold text-xs block w-fit">
-                        {attendee.unique_code}
-                      </code>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 py-2 border-t border-b border-rose-200/40">
-                      <div>
-                        <p className="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Seat Confirmed</p>
-                        {attendee.seat_confirmed ? (
-                          <p className="text-xs font-bold text-emerald-600">Yes</p>
-                        ) : (
-                          <p className="text-xs font-bold text-slate-400">No</p>
-                        )}
+                  <div 
+                    key={attendee.id} 
+                    className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-rose-200/70 space-y-3 transition-all"
+                  >
+                    {/* Top Row: Full Name + Status Badge */}
+                    <div className="flex justify-between items-start gap-2 border-b border-rose-100 pb-2.5">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 text-rose-600 font-bold text-[10px] uppercase tracking-wider mb-0.5">
+                          <User size={12} />
+                          <span>Attendee</span>
+                        </div>
+                        <h3 className="text-base font-extrabold text-[#3b1427] truncate leading-snug">
+                          {attendee.fullname}
+                        </h3>
                       </div>
-                      <div>
-                        <p className="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Seat</p>
+                      {attendee.seat_confirmed ? (
+                        <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full font-extrabold text-[11px] shrink-0">
+                          Confirmed
+                        </span>
+                      ) : (
+                        <span className="px-2.5 py-1 bg-amber-100 text-amber-800 border border-amber-200 rounded-full font-extrabold text-[11px] shrink-0">
+                          Pending
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Email */}
+                    <div className="flex items-center gap-2 text-xs text-slate-700 bg-rose-50/50 px-3 py-2 rounded-xl">
+                      <Mail size={14} className="text-rose-500 shrink-0" />
+                      <span className="break-all font-medium">{attendee.email}</span>
+                    </div>
+
+                    {/* Access Code & Seat Info Grid */}
+                    <div className="grid grid-cols-2 gap-2.5">
+                      {/* Access Code */}
+                      <div className="bg-rose-50/80 p-2.5 rounded-xl border border-rose-100">
+                        <p className="text-[10px] text-rose-600 font-bold uppercase tracking-wider flex items-center gap-1 mb-1">
+                          <Key size={11} />
+                          Access Code
+                        </p>
+                        <code className="text-rose-700 font-mono font-extrabold text-xs tracking-wider block">
+                          {attendee.unique_code}
+                        </code>
+                      </div>
+
+                      {/* Seat info */}
+                      <div className="bg-rose-50/80 p-2.5 rounded-xl border border-rose-100">
+                        <p className="text-[10px] text-rose-600 font-bold uppercase tracking-wider flex items-center gap-1 mb-1">
+                          <Armchair size={11} />
+                          Seat Location
+                        </p>
                         {attendee.seat_confirmed && attendee.table_number ? (
-                          <p className="text-xs font-mono font-bold text-[#3b1427]">T{attendee.table_number} • S{attendee.seat_number}</p>
+                          <p className="text-xs font-mono font-bold text-[#3b1427]">
+                            Table {attendee.table_number} • Seat {attendee.seat_number}
+                          </p>
                         ) : (
-                          <p className="text-xs text-slate-400">—</p>
+                          <p className="text-xs text-slate-400 italic">Not selected</p>
                         )}
                       </div>
                     </div>
-                    <div className="flex justify-between items-center pt-2">
-                      <p className="text-xs text-slate-400">
-                        {new Date(attendee.created_at).toLocaleDateString()}
-                      </p>
+
+                    {/* Bottom Actions Row */}
+                    <div className="flex justify-between items-center pt-1">
+                      <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium">
+                        <Calendar size={12} className="text-rose-400" />
+                        <span>{new Date(attendee.created_at).toLocaleDateString()}</span>
+                      </div>
+
                       <button
                         onClick={() => copyToClipboard(attendee.unique_code)}
-                        className="neu-button px-3 py-1 rounded-lg text-rose-600 font-semibold text-xs inline-flex items-center gap-1"
+                        className="px-3.5 py-1.5 bg-rose-600 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition-all hover:bg-rose-700"
                       >
-                        <Copy size={14} />
-                        {copiedCode === attendee.unique_code ? 'Copied!' : 'Copy'}
+                        {copiedCode === attendee.unique_code ? (
+                          <>
+                            <Check size={13} />
+                            <span>Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy size={13} />
+                            <span>Copy Code</span>
+                          </>
+                        )}
                       </button>
                     </div>
                   </div>

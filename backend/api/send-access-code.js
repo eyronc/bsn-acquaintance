@@ -1,29 +1,19 @@
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
+/**
+ * Vercel Serverless Function: Send Access Code Email
+ * Production endpoint: /api/send-access-code
+ * Matches frontend design with Plus Jakarta Sans font and pink luxury theme
+ */
 
-dotenv.config(); // loads backend/.env
-dotenv.config({ path: '../.env' });
-dotenv.config({ path: '../.env.local' });
+export default async function handler(req, res) {
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-const app = express();
-const PORT = process.env.PORT || 3001;
-const RESEND_API_KEY = process.env.VITE_RESEND_API_KEY || process.env.RESEND_API_KEY;
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Backend is running' });
-});
-
-// Send access code email endpoint
-app.post('/api/send-access-code', async (req, res) => {
   try {
     const { email, fullname, unique_code, eventUrl } = req.body;
 
+    // Validate input
     if (!email || !fullname || !unique_code) {
       return res.status(400).json({
         success: false,
@@ -31,15 +21,18 @@ app.post('/api/send-access-code', async (req, res) => {
       });
     }
 
+    // Get API key from environment
+    const RESEND_API_KEY = process.env.VITE_RESEND_API_KEY || process.env.RESEND_API_KEY;
+
     if (!RESEND_API_KEY) {
       console.warn('Resend API key not configured');
-      return res.json({
+      return res.status(500).json({
         success: false,
-        message: 'Email service not configured - check VITE_RESEND_API_KEY',
-        email_would_send: true,
+        message: 'Email service not configured',
       });
     }
 
+    // Build luxury email HTML
     const emailHtml = `
       <!DOCTYPE html>
       <html>
@@ -156,6 +149,7 @@ app.post('/api/send-access-code', async (req, res) => {
       </html>
     `;
 
+    // Send via Resend
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -176,12 +170,11 @@ app.post('/api/send-access-code', async (req, res) => {
       return res.status(response.status).json({
         success: false,
         message: 'Failed to send email via Resend',
-        error: error.message,
       });
     }
 
     const data = await response.json();
-    console.log('Access code email sent:', data.id);
+    console.log('Email sent:', data.id);
 
     return res.status(200).json({
       success: true,
@@ -189,168 +182,10 @@ app.post('/api/send-access-code', async (req, res) => {
       email_id: data.id,
     });
   } catch (error) {
-    console.error('Backend error:', error);
+    console.error('Serverless function error:', error);
     return res.status(500).json({
       success: false,
       message: 'Server error: ' + error.message,
     });
   }
-});
-
-// Send seat confirmation email endpoint
-app.post('/api/send-seat-confirmation', async (req, res) => {
-  try {
-    const { email, fullname, table_number, seat_number, eventUrl } = req.body;
-
-    if (!email || !fullname || !table_number || !seat_number) {
-      return res.status(400).json({
-        success: false,
-        message: 'Missing required fields: email, fullname, table_number, seat_number',
-      });
-    }
-
-    if (!RESEND_API_KEY) {
-      console.warn('Resend API key not configured');
-      return res.json({
-        success: false,
-        message: 'Email service not configured',
-      });
-    }
-
-    const emailHtml = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Seat Confirmed - BSN Acquaintance Party 2026</title>
-        <style>
-          @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        </style>
-      </head>
-      <body style="margin: 0; padding: 0; background-color: #fdf2f7; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
-        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #fdf2f7; padding: 30px 10px;">
-          <tr>
-            <td align="center">
-              <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 580px; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 15px 35px rgba(219, 39, 119, 0.12); border: 1px solid #fbcfe8;">
-                
-                <!-- Hero Header -->
-                <tr>
-                  <td style="background: linear-gradient(135deg, #065f46 0%, #047857 50%, #3b1427 100%); padding: 40px 30px; text-align: center; color: #ffffff;">
-                    <div style="display: inline-block; background: rgba(52, 211, 153, 0.25); border: 1px solid rgba(52, 211, 153, 0.4); border-radius: 50px; padding: 6px 16px; margin-bottom: 16px;">
-                      <span style="color: #a7f3d0; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">🎉 SEAT RESERVATION CONFIRMED</span>
-                    </div>
-                    <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">
-                      BSN Acquaintance Party 2026
-                    </h1>
-                    <p style="margin: 8px 0 0 0; color: #6ee7b7; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
-                      UCLM College of Nursing
-                    </p>
-                  </td>
-                </tr>
-
-                <!-- Main Body -->
-                <tr>
-                  <td style="padding: 36px 30px 20px 30px;">
-                    <div style="text-align: center; margin-bottom: 28px;">
-                      <p style="margin: 0 0 6px 0; color: #047857; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Seat Reserved For</p>
-                      <h2 style="margin: 0; color: #3b1427; font-size: 24px; font-weight: 800;">${fullname}</h2>
-                    </div>
-
-                    <!-- Ticket Stub Container -->
-                    <div style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid #10b981; border-radius: 20px; padding: 28px 20px; text-align: center; margin-bottom: 30px; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.12);">
-                      <p style="margin: 0 0 12px 0; color: #065f46; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Your Reserved Seat Location</p>
-                      
-                      <!-- Seat Badge Grid -->
-                      <div style="display: inline-block; background: #ffffff; border-radius: 16px; padding: 18px 28px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15); border: 1px solid #a7f3d0; margin-bottom: 16px;">
-                        <span style="font-family: 'Courier New', Courier, monospace; font-size: 28px; font-weight: 800; color: #047857; letter-spacing: 2px;">
-                          TABLE ${table_number} &bull; SEAT ${seat_number}
-                        </span>
-                      </div>
-
-                      <div>
-                        <a href="${eventUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #047857 100%); color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 12px; box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);">
-                          View Seat Map →
-                        </a>
-                      </div>
-                    </div>
-
-                    <!-- Details Card -->
-                    <div style="background: #fdf2f7; border-radius: 18px; padding: 24px; border: 1px solid #fbcfe8; margin-bottom: 24px; text-align: center;">
-                      <h3 style="margin: 0 0 8px 0; color: #3b1427; font-size: 16px; font-weight: 800;">
-                        ✨ See You at the Enchanted Table!
-                      </h3>
-                      <p style="margin: 0 0 12px 0; color: #831843; font-size: 13px; line-height: 1.6;">
-                        Your seat is officially locked in. Please keep this email as your digital pass for entry at the event.
-                      </p>
-                      <p style="margin: 0; color: #be185d; font-size: 12px; font-weight: 700;">
-                        Event URL: <a href="${eventUrl}" style="color: #db2777; text-decoration: underline;">${eventUrl}</a>
-                      </p>
-                    </div>
-
-                  </td>
-                </tr>
-
-                <!-- Footer -->
-                <tr>
-                  <td style="background: #fdf2f7; padding: 24px 30px; text-align: center; border-top: 1px solid #fbcfe8;">
-                    <p style="margin: 0 0 6px 0; color: #047857; font-size: 13px; font-weight: 700;">Get ready for an unforgettable night!</p>
-                    <p style="margin: 0; color: #831843; font-size: 11px; font-weight: 500;">UCLM College of Nursing • BSN Acquaintance Party 2026</p>
-                  </td>
-                </tr>
-
-              </table>
-            </td>
-          </tr>
-        </table>
-      </body>
-      </html>
-    `;
-
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: 'BSN Party <noreply@resend.dev>',
-        to: email,
-        subject: 'Your Seat is Confirmed - BSN Acquaintance Party 2026',
-        html: emailHtml,
-      }),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('Resend error:', error);
-      return res.status(response.status).json({
-        success: false,
-        message: 'Failed to send email via Resend',
-      });
-    }
-
-    const data = await response.json();
-    console.log('Seat confirmation email sent:', data.id);
-
-    return res.status(200).json({
-      success: true,
-      message: 'Seat confirmation email sent successfully!',
-      email_id: data.id,
-    });
-  } catch (error) {
-    console.error('Backend error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Server error: ' + error.message,
-    });
-  }
-});
-
-// Start server
-app.listen(PORT, () => {
-  console.log(`Backend running on http://localhost:${PORT}`);
-  console.log(`Email endpoints: POST http://localhost:${PORT}/api/send-access-code`);
-  console.log(`                 POST http://localhost:${PORT}/api/send-seat-confirmation`);
-  console.log(`Health check: GET http://localhost:${PORT}/health`);
-});
+}
