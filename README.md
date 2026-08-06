@@ -1,8 +1,8 @@
-# ✨ BSN Acquaintance Party 2026 - Seating System
+# BSN Acquaintance Party 2026 - Seating System
 
 An enchanted web application for managing seat reservations for the UCLM Bachelor of Science in Nursing (BSN) Acquaintance Party 2026.
 
-## 🎨 Features
+## Features
 
 - **Student Dashboard**: Students login with email + unique code and select their seat from 6 banquet tables (10 seats each)
 - **Admin Panel**: Admins create attendee records, generate cryptic access codes, and manage registrations
@@ -11,7 +11,7 @@ An enchanted web application for managing seat reservations for the UCLM Bachelo
 - **Mobile Responsive**: Fully responsive design for all devices
 - **Secure**: Row-level security in Supabase, hardcoded admin password protection
 
-## 🚀 Tech Stack
+## Tech Stack
 
 - **Frontend**: React 18 + Vite
 - **Styling**: Tailwind CSS with custom enchanted theme
@@ -20,7 +20,7 @@ An enchanted web application for managing seat reservations for the UCLM Bachelo
 - **Icons**: Lucide React
 - **Deployment**: Vercel
 
-## 📦 Installation
+## Installation
 
 ### 1. Clone Repository
 ```bash
@@ -59,7 +59,7 @@ npm run dev
 
 Visit `http://localhost:5173`
 
-## 🔐 Login Credentials
+## Login Credentials
 
 ### Student Access
 - **Email**: Any registered attendee email
@@ -68,7 +68,7 @@ Visit `http://localhost:5173`
 ### Admin Access
 - **Password**: Use the `VITE_ADMIN_PASSWORD` from `.env.local`
 
-## 📋 Database Schema
+## Database Schema
 
 ### attendees table
 - `id`: UUID (primary key)
@@ -87,7 +87,7 @@ Visit `http://localhost:5173`
 - `confirmed_at`: Timestamp of confirmation
 - `created_at`, `updated_at`: Timestamps
 
-## 🎯 Workflow
+## Workflow
 
 1. **Admin**: Creates attendee (email + name) → generates unique code → sends via email
 2. **Student**: Logs in with email + code
@@ -97,7 +97,7 @@ Visit `http://localhost:5173`
 6. **Real-time**: All other users see seat as occupied (pink, faded)
 7. **Student**: Cannot change seat once confirmed
 
-## 🎨 Theme Colors
+## Theme Colors
 
 - **Pink**: `#FFB6D9` (Primary, nursing soft)
 - **Lavender**: `#E6D4F7` (Secondary)
@@ -106,13 +106,13 @@ Visit `http://localhost:5173`
 - **Deep Plum**: `#4A3F5C` (Text)
 - **Gold**: `#F4D8A6` (Accents, sparkle)
 
-## 📱 Responsive Design
+## Responsive Design
 
 - Mobile-first approach
 - Tablet optimized
 - Desktop enhanced with seat circle layout
 
-## 🚀 Deployment
+## Deployment
 
 ### Deploy to Vercel
 
@@ -128,5 +128,3 @@ npm run preview
 ```
 
 ---
-
-**Created with ✨ for the BSN Acquaintance Party 2026**
