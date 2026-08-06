@@ -6,7 +6,7 @@ const SeatButton = memo(({ seat, index, status, isSelected, onSeatSelect }) => {
   const xPct = Math.cos(angle) * radiusPct;
   const yPct = Math.sin(angle) * radiusPct;
 
-  const isClickable = status === 'available' || isSelected;
+  const isClickable = status === 'available' || status === 'selected' || isSelected;
 
   let classes = 'neu-seat-available font-extrabold cursor-pointer';
   
@@ -21,7 +21,7 @@ const SeatButton = memo(({ seat, index, status, isSelected, onSeatSelect }) => {
   return (
     <button
       onClick={() => {
-        if (isSelected) {
+        if (isSelected || status === 'selected') {
           onSeatSelect(null);
         } else if (isClickable) {
           onSeatSelect(seat);
@@ -34,7 +34,7 @@ const SeatButton = memo(({ seat, index, status, isSelected, onSeatSelect }) => {
         transform: 'translate(-50%, -50%)',
       }}
       className={`w-8 xs:w-9 sm:w-11 md:w-12 h-8 xs:h-9 sm:h-11 md:h-12 rounded-xl text-xs sm:text-sm flex items-center justify-center active:scale-95 ${classes}`}
-      disabled={!isClickable && !isSelected}
+      disabled={!isClickable && !isSelected && status !== 'selected'}
       title={`Table ${seat.table_number} • Seat ${seat.seat_number} (${status})`}
     >
       {seat.seat_number}
@@ -42,7 +42,7 @@ const SeatButton = memo(({ seat, index, status, isSelected, onSeatSelect }) => {
   );
 });
 
-export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
+export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUserId }) {
   // Group seats by table (6 tables × 10 seats)
   const tableSeats = {};
   for (let i = 1; i <= 6; i++) {
@@ -50,9 +50,12 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat }) {
   }
 
   const getSeatStatus = (seat) => {
-    if (userSeat && userSeat.id === seat.id) return 'selected';
+    if ((userSeat && userSeat.id === seat.id) || selectedSeat?.id === seat.id) return 'selected';
     if (seat.status === 'confirmed') return 'confirmed';
-    if (seat.status === 'reserved' && seat.attendee_id) return 'reserved';
+    if (seat.status === 'reserved') {
+      if (currentUserId && seat.attendee_id === currentUserId) return 'selected';
+      return 'reserved';
+    }
     return 'available';
   };
 

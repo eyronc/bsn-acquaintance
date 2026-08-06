@@ -38,6 +38,11 @@ function saveMockSeats(seatsData) {
   localStorage.setItem('bsn_mock_seats', JSON.stringify(seatsData));
 }
 
+function isValidUUID(str) {
+  if (typeof str !== 'string') return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+}
+
 export function useSeats() {
   const [seats, setSeats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -117,7 +122,9 @@ export function useSeats() {
   }, [fetchSeats]);
 
   const getUserSeat = useCallback(async (attendeeId) => {
-    if (isTableMissingInSupabase || isFallbackMode) {
+    if (!attendeeId) return null;
+
+    if (isTableMissingInSupabase || isFallbackMode || !isValidUUID(attendeeId)) {
       const currentSeats = generateMockSeats();
       return currentSeats.find((s) => s.attendee_id === attendeeId) || null;
     }
@@ -138,7 +145,7 @@ export function useSeats() {
   }, [isFallbackMode]);
 
   const reserveSeat = useCallback(async (seatId, attendeeId) => {
-    if (isTableMissingInSupabase || isFallbackMode) {
+    if (isTableMissingInSupabase || isFallbackMode || !isValidUUID(seatId) || !isValidUUID(attendeeId)) {
       setSeats((prev) => {
         const updated = prev.map((s) =>
           s.id === seatId ? { ...s, attendee_id: attendeeId, status: 'reserved' } : s
@@ -170,7 +177,7 @@ export function useSeats() {
   }, [isFallbackMode]);
 
   const confirmSeat = useCallback(async (seatId) => {
-    if (isTableMissingInSupabase || isFallbackMode) {
+    if (isTableMissingInSupabase || isFallbackMode || !isValidUUID(seatId)) {
       setSeats((prev) => {
         const updated = prev.map((s) =>
           s.id === seatId ? { ...s, status: 'confirmed', confirmed_at: new Date().toISOString() } : s
@@ -202,7 +209,7 @@ export function useSeats() {
   }, [isFallbackMode]);
 
   const clearSeat = useCallback(async (seatId) => {
-    if (isTableMissingInSupabase || isFallbackMode) {
+    if (isTableMissingInSupabase || isFallbackMode || !isValidUUID(seatId)) {
       setSeats((prev) => {
         const updated = prev.map((s) =>
           s.id === seatId ? { ...s, attendee_id: null, status: 'available' } : s
