@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LogOut, Plus, Copy, Mail, Database, Check } from 'lucide-react';
 import { supabase } from '../../supabase/client';
 import { Toast } from '../UI/Toast';
+import { sendAccessCodeEmail } from '../../services/emailService';
 
 // Generate cryptic unique code
 function generateUniqueCode() {
@@ -95,10 +96,22 @@ export function AdminPanel({ onLogout }) {
       setAttendees([newAttendee, ...attendees]);
       setEmail('');
       setFullname('');
-      setToast({
-        message: `Registered ${fullname}! Code: ${uniqueCode}`,
-        type: 'success',
-      });
+
+      // Send email with access code
+      const emailResult = await sendAccessCodeEmail(newAttendee);
+
+      if (emailResult.success) {
+        setToast({
+          message: `✨ ${fullname} registered! Email sent with access code.`,
+          type: 'success',
+        });
+      } else {
+        setToast({
+          message: `✨ ${fullname} registered! Code: ${uniqueCode} (Email: check console)`,
+          type: 'success',
+        });
+        console.warn('Email service:', emailResult.message);
+      }
     } catch (error) {
       // Local fallback
       const uniqueCode = generateUniqueCode();
@@ -114,8 +127,12 @@ export function AdminPanel({ onLogout }) {
       localStorage.setItem('bsn_mock_attendees', JSON.stringify(updated));
       setEmail('');
       setFullname('');
+
+      // Try to send email even in fallback
+      await sendAccessCodeEmail(newAttendee);
+
       setToast({
-        message: `Registered ${fullname}! Code: ${uniqueCode}`,
+        message: `✨ Registered ${fullname}! Code: ${uniqueCode}`,
         type: 'success',
       });
     } finally {
