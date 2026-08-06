@@ -4,6 +4,7 @@ import { useSeats } from '../../hooks/useSeats';
 import { SeatMap } from './SeatMap';
 import { ConfirmModal } from './ConfirmModal';
 import { Toast } from '../UI/Toast';
+import { sendSeatConfirmationEmail } from '../../services/emailService';
 
 export function StudentDashboard({ user, onLogout }) {
   const { seats, loading, error, getUserSeat, reserveSeat, confirmSeatWithAttendee, clearSeat } = useSeats();
@@ -84,10 +85,26 @@ export function StudentDashboard({ user, onLogout }) {
       await confirmSeatWithAttendee(selectedSeat.id, user.id);
       setUserSeat({ ...selectedSeat, status: 'confirmed' });
       setShowConfirmModal(false);
-      setToast({
-        message: 'Your seat is confirmed! See you at the party!',
-        type: 'success',
-      });
+
+      // Send confirmation email
+      const emailResult = await sendSeatConfirmationEmail(
+        user,
+        selectedSeat.table_number,
+        selectedSeat.seat_number
+      );
+
+      if (emailResult.success) {
+        setToast({
+          message: 'Your seat is confirmed! Confirmation email sent.',
+          type: 'success',
+        });
+      } else {
+        setToast({
+          message: 'Your seat is confirmed! (Email: check console)',
+          type: 'success',
+        });
+        console.warn('Seat confirmation email:', emailResult.message);
+      }
     } catch (err) {
       console.error('Error confirming seat:', err);
       setToast({ message: 'Failed to confirm seat: ' + err.message, type: 'error' });

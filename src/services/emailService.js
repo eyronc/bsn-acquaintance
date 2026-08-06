@@ -7,10 +7,10 @@
 const getApiEndpoint = () => {
   if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
     // Local development
-    return 'http://localhost:3001/api/send-access-code';
+    return 'http://localhost:3001/api';
   }
   // Production
-  return '/api/send-access-code';
+  return '/api';
 };
 
 // Get event URL
@@ -26,9 +26,9 @@ export async function sendAccessCodeEmail(attendee) {
     const endpoint = getApiEndpoint();
     const eventUrl = getEventUrl();
 
-    console.log(`📧 Sending email via ${endpoint}`);
+    console.log(`Sending access code email via ${endpoint}/send-access-code`);
 
-    const response = await fetch(endpoint, {
+    const response = await fetch(`${endpoint}/send-access-code`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -51,7 +51,52 @@ export async function sendAccessCodeEmail(attendee) {
       };
     }
 
-    console.log('Email sent successfully:', data.email_id);
+    console.log('Access code email sent successfully:', data.email_id);
+    return {
+      success: true,
+      message: data.message,
+    };
+  } catch (error) {
+    console.error('Email service error:', error);
+    return {
+      success: false,
+      message: error.message || 'Network error sending email',
+    };
+  }
+}
+
+export async function sendSeatConfirmationEmail(attendee, tableNumber, seatNumber, eventUrl) {
+  try {
+    const endpoint = getApiEndpoint();
+    const url = getEventUrl() || eventUrl;
+
+    console.log(`Sending seat confirmation email via ${endpoint}/send-seat-confirmation`);
+
+    const response = await fetch(`${endpoint}/send-seat-confirmation`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: attendee.email,
+        fullname: attendee.fullname,
+        table_number: tableNumber,
+        seat_number: seatNumber,
+        eventUrl: url,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error('Seat confirmation email error:', data.message);
+      return {
+        success: false,
+        message: data.message || 'Failed to send seat confirmation email',
+      };
+    }
+
+    console.log('Seat confirmation email sent successfully:', data.email_id);
     return {
       success: true,
       message: data.message,
