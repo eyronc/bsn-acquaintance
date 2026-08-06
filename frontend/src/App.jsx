@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
 import { StudentLogin } from './components/Auth/StudentLogin';
 import { AdminLogin } from './components/Auth/AdminLogin';
@@ -7,39 +8,84 @@ import { AdminPanel } from './components/Admin/AdminPanel';
 
 function App() {
   const { user, isAuthenticated, isAdmin, studentLogin, adminLogin, logout } = useAuth();
-  
-  // Demo mode: Show dashboard directly (toggle to false to see login)
-  const DEMO_MODE = false;
+  const navigate = useNavigate();
 
-  // Check if user is trying to access /admin route
-  const isAdminRoute = window.location.pathname === '/admin';
+  const handleStudentLogin = async (code) => {
+    await studentLogin(code);
+    navigate('/dashboard');
+  };
 
-  if (DEMO_MODE) {
-    return <StudentDashboard 
-      user={{ id: 'demo-user', fullname: 'Demo Student', email: 'demo@example.com', role: 'student' }} 
-      onLogout={() => window.location.reload()} 
-    />;
-  }
+  const handleAdminLogin = async (password) => {
+    await adminLogin(password);
+    navigate('/admin/panel');
+  };
 
-  // Show admin login if /admin route and not authenticated
-  if (isAdminRoute && !isAuthenticated) {
-    return (
-      <AdminLogin
-        onLogin={adminLogin}
-        onBackToStudent={() => window.location.pathname = '/'}
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  return (
+    <Routes>
+      {/* Student Login Route */}
+      <Route
+        path="/"
+        element={
+          isAuthenticated ? (
+            isAdmin ? <Navigate to="/admin/panel" replace /> : <Navigate to="/dashboard" replace />
+          ) : (
+            <StudentLogin onLogin={handleStudentLogin} />
+          )
+        }
       />
-    );
-  }
+      <Route path="/login" element={<Navigate to="/" replace />} />
 
-  if (!isAuthenticated) {
-    return <StudentLogin onLogin={studentLogin} />;
-  }
+      {/* Student Dashboard Route */}
+      <Route
+        path="/dashboard"
+        element={
+          isAuthenticated && !isAdmin ? (
+            <StudentDashboard user={user} onLogout={handleLogout} />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+      <Route path="/student" element={<Navigate to="/dashboard" replace />} />
 
-  if (isAdmin) {
-    return <AdminPanel onLogout={logout} />;
-  }
+      {/* Admin Login Route */}
+      <Route
+        path="/admin"
+        element={
+          isAuthenticated && isAdmin ? (
+            <Navigate to="/admin/panel" replace />
+          ) : (
+            <AdminLogin
+              onLogin={handleAdminLogin}
+              onBackToStudent={() => navigate('/')}
+            />
+          )
+        }
+      />
+      <Route path="/admin/login" element={<Navigate to="/admin" replace />} />
 
-  return <StudentDashboard user={user} onLogout={logout} />;
+      {/* Admin Management Panel Route */}
+      <Route
+        path="/admin/panel"
+        element={
+          isAuthenticated && isAdmin ? (
+            <AdminPanel onLogout={handleLogout} />
+          ) : (
+            <Navigate to="/admin" replace />
+          )
+        }
+      />
+      <Route path="/admin/dashboard" element={<Navigate to="/admin/panel" replace />} />
+
+      {/* Fallback Route */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
 }
 
 export default App;
