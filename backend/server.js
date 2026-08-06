@@ -20,7 +20,7 @@ app.get('/health', (req, res) => {
 // Send email endpoint
 app.post('/api/send-access-code', async (req, res) => {
   try {
-    const { email, fullname, unique_code } = req.body;
+    const { email, fullname, unique_code, eventUrl } = req.body;
 
     // Validate input
     if (!email || !fullname || !unique_code) {
@@ -41,38 +41,44 @@ app.post('/api/send-access-code', async (req, res) => {
       });
     }
 
-    // Build email HTML
+    // Build email HTML - matching frontend design
     const emailHtml = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #4A3F5C; font-size: 28px; margin: 0;">✨ BSN Acquaintance Party 2026</h1>
-          <p style="color: #FFB6D9; font-size: 14px; margin: 5px 0;">UCLM College of Nursing</p>
+      <div style="font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(135deg, #FDE8F0 0%, #FDF2F7 45%, #FFFFFF 100%);">
+        
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 40px;">
+          <h1 style="color: #3b1427; font-size: 32px; margin: 0; font-weight: 700; letter-spacing: -0.5px;">BSN Acquaintance Party 2026</h1>
+          <p style="color: #ec4899; font-size: 14px; margin: 8px 0 0 0; font-weight: 500;">UCLM College of Nursing</p>
         </div>
 
-        <div style="background: linear-gradient(135deg, #FFB6D9 0%, #E6D4F7 100%); border-radius: 12px; padding: 30px; text-align: center; margin: 20px 0;">
-          <p style="color: white; margin: 0 0 10px 0; font-size: 14px;">Welcome,</p>
-          <h2 style="color: white; margin: 0 0 20px 0; font-size: 24px;">${fullname}</h2>
+        <!-- Main Card -->
+        <div style="background: #f9eaf1; border-radius: 16px; padding: 40px; margin: 30px 0; box-shadow: 8px 8px 18px rgba(220, 174, 196, 0.3), -8px -8px 18px rgba(255, 255, 255, 0.8);">
           
-          <p style="color: white; margin: 0 0 15px 0; font-size: 14px;">Your Access Code:</p>
-          <div style="background: white; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <code style="font-size: 32px; font-weight: bold; color: #FFB6D9; letter-spacing: 4px;">
-              ${unique_code}
-            </code>
+          <p style="color: #3b1427; font-size: 14px; margin: 0 0 16px 0; font-weight: 500; text-align: center;">Welcome,</p>
+          <h2 style="color: #3b1427; font-size: 28px; margin: 0 0 30px 0; text-align: center; font-weight: 700;">${fullname}</h2>
+          
+          <p style="color: #3b1427; font-size: 14px; margin: 0 0 20px 0; text-align: center; font-weight: 500;">Your Access Code:</p>
+          
+          <!-- Code Box -->
+          <div style="background: white; padding: 24px; border-radius: 12px; margin: 20px 0; text-align: center; box-shadow: inset 3px 3px 6px rgba(220, 174, 196, 0.2), inset -3px -3px 6px rgba(255, 255, 255, 0.6);">
+            <code style="font-size: 36px; font-weight: 700; color: #ec4899; letter-spacing: 2px; font-family: 'Courier New', monospace;">${unique_code}</code>
           </div>
         </div>
 
-        <div style="background: #FEF9F3; border-left: 4px solid #4A3F5C; padding: 15px; margin: 20px 0; border-radius: 4px;">
-          <h3 style="color: #4A3F5C; margin: 0 0 10px 0; font-size: 16px;">How to Login:</h3>
-          <ol style="color: #4A3F5C; margin: 0; padding-left: 20px; font-size: 14px;">
-            <li>Visit your event URL</li>
-            <li>Email: <code>${email}</code></li>
-            <li>Access Code: <code>${unique_code}</code></li>
-            <li>Select your seat at the enchanted table!</li>
+        <!-- Instructions Card -->
+        <div style="background: #f9eaf1; border-radius: 16px; padding: 32px; margin: 20px 0; box-shadow: 8px 8px 18px rgba(220, 174, 196, 0.3), -8px -8px 18px rgba(255, 255, 255, 0.8);">
+          <h3 style="color: #3b1427; margin: 0 0 20px 0; font-size: 16px; font-weight: 700;">How to Login:</h3>
+          <ol style="color: #3b1427; margin: 0; padding-left: 24px; font-size: 14px; line-height: 1.8;">
+            <li style="margin-bottom: 12px;">Visit your event URL: <a href="${eventUrl}" style="color: #ec4899; text-decoration: none; font-weight: 600;">${eventUrl}</a></li>
+            <li style="margin-bottom: 12px;">Email: <code style="background: rgba(236, 72, 153, 0.1); padding: 4px 8px; border-radius: 4px; font-family: 'Courier New', monospace; color: #3b1427;">${email}</code></li>
+            <li style="margin-bottom: 12px;">Access Code: <code style="background: rgba(236, 72, 153, 0.1); padding: 4px 8px; border-radius: 4px; font-family: 'Courier New', monospace; color: #3b1427;">${unique_code}</code></li>
+            <li>Select your seat at the enchanted table</li>
           </ol>
         </div>
 
-        <div style="text-align: center; margin-top: 30px; color: #999; font-size: 12px;">
-          <p style="margin: 0;">See you at the party! ✨</p>
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(220, 174, 196, 0.2);">
+          <p style="color: #3b1427; font-size: 14px; margin: 0; font-weight: 500;">See you at the party</p>
         </div>
       </div>
     `;
@@ -87,7 +93,7 @@ app.post('/api/send-access-code', async (req, res) => {
       body: JSON.stringify({
         from: 'BSN Party <noreply@resend.dev>',
         to: email,
-        subject: '🎉 Your Access Code - BSN Acquaintance Party 2026',
+        subject: 'Your Access Code - BSN Acquaintance Party 2026',
         html: emailHtml,
       }),
     });
@@ -103,9 +109,9 @@ app.post('/api/send-access-code', async (req, res) => {
     }
 
     const data = await response.json();
-    console.log('✅ Email sent:', data.id);
+    console.log('Email sent:', data.id);
 
-    return res.json({
+    return res.status(200).json({
       success: true,
       message: 'Email sent successfully!',
       email_id: data.id,
@@ -121,7 +127,7 @@ app.post('/api/send-access-code', async (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Backend running on http://localhost:${PORT}`);
-  console.log(`📧 Email endpoint: POST http://localhost:${PORT}/api/send-access-code`);
-  console.log(`✅ Health check: GET http://localhost:${PORT}/health`);
+  console.log(`Backend running on http://localhost:${PORT}`);
+  console.log(`Email endpoint: POST http://localhost:${PORT}/api/send-access-code`);
+  console.log(`Health check: GET http://localhost:${PORT}/health`);
 });

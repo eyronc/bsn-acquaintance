@@ -13,9 +13,18 @@ const getApiEndpoint = () => {
   return '/api/send-access-code';
 };
 
+// Get event URL
+const getEventUrl = () => {
+  if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+    return 'http://localhost:5173';
+  }
+  return window.location.origin;
+};
+
 export async function sendAccessCodeEmail(attendee) {
   try {
     const endpoint = getApiEndpoint();
+    const eventUrl = getEventUrl();
 
     console.log(`📧 Sending email via ${endpoint}`);
 
@@ -28,6 +37,7 @@ export async function sendAccessCodeEmail(attendee) {
         email: attendee.email,
         fullname: attendee.fullname,
         unique_code: attendee.unique_code,
+        eventUrl: eventUrl,
       }),
     });
 
@@ -41,7 +51,7 @@ export async function sendAccessCodeEmail(attendee) {
       };
     }
 
-    console.log('✅ Email sent successfully:', data.email_id);
+    console.log('Email sent successfully:', data.email_id);
     return {
       success: true,
       message: data.message,
