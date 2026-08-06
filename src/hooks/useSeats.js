@@ -208,6 +208,94 @@ export function useSeats() {
     }
   }, [isFallbackMode]);
 
+  const confirmSeatWithAttendee = useCallback(
+    async (seatId, attendeeId) => {
+      if (!seatId || !attendeeId) {
+        throw new Error('Missing seatId or attendeeId');
+      }
+
+      if (isTableMissingInSupabase || isFallbackMode) {
+        // Fallback mode - update local state only
+        setSeats((prev) => {
+          const seatRecord = prev.find((s) => s.id === seatId);
+          if (!seatRecord) {
+            throw new Error('Seat not found');
+          }
+
+          const updated = prev.map((s) => {
+            if (s.id === seatId) {
+              return {
+                ...s,
+                attendee_id: attendeeId,
+                status: 'confirmed',
+                confirmed_at: new Date().toISOString(),
+              };
+            }
+            return s;
+          });
+          saveMockSeats(updated);
+          return updated;
+        });
+        return true;
+      }
+
+      try {
+        // Get seat details to extract table and seat numbers
+        const seatRecord = seats.find((s) => s.id === seatId);
+        if (!seatRecord) {
+          throw new Error('Seat not found');
+        }
+
+        const { table_number, seat_number } = seatRecord;
+
+        // Update seats table
+        const { error: seatError } = await supabase
+          .from('seats')
+          .update({
+            attendee_id: attendeeId,
+            status: 'confirmed',
+            confirmed_at: new Date(),
+          })
+          .eq('id', seatId);
+
+        if (seatError) throw seatError;
+
+        // Update attendees table
+        const { error: attendeeError } = await supabase
+          .from('attendees')
+          .update({
+            seat_confirmed: true,
+            table_number: table_number,
+            seat_number: seat_number,
+            seat_confirmed_at: new Date(),
+          })
+          .eq('id', attendeeId);
+
+        if (attendeeError) throw attendeeError;
+
+        // Update local state
+        setSeats((prev) =>
+          prev.map((s) =>
+            s.id === seatId
+              ? {
+                  ...s,
+                  attendee_id: attendeeId,
+                  status: 'confirmed',
+                  confirmed_at: new Date().toISOString(),
+                }
+              : s
+          )
+        );
+
+        return true;
+      } catch (err) {
+        console.error('Error confirming seat with attendee:', err);
+        throw err;
+      }
+    },
+    [seats, isFallbackMode]
+  );
+
   const clearSeat = useCallback(async (seatId) => {
     if (isTableMissingInSupabase || isFallbackMode || !isValidUUID(seatId)) {
       setSeats((prev) => {
@@ -249,6 +337,7 @@ export function useSeats() {
     getUserSeat,
     reserveSeat,
     confirmSeat,
+    confirmSeatWithAttendee,
     clearSeat,
   };
 }

@@ -6,7 +6,7 @@ import { ConfirmModal } from './ConfirmModal';
 import { Toast } from '../UI/Toast';
 
 export function StudentDashboard({ user, onLogout }) {
-  const { seats, loading, error, getUserSeat, reserveSeat, confirmSeat, clearSeat } = useSeats();
+  const { seats, loading, error, getUserSeat, reserveSeat, confirmSeatWithAttendee, clearSeat } = useSeats();
   const [userSeat, setUserSeat] = useState(null);
   const [selectedSeat, setSelectedSeat] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -80,7 +80,8 @@ export function StudentDashboard({ user, onLogout }) {
   const handleConfirmSeat = async () => {
     setConfirmLoading(true);
     try {
-      await confirmSeat(selectedSeat.id);
+      // Call confirmSeatWithAttendee to update both tables
+      await confirmSeatWithAttendee(selectedSeat.id, user.id);
       setUserSeat({ ...selectedSeat, status: 'confirmed' });
       setShowConfirmModal(false);
       setToast({
@@ -88,7 +89,8 @@ export function StudentDashboard({ user, onLogout }) {
         type: 'success',
       });
     } catch (err) {
-      setToast({ message: 'Failed to confirm seat', type: 'error' });
+      console.error('Error confirming seat:', err);
+      setToast({ message: 'Failed to confirm seat: ' + err.message, type: 'error' });
     } finally {
       setConfirmLoading(false);
     }
