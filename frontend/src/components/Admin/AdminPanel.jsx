@@ -485,9 +485,22 @@ export function AdminPanel({ onLogout }) {
 
                         {/* Access Code */}
                         <td className="py-3 px-4 text-center">
-                          <code className="neu-pressed px-2.5 py-1 rounded-md text-rose-600 font-mono font-bold text-[11px] inline-block whitespace-nowrap">
-                            {attendee.unique_code}
-                          </code>
+                          <div className="flex items-center justify-center gap-1.5">
+                            <code className="neu-pressed px-2.5 py-1 rounded-md text-rose-600 font-mono font-bold text-[11px] inline-block whitespace-nowrap">
+                              {attendee.unique_code}
+                            </code>
+                            <button
+                              onClick={() => copyToClipboard(attendee.unique_code)}
+                              className="p-1.5 hover:bg-rose-100 rounded-md transition-colors flex items-center justify-center text-rose-600"
+                              title="Copy Code"
+                            >
+                              {copiedCode === attendee.unique_code ? (
+                                <Check size={14} className="text-emerald-600" />
+                              ) : (
+                                <Copy size={14} />
+                              )}
+                            </button>
+                          </div>
                         </td>
 
                         {/* Status */}
