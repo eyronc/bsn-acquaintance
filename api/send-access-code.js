@@ -70,8 +70,12 @@ export default async function handler(req, res) {
                 <!-- Hero Header -->
                 <tr>
                   <td style="background: linear-gradient(135deg, #3b1427 0%, #581c37 50%, #831843 100%); padding: 40px 30px; text-align: center; color: #ffffff;">
+                    <!-- UCLM NSBO Sender Profile Emblem (SVG) -->
+                    <div style="text-align: center; margin-bottom: 16px;">
+                      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><defs><linearGradient id='bg' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%239f1239'/><stop offset='100%' stop-color='%23be185d'/></linearGradient></defs><circle cx='40' cy='40' r='38' fill='url(%23bg)' stroke='%23fbcfe8' stroke-width='3'/><path d='M40 18 C45 12, 56 14, 57 23 C58 32, 40 43, 40 43 C40 43, 22 32, 23 23 C24 14, 35 12, 40 18 Z' fill='%23ffffff'/><rect x='36' y='24' width='8' height='18' rx='2' fill='%23be185d'/><rect x='31' y='29' width='18' height='8' rx='2' fill='%23be185d'/><text x='40' y='62' font-family='sans-serif' font-size='9' font-weight='900' fill='%23ffffff' text-anchor='middle' letter-spacing='1'>UCLM NSBO</text></svg>" width="70" height="70" alt="UCLM NSBO Logo" style="display: inline-block; border-radius: 50%; box-shadow: 0 4px 14px rgba(0,0,0,0.25); border: 2px solid #fbcfe8;" />
+                    </div>
                     <div style="display: inline-block; background: rgba(244, 114, 182, 0.2); border: 1px solid rgba(244, 114, 182, 0.4); border-radius: 50px; padding: 6px 16px; margin-bottom: 16px;">
-                      <span style="color: #fbcfe8; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">✨ Official Event Pass</span>
+                      <span style="color: #fbcfe8; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">Official Event Pass</span>
                     </div>
                     <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">
                       BSN Acquaintance Party 2026
@@ -100,7 +104,7 @@ export default async function handler(req, res) {
 
                       <div>
                         <a href="${eventUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 12px; box-shadow: 0 6px 18px rgba(236, 72, 153, 0.35);">
-                          Access Portal & Choose Seat →
+                          Access Portal & Choose Seat
                         </a>
                       </div>
                     </div>
@@ -108,7 +112,7 @@ export default async function handler(req, res) {
                     <!-- Login Instructions Card -->
                     <div style="background: #fdf2f7; border-radius: 18px; padding: 24px; border: 1px solid #fbcfe8; margin-bottom: 24px;">
                       <h3 style="margin: 0 0 16px 0; color: #3b1427; font-size: 15px; font-weight: 800;">
-                        📌 How to Complete Registration:
+                        How to Complete Registration:
                       </h3>
                       
                       <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -141,7 +145,7 @@ export default async function handler(req, res) {
                             <span style="background: #ec4899; color: #ffffff; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">4</span>
                           </td>
                           <td style="color: #4c0519; font-size: 13px; line-height: 1.5;">
-                            Select your preferred seat at the enchanted table map!
+                            Select your preferred seat at the event table map!
                           </td>
                         </tr>
                       </table>
@@ -180,9 +184,10 @@ export default async function handler(req, res) {
         });
 
     const info = await transporter.sendMail({
-      from: `"BSN Party" <${EMAIL_USER}>`,
+      from: `"BSN Acquaintance Party" <${EMAIL_USER}>`,
       to: email,
       subject: 'Your Access Code - BSN Acquaintance Party 2026',
+      text: `Hello ${fullname},\n\nYour Access Code for the BSN Acquaintance Party 2026 is: ${unique_code}\n\nAccess the portal to reserve your seat: ${eventUrl}\n\nThank you,\nUCLM College of Nursing`,
       html: emailHtml,
     });
 
