@@ -4,10 +4,6 @@
   "devCommand": "cd frontend && npm run dev",
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/backend/api/$1"
-    },
-    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }

@@ -448,15 +448,15 @@ export function AdminPanel({ onLogout }) {
             </div>
           ) : (
             <>
-              {/* Desktop Table View (md and up) - All 8 Columns Centered & Responsive (No Horizontal Scrollbar) */}
+              {/* Desktop Table View (md and up) - Responsive without horizontal scrollbar */}
               <div className="hidden md:block w-full overflow-hidden rounded-2xl border border-rose-200/80">
                 <table className="w-full text-xs lg:text-sm table-fixed border-collapse">
                   <thead>
                     <tr className="border-b border-rose-200/80 bg-rose-50/50">
-                      <th className="w-[17%] text-center py-3 px-2 font-extrabold text-[#3b1427]">Name</th>
-                      <th className="w-[12%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Class / Section</th>
-                      <th className="w-[20%] text-center py-3 px-2 font-extrabold text-[#3b1427]">Email</th>
-                      <th className="w-[13%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Access Code</th>
+                      <th className="w-[20%] text-left py-3 pl-6 pr-2 font-extrabold text-[#3b1427]">Name</th>
+                      <th className="w-[11%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Class / Section</th>
+                      <th className="w-[24%] text-left py-3 px-2 font-extrabold text-[#3b1427]">Email</th>
+                      <th className="w-[12%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Access Code</th>
                       <th className="w-[9%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Status</th>
                       <th className="w-[11%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Seat</th>
                       <th className="w-[8%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Registered</th>
@@ -467,7 +467,7 @@ export function AdminPanel({ onLogout }) {
                     {filteredAttendees.map((attendee) => (
                       <tr key={attendee.id} className="hover:bg-rose-50/50 transition-colors">
                         {/* Name */}
-                        <td className="py-3 px-2 text-center text-[#3b1427] font-semibold truncate" title={attendee.fullname}>
+                        <td className="py-3 pl-6 pr-2 text-left text-[#3b1427] font-semibold truncate" title={attendee.fullname}>
                           {attendee.fullname}
                         </td>
 
@@ -479,7 +479,7 @@ export function AdminPanel({ onLogout }) {
                         </td>
 
                         {/* Email */}
-                        <td className="py-3 px-2 text-center text-slate-600 text-xs truncate" title={attendee.email}>
+                        <td className="py-3 px-2 text-left text-slate-600 text-xs truncate" title={attendee.email}>
                           {attendee.email}
                         </td>
 
@@ -559,7 +559,7 @@ export function AdminPanel({ onLogout }) {
                         <div className="flex items-center gap-1.5 text-rose-600 font-bold text-[10px] uppercase tracking-wider mb-0.5">
                           <User size={12} />
                           <span>Attendee</span>
-                          <span className="font-mono text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded text-[10px] lowercase">
+                          <span className="font-mono text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold">
                             {formatClassBadge(attendee.year, attendee.section)}
                           </span>
                         </div>
