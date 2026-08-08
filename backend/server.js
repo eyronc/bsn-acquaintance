@@ -83,16 +83,18 @@ app.post('/api/send-access-code', async (req, res) => {
             <td align="center">
               <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 580px; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 15px 35px rgba(219, 39, 119, 0.12); border: 1px solid #fbcfe8;">
                 
-                <!-- Hero Header -->
+                <!-- Logo & Hero Header -->
                 <tr>
-                  <td style="background: linear-gradient(135deg, #3b1427 0%, #581c37 50%, #831843 100%); padding: 40px 30px; text-align: center; color: #ffffff;">
+                  <td style="background: linear-gradient(135deg, #3b1427 0%, #581c37 50%, #831843 100%); padding: 32px 30px 24px 30px; text-align: center; color: #ffffff;">
+                    <img src="https://bsn-acquaintance.vercel.app/uclmnsbo.jpg" alt="UCLM NSBO Logo" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(244, 114, 182, 0.3); margin-bottom: 12px; display: inline-block;">
+                    
                     <div style="display: inline-block; background: rgba(244, 114, 182, 0.2); border: 1px solid rgba(244, 114, 182, 0.4); border-radius: 50px; padding: 6px 16px; margin-bottom: 16px;">
-                      <span style="color: #fbcfe8; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">✨ Official Event Pass</span>
+                      <span style="color: #fbcfe8; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">Official Event Pass</span>
                     </div>
-                    <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">
+                    <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
                       BSN Acquaintance Party 2026
                     </h1>
-                    <p style="margin: 8px 0 0 0; color: #f472b6; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
+                    <p style="margin: 8px 0 0 0; color: #f472b6; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
                       UCLM College of Nursing
                     </p>
                   </td>
@@ -102,20 +104,20 @@ app.post('/api/send-access-code', async (req, res) => {
                 <tr>
                   <td style="padding: 36px 30px 20px 30px;">
                     <div style="text-align: center; margin-bottom: 28px;">
-                      <p style="margin: 0 0 6px 0; color: #9f1239; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Welcome Guest</p>
-                      <h2 style="margin: 0; color: #3b1427; font-size: 24px; font-weight: 800;">${fullname}</h2>
+                      <p style="margin: 0 0 6px 0; color: #9f1239; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">Welcome Guest</p>
+                      <h2 style="margin: 0; color: #3b1427; font-size: 24px; font-weight: 800; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">${fullname}</h2>
                     </div>
 
                     <!-- Ticket Code Container -->
                     <div style="background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); border: 2px dashed #f472b6; border-radius: 20px; padding: 28px 20px; text-align: center; margin-bottom: 30px;">
-                      <p style="margin: 0 0 10px 0; color: #831843; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Your Unique Access Code</p>
+                      <p style="margin: 0 0 10px 0; color: #831843; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">Your Unique Access Code</p>
                       
                       <div style="background: #ffffff; border-radius: 14px; padding: 16px 20px; display: inline-block; box-shadow: inset 0 2px 4px rgba(0,0,0,0.04), 0 4px 12px rgba(244, 114, 182, 0.15); margin-bottom: 16px;">
                         <code style="font-family: 'Courier New', Courier, monospace; font-size: 32px; font-weight: 800; color: #db2777; letter-spacing: 4px; display: block;">${unique_code}</code>
                       </div>
 
                       <div>
-                        <a href="${eventUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 12px; box-shadow: 0 6px 18px rgba(236, 72, 153, 0.35);">
+                        <a href="${eventUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 12px; box-shadow: 0 6px 18px rgba(236, 72, 153, 0.35); font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
                           Access Portal & Choose Seat →
                         </a>
                       </div>
@@ -123,40 +125,40 @@ app.post('/api/send-access-code', async (req, res) => {
 
                     <!-- Login Instructions Card -->
                     <div style="background: #fdf2f7; border-radius: 18px; padding: 24px; border: 1px solid #fbcfe8; margin-bottom: 24px;">
-                      <h3 style="margin: 0 0 16px 0; color: #3b1427; font-size: 15px; font-weight: 800;">
-                        📌 How to Complete Registration:
+                      <h3 style="margin: 0 0 16px 0; color: #3b1427; font-size: 15px; font-weight: 800; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
+                        How to Complete Registration:
                       </h3>
                       
                       <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                           <td width="28" valign="top" style="padding-bottom: 12px;">
-                            <span style="background: #ec4899; color: #ffffff; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">1</span>
+                            <span style="background: #ec4899; color: #ffffff; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">1</span>
                           </td>
-                          <td style="padding-bottom: 12px; color: #4c0519; font-size: 13px; line-height: 1.5;">
+                          <td style="padding-bottom: 12px; color: #4c0519; font-size: 13px; line-height: 1.5; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
                             Go to event portal: <a href="${eventUrl}" style="color: #db2777; font-weight: 700; text-decoration: underline;">${eventUrl}</a>
                           </td>
                         </tr>
                         <tr>
                           <td width="28" valign="top" style="padding-bottom: 12px;">
-                            <span style="background: #ec4899; color: #ffffff; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">2</span>
+                            <span style="background: #ec4899; color: #ffffff; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">2</span>
                           </td>
-                          <td style="padding-bottom: 12px; color: #4c0519; font-size: 13px; line-height: 1.5;">
+                          <td style="padding-bottom: 12px; color: #4c0519; font-size: 13px; line-height: 1.5; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
                             Enter email: <code style="background: #ffffff; border: 1px solid #fbcfe8; padding: 2px 8px; border-radius: 6px; color: #be185d; font-weight: 700;">${email}</code>
                           </td>
                         </tr>
                         <tr>
                           <td width="28" valign="top" style="padding-bottom: 12px;">
-                            <span style="background: #ec4899; color: #ffffff; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">3</span>
+                            <span style="background: #ec4899; color: #ffffff; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">3</span>
                           </td>
-                          <td style="padding-bottom: 12px; color: #4c0519; font-size: 13px; line-height: 1.5;">
+                          <td style="padding-bottom: 12px; color: #4c0519; font-size: 13px; line-height: 1.5; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
                             Enter Access Code: <code style="background: #ffffff; border: 1px solid #fbcfe8; padding: 2px 8px; border-radius: 6px; color: #be185d; font-weight: 700;">${unique_code}</code>
                           </td>
                         </tr>
                         <tr>
                           <td width="28" valign="top">
-                            <span style="background: #ec4899; color: #ffffff; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">4</span>
+                            <span style="background: #ec4899; color: #ffffff; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">4</span>
                           </td>
-                          <td style="color: #4c0519; font-size: 13px; line-height: 1.5;">
+                          <td style="color: #4c0519; font-size: 13px; line-height: 1.5; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
                             Select your preferred seat at the enchanted table map!
                           </td>
                         </tr>
@@ -169,8 +171,8 @@ app.post('/api/send-access-code', async (req, res) => {
                 <!-- Footer -->
                 <tr>
                   <td style="background: #fdf2f7; padding: 24px 30px; text-align: center; border-top: 1px solid #fbcfe8;">
-                    <p style="margin: 0 0 6px 0; color: #831843; font-size: 13px; font-weight: 700;">We look forward to seeing you!</p>
-                    <p style="margin: 0; color: #9f1239; font-size: 11px; font-weight: 500;">UCLM College of Nursing • BSN Acquaintance Party 2026</p>
+                    <p style="margin: 0 0 6px 0; color: #831843; font-size: 13px; font-weight: 700; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">We look forward to seeing you!</p>
+                    <p style="margin: 0; color: #9f1239; font-size: 11px; font-weight: 500; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">UCLM College of Nursing • BSN Acquaintance Party 2026</p>
                   </td>
                 </tr>
 
@@ -242,16 +244,18 @@ app.post('/api/send-seat-confirmation', async (req, res) => {
             <td align="center">
               <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 580px; background-color: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 15px 35px rgba(219, 39, 119, 0.12); border: 1px solid #fbcfe8;">
                 
-                <!-- Hero Header -->
+                <!-- Logo & Hero Header -->
                 <tr>
-                  <td style="background: linear-gradient(135deg, #065f46 0%, #047857 50%, #3b1427 100%); padding: 40px 30px; text-align: center; color: #ffffff;">
+                  <td style="background: linear-gradient(135deg, #065f46 0%, #047857 50%, #3b1427 100%); padding: 32px 30px 24px 30px; text-align: center; color: #ffffff;">
+                    <img src="https://bsn-acquaintance.vercel.app/uclmnsbo.jpg" alt="UCLM NSBO Logo" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(52, 211, 153, 0.3); margin-bottom: 12px; display: inline-block;">
+                    
                     <div style="display: inline-block; background: rgba(52, 211, 153, 0.25); border: 1px solid rgba(52, 211, 153, 0.4); border-radius: 50px; padding: 6px 16px; margin-bottom: 16px;">
-                      <span style="color: #a7f3d0; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">🎉 SEAT RESERVATION CONFIRMED</span>
+                      <span style="color: #a7f3d0; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">Seat Reservation Confirmed</span>
                     </div>
-                    <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">
+                    <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
                       BSN Acquaintance Party 2026
                     </h1>
-                    <p style="margin: 8px 0 0 0; color: #6ee7b7; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
+                    <p style="margin: 8px 0 0 0; color: #6ee7b7; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
                       UCLM College of Nursing
                     </p>
                   </td>
@@ -261,13 +265,13 @@ app.post('/api/send-seat-confirmation', async (req, res) => {
                 <tr>
                   <td style="padding: 36px 30px 20px 30px;">
                     <div style="text-align: center; margin-bottom: 28px;">
-                      <p style="margin: 0 0 6px 0; color: #047857; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Seat Reserved For</p>
-                      <h2 style="margin: 0; color: #3b1427; font-size: 24px; font-weight: 800;">${fullname}</h2>
+                      <p style="margin: 0 0 6px 0; color: #047857; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">Seat Reserved For</p>
+                      <h2 style="margin: 0; color: #3b1427; font-size: 24px; font-weight: 800; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">${fullname}</h2>
                     </div>
 
                     <!-- Ticket Stub Container -->
                     <div style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid #10b981; border-radius: 20px; padding: 28px 20px; text-align: center; margin-bottom: 30px; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.12);">
-                      <p style="margin: 0 0 12px 0; color: #065f46; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Your Reserved Seat Location</p>
+                      <p style="margin: 0 0 12px 0; color: #065f46; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">Your Reserved Seat Location</p>
                       
                       <!-- Seat Badge Grid -->
                       <div style="display: inline-block; background: #ffffff; border-radius: 16px; padding: 18px 28px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15); border: 1px solid #a7f3d0; margin-bottom: 16px;">
@@ -277,7 +281,7 @@ app.post('/api/send-seat-confirmation', async (req, res) => {
                       </div>
 
                       <div>
-                        <a href="${eventUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #047857 100%); color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 12px; box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);">
+                        <a href="${eventUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #047857 100%); color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 12px; box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35); font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
                           View Seat Map →
                         </a>
                       </div>
@@ -285,13 +289,13 @@ app.post('/api/send-seat-confirmation', async (req, res) => {
 
                     <!-- Details Card -->
                     <div style="background: #fdf2f7; border-radius: 18px; padding: 24px; border: 1px solid #fbcfe8; margin-bottom: 24px; text-align: center;">
-                      <h3 style="margin: 0 0 8px 0; color: #3b1427; font-size: 16px; font-weight: 800;">
-                        ✨ See You at the Enchanted Table!
+                      <h3 style="margin: 0 0 8px 0; color: #3b1427; font-size: 16px; font-weight: 800; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
+                        See You at the Enchanted Table!
                       </h3>
-                      <p style="margin: 0 0 12px 0; color: #831843; font-size: 13px; line-height: 1.6;">
+                      <p style="margin: 0 0 12px 0; color: #831843; font-size: 13px; line-height: 1.6; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
                         Your seat is officially locked in. Please keep this email as your digital pass for entry at the event.
                       </p>
-                      <p style="margin: 0; color: #be185d; font-size: 12px; font-weight: 700;">
+                      <p style="margin: 0; color: #be185d; font-size: 12px; font-weight: 700; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
                         Event URL: <a href="${eventUrl}" style="color: #db2777; text-decoration: underline;">${eventUrl}</a>
                       </p>
                     </div>
@@ -302,8 +306,8 @@ app.post('/api/send-seat-confirmation', async (req, res) => {
                 <!-- Footer -->
                 <tr>
                   <td style="background: #fdf2f7; padding: 24px 30px; text-align: center; border-top: 1px solid #fbcfe8;">
-                    <p style="margin: 0 0 6px 0; color: #047857; font-size: 13px; font-weight: 700;">Get ready for an unforgettable night!</p>
-                    <p style="margin: 0; color: #831843; font-size: 11px; font-weight: 500;">UCLM College of Nursing • BSN Acquaintance Party 2026</p>
+                    <p style="margin: 0 0 6px 0; color: #047857; font-size: 13px; font-weight: 700; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">Get ready for an unforgettable night!</p>
+                    <p style="margin: 0; color: #831843; font-size: 11px; font-weight: 500; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">UCLM College of Nursing • BSN Acquaintance Party 2026</p>
                   </td>
                 </tr>
 
