@@ -129,35 +129,35 @@ export function StudentDashboard({ user, onLogout }) {
   return (
     <div className="min-h-screen bg-[#f7e5ee] text-[#3b1427]">
       {/* Fixed Sticky Header */}
-      <header className="sticky top-0 z-50 bg-[#f7e5ee]/95 backdrop-blur-md border-b border-rose-200/60 shadow-sm mb-6">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3.5 flex justify-between items-center gap-4">
-          <div className="flex items-center gap-3.5 min-w-0">
+      <header className="sticky top-0 z-50 bg-[#f7e5ee]/95 backdrop-blur-md border-b border-rose-200/60 shadow-sm mb-4 sm:mb-6">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex justify-between items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
             <img 
               src="/uclmnursing.svg" 
               alt="UCLM Nursing Emblem" 
-              className="w-11 h-11 md:w-12 md:h-12 rounded-full neu-avatar object-contain p-1 flex-shrink-0"
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full neu-avatar object-contain p-1 flex-shrink-0"
             />
             <div className="min-w-0">
-              <h1 className="text-lg md:text-2xl font-extrabold text-[#3b1427] font-heading truncate tracking-tight">
-                BSN 2026 <span className="text-rose-600 font-extrabold text-sm md:text-base ml-1">Acquaintance Party</span>
+              <h1 className="text-sm xs:text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading truncate leading-tight">
+                BSN 2026 <span className="text-rose-600 font-extrabold text-xs sm:text-base ml-0.5 sm:ml-1">Acquaintance Party</span>
               </h1>
-              <p className="text-slate-500 text-xs md:text-sm truncate font-medium">Welcome, {user.fullname}!</p>
+              <p className="text-slate-500 text-[11px] sm:text-sm truncate font-medium">Welcome, {user.fullname}!</p>
             </div>
           </div>
 
           <button
             onClick={onLogout}
-            className="neu-button px-3.5 md:px-5 py-2 text-[#3b1427] hover:text-rose-600 font-bold rounded-xl text-xs md:text-sm flex items-center gap-2 tracking-wide active:scale-95 transition-transform"
+            className="neu-button px-3 sm:px-5 py-2 text-[#3b1427] hover:text-rose-600 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 shrink-0 active:scale-95 transition-transform"
+            aria-label="Logout"
           >
-            <LogOut size={16} />
-            <span className="hidden sm:inline">Logout</span>
-            <span className="sm:hidden">Log</span>
+            <LogOut size={16} className="text-rose-600 shrink-0" />
+            <span className="font-bold">Logout</span>
           </button>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-6 md:py-10">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 py-4 md:py-8">
         {error && (
           <div className="mb-6 p-4 neu-pressed rounded-2xl text-rose-600 text-sm font-semibold">
             Error: {error}
@@ -199,14 +199,16 @@ export function StudentDashboard({ user, onLogout }) {
         )}
       </main>
 
-      {/* Sticky "Choose this seat" button */}
+      {/* Sticky "Choose this seat" action bar */}
       {selectedSeat && !isConfirmed && (
-        <button
-          onClick={() => setShowConfirmModal(true)}
-          className="fixed bottom-6 right-6 z-30 px-6 py-3.5 neu-button-primary text-white font-bold rounded-2xl text-sm md:text-base animate-in fade-in slide-in-from-bottom-3 duration-300"
-        >
-          Choose This Seat (Table {selectedSeat.table_number} • Seat {selectedSeat.seat_number})
-        </button>
+        <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 z-40 max-w-md sm:w-auto">
+          <button
+            onClick={() => setShowConfirmModal(true)}
+            className="w-full sm:w-auto px-6 py-3.5 neu-button-primary text-white font-bold rounded-2xl text-sm md:text-base shadow-2xl flex items-center justify-center gap-2 active:scale-95 transition-transform"
+          >
+            Choose This Seat (Table {selectedSeat.table_number} • Seat {selectedSeat.seat_number})
+          </button>
+        </div>
       )}
 
       {/* Confirmation Modal */}
