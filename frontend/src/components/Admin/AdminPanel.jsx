@@ -489,7 +489,7 @@ export function AdminPanel({ onLogout }) {
                         <td className="py-3 px-4 text-center">
                           <code
                             onDoubleClick={() => copyToClipboard(attendee.unique_code)}
-                            className={`neu-pressed px-2.5 py-1 rounded-md font-mono font-bold text-[11px] inline-block whitespace-nowrap cursor-pointer transition-all select-none ${copiedCode === attendee.unique_code
+                            className={`neu-pressed px-2.5 py-1 rounded-md font-mono font-bold text-[11px] inline-flex items-center justify-center whitespace-nowrap cursor-pointer transition-all select-none w-[110px] ${copiedCode === attendee.unique_code
                                 ? 'bg-emerald-100 text-emerald-600'
                                 : 'bg-rose-100 text-rose-600 hover:bg-rose-200'
                               }`}
@@ -502,11 +502,11 @@ export function AdminPanel({ onLogout }) {
                         {/* Status */}
                         <td className="py-3 px-4 text-center">
                           {attendee.seat_confirmed ? (
-                            <span className="inline-block px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-[11px] whitespace-nowrap">
+                            <span className="inline-flex items-center justify-center px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-[11px] whitespace-nowrap w-[85px]">
                               Confirmed
                             </span>
                           ) : (
-                            <span className="inline-block px-2.5 py-1 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-[11px] whitespace-nowrap">
+                            <span className="inline-flex items-center justify-center px-2.5 py-1 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-[11px] whitespace-nowrap w-[85px]">
                               Pending
                             </span>
                           )}
