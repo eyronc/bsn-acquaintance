@@ -302,8 +302,8 @@ export function AdminPanel({ onLogout }) {
               className="w-9 h-9 sm:w-12 sm:h-12 rounded-full neu-avatar object-contain p-1 flex-shrink-0"
             />
             <div className="min-w-0">
-              <h1 className="text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading truncate leading-tight tracking-tight">Admin Panel</h1>
-              <p className="text-rose-600 font-bold text-[11px] sm:text-sm truncate tracking-wider uppercase">BSN Party 2026</p>
+              <h1 className="text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading truncate leading-tight">Admin Panel</h1>
+              <p className="text-rose-600 font-bold text-[11px] sm:text-sm truncate">BSN Party 2026</p>
             </div>
           </div>
 
@@ -517,7 +517,7 @@ export function AdminPanel({ onLogout }) {
 
                         {/* Class / Section */}
                         <td className="py-3 px-4 text-center">
-                          <span className="font-mono font-bold text-[11px] px-2.5 py-1 bg-rose-100 text-rose-800 rounded-md border border-rose-200 inline-block whitespace-nowrap tracking-wider">
+                          <span className="font-mono font-bold text-[11px] px-2.5 py-1 bg-rose-100 text-rose-800 rounded-md border border-rose-200 inline-block whitespace-nowrap">
                             {formatClassBadge(attendee.year, attendee.section)}
                           </span>
                         </td>
@@ -529,27 +529,26 @@ export function AdminPanel({ onLogout }) {
 
                         {/* Access Code - Click Once to Copy */}
                         <td className="py-3 px-4 text-center">
-                          <button
-                            type="button"
+                          <code
                             onClick={() => copyToClipboard(attendee.unique_code)}
-                            className={`neu-pressed px-2.5 py-1 rounded-md font-mono font-bold text-[11px] inline-flex items-center justify-center whitespace-nowrap cursor-pointer transition-all select-none tracking-widest active:scale-95 ${copiedCode === attendee.unique_code
+                            className={`neu-pressed px-2.5 py-1 rounded-md font-mono font-bold text-[11px] inline-flex items-center justify-center whitespace-nowrap cursor-pointer transition-all select-none w-[110px] ${copiedCode === attendee.unique_code
                                 ? 'bg-emerald-100 text-emerald-600 border border-emerald-300'
                                 : 'bg-rose-100 text-rose-600 hover:bg-rose-200 border border-rose-200'
                               }`}
                             title="Click to copy code"
                           >
                             {copiedCode === attendee.unique_code ? '✓ Copied!' : attendee.unique_code}
-                          </button>
+                          </code>
                         </td>
 
                         {/* Status */}
                         <td className="py-3 px-4 text-center">
                           {attendee.seat_confirmed ? (
-                            <span className="inline-flex items-center justify-center px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-[11px] whitespace-nowrap tracking-wider">
+                            <span className="inline-flex items-center justify-center px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-[11px] whitespace-nowrap w-[85px]">
                               Confirmed
                             </span>
                           ) : (
-                            <span className="inline-flex items-center justify-center px-2.5 py-1 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-[11px] whitespace-nowrap tracking-wider">
+                            <span className="inline-flex items-center justify-center px-2.5 py-1 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-[11px] whitespace-nowrap w-[85px]">
                               Pending
                             </span>
                           )}
@@ -639,18 +638,17 @@ export function AdminPanel({ onLogout }) {
                     {/* Bottom Actions Row */}
                     <div className="flex justify-between items-center pt-2 border-t border-rose-100/60">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-slate-400 font-bold tracking-wider uppercase">Code:</span>
-                        <button
-                          type="button"
+                        <span className="text-[10px] text-slate-400">Code:</span>
+                        <code
                           onClick={() => copyToClipboard(attendee.unique_code)}
-                          className={`neu-pressed px-2.5 py-1 rounded font-mono font-bold text-xs cursor-pointer transition-all select-none tracking-widest active:scale-95 ${copiedCode === attendee.unique_code
+                          className={`neu-pressed px-2 py-0.5 rounded font-mono font-bold text-xs cursor-pointer transition-all select-none ${copiedCode === attendee.unique_code
                               ? 'bg-emerald-100 text-emerald-600 border border-emerald-300'
-                              : 'bg-rose-100 text-rose-600 border border-rose-200'
+                              : 'bg-rose-100 text-rose-600'
                             }`}
                           title="Click to copy code"
                         >
                           {copiedCode === attendee.unique_code ? '✓ Copied!' : attendee.unique_code}
-                        </button>
+                        </code>
                       </div>
                       <button
                         onClick={() => setAttendeeToDelete(attendee)}

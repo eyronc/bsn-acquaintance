@@ -139,9 +139,9 @@ export function StudentDashboard({ user, onLogout }) {
             />
             <div className="min-w-0">
               <h1 className="text-lg md:text-2xl font-extrabold text-[#3b1427] font-heading truncate tracking-tight">
-                BSN 2026 <span className="text-rose-600 font-extrabold text-sm md:text-base ml-1 tracking-wider uppercase">Acquaintance Party</span>
+                BSN 2026 <span className="text-rose-600 font-extrabold text-sm md:text-base ml-1">Acquaintance Party</span>
               </h1>
-              <p className="text-slate-500 text-xs md:text-sm truncate font-semibold">Welcome, {user.fullname}!</p>
+              <p className="text-slate-500 text-xs md:text-sm truncate font-medium">Welcome, {user.fullname}!</p>
             </div>
           </div>
 
