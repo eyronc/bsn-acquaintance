@@ -17,20 +17,32 @@ export function useAuth() {
   const studentLogin = async (email, code) => {
     try {
       setError(null);
+      console.log('🔐 Attempting login:', { email, code });
+      
       const { data, error } = await supabase
         .from('attendees')
-        .select('id, email, fullname')
+        .select('id, email, fullname, unique_code')
         .eq('email', email)
         .eq('unique_code', code)
-        .single();
+        .maybeSingle();
 
-      if (error) throw new Error('Invalid email or code');
+      if (error) {
+        console.error('❌ Supabase error:', error);
+        throw new Error('Invalid email or code');
+      }
 
+      if (!data) {
+        console.warn('⚠️ No attendee found with that email and code');
+        throw new Error('Invalid email or code');
+      }
+
+      console.log('✅ Login successful:', data);
       const userData = { ...data, role: 'student' };
       setUser(userData);
       localStorage.setItem('bsn_user', JSON.stringify(userData));
       return userData;
     } catch (err) {
+      console.error('❌ Login error:', err.message);
       setError(err.message);
       throw err;
     }
