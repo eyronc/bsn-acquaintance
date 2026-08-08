@@ -1,3 +1,5 @@
+import nodemailer from 'nodemailer';
+
 /**
  * Vercel Serverless Function: Send Access Code Email
  * Production endpoint: /api/send-access-code
@@ -21,14 +23,15 @@ export default async function handler(req, res) {
       });
     }
 
-    // Get API key from environment
-    const RESEND_API_KEY = process.env.VITE_RESEND_API_KEY || process.env.RESEND_API_KEY;
+    // Get email credentials from environment
+    const EMAIL_USER = process.env.EMAIL_USER || process.env.GMAIL_USER || 'nsbouclm@gmail.com';
+    const EMAIL_PASS = process.env.EMAIL_PASS || process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS;
 
-    if (!RESEND_API_KEY) {
-      console.warn('Resend API key not configured');
+    if (!EMAIL_PASS || EMAIL_PASS === 'your_gmail_app_password_here') {
+      console.warn('Nodemailer EMAIL_PASS not configured');
       return res.status(500).json({
         success: false,
-        message: 'Email service not configured',
+        message: 'Email service not configured - please set EMAIL_PASS in environment',
       });
     }
 
@@ -149,37 +152,32 @@ export default async function handler(req, res) {
       </html>
     `;
 
-    // Send via Resend
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: 'BSN Party <noreply@resend.dev>',
-        to: email,
-        subject: 'Your Access Code - BSN Acquaintance Party 2026',
-        html: emailHtml,
-      }),
+    // Send via Nodemailer
+    const transporter = process.env.SMTP_HOST
+      ? nodemailer.createTransport({
+          host: process.env.SMTP_HOST,
+          port: Number(process.env.SMTP_PORT) || 587,
+          secure: process.env.SMTP_SECURE === 'true',
+          auth: { user: EMAIL_USER, pass: EMAIL_PASS },
+        })
+      : nodemailer.createTransport({
+          service: 'gmail',
+          auth: { user: EMAIL_USER, pass: EMAIL_PASS },
+        });
+
+    const info = await transporter.sendMail({
+      from: `"BSN Party" <${EMAIL_USER}>`,
+      to: email,
+      subject: 'Your Access Code - BSN Acquaintance Party 2026',
+      html: emailHtml,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('Resend error:', error);
-      return res.status(response.status).json({
-        success: false,
-        message: 'Failed to send email via Resend',
-      });
-    }
-
-    const data = await response.json();
-    console.log('Email sent:', data.id);
+    console.log('Email sent via Nodemailer:', info.messageId);
 
     return res.status(200).json({
       success: true,
       message: 'Email sent successfully!',
-      email_id: data.id,
+      email_id: info.messageId,
     });
   } catch (error) {
     console.error('Serverless function error:', error);

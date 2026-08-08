@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
 
 dotenv.config(); // loads backend/.env
 dotenv.config({ path: '../.env' });
@@ -8,7 +9,32 @@ dotenv.config({ path: '../.env.local' });
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const RESEND_API_KEY = process.env.VITE_RESEND_API_KEY || process.env.RESEND_API_KEY;
+const EMAIL_USER = process.env.EMAIL_USER || process.env.GMAIL_USER || 'nsbouclm@gmail.com';
+const EMAIL_PASS = process.env.EMAIL_PASS || process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS;
+
+const createTransporter = () => {
+  if (process.env.SMTP_HOST) {
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: EMAIL_USER,
+        pass: EMAIL_PASS,
+      },
+    });
+  }
+
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: EMAIL_USER,
+      pass: EMAIL_PASS,
+    },
+  });
+};
+
+const transporter = createTransporter();
 
 // Middleware
 app.use(cors());
@@ -31,11 +57,11 @@ app.post('/api/send-access-code', async (req, res) => {
       });
     }
 
-    if (!RESEND_API_KEY) {
-      console.warn('Resend API key not configured');
+    if (!EMAIL_PASS || EMAIL_PASS === 'your_gmail_app_password_here') {
+      console.warn('Nodemailer EMAIL_PASS not configured in environment');
       return res.json({
         success: false,
-        message: 'Email service not configured - check VITE_RESEND_API_KEY',
+        message: 'Email service not configured - please set EMAIL_PASS in backend/.env',
         email_would_send: true,
       });
     }
@@ -156,37 +182,19 @@ app.post('/api/send-access-code', async (req, res) => {
       </html>
     `;
 
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: 'BSN Party <noreply@resend.dev>',
-        to: email,
-        subject: 'Your Access Code - BSN Acquaintance Party 2026',
-        html: emailHtml,
-      }),
+    const info = await transporter.sendMail({
+      from: `"BSN Party" <${EMAIL_USER}>`,
+      to: email,
+      subject: 'Your Access Code - BSN Acquaintance Party 2026',
+      html: emailHtml,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('Resend error:', error);
-      return res.status(response.status).json({
-        success: false,
-        message: 'Failed to send email via Resend',
-        error: error.message,
-      });
-    }
-
-    const data = await response.json();
-    console.log('Access code email sent:', data.id);
+    console.log('Access code email sent via Nodemailer:', info.messageId);
 
     return res.status(200).json({
       success: true,
       message: 'Email sent successfully!',
-      email_id: data.id,
+      email_id: info.messageId,
     });
   } catch (error) {
     console.error('Backend error:', error);
@@ -209,11 +217,11 @@ app.post('/api/send-seat-confirmation', async (req, res) => {
       });
     }
 
-    if (!RESEND_API_KEY) {
-      console.warn('Resend API key not configured');
+    if (!EMAIL_PASS || EMAIL_PASS === 'your_gmail_app_password_here') {
+      console.warn('Nodemailer EMAIL_PASS not configured in environment');
       return res.json({
         success: false,
-        message: 'Email service not configured',
+        message: 'Email service not configured - please set EMAIL_PASS in backend/.env',
       });
     }
 
@@ -307,36 +315,19 @@ app.post('/api/send-seat-confirmation', async (req, res) => {
       </html>
     `;
 
-    const response = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${RESEND_API_KEY}`,
-      },
-      body: JSON.stringify({
-        from: 'BSN Party <noreply@resend.dev>',
-        to: email,
-        subject: 'Your Seat is Confirmed - BSN Acquaintance Party 2026',
-        html: emailHtml,
-      }),
+    const info = await transporter.sendMail({
+      from: `"BSN Party" <${EMAIL_USER}>`,
+      to: email,
+      subject: 'Your Seat is Confirmed - BSN Acquaintance Party 2026',
+      html: emailHtml,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      console.error('Resend error:', error);
-      return res.status(response.status).json({
-        success: false,
-        message: 'Failed to send email via Resend',
-      });
-    }
-
-    const data = await response.json();
-    console.log('Seat confirmation email sent:', data.id);
+    console.log('Seat confirmation email sent via Nodemailer:', info.messageId);
 
     return res.status(200).json({
       success: true,
       message: 'Seat confirmation email sent successfully!',
-      email_id: data.id,
+      email_id: info.messageId,
     });
   } catch (error) {
     console.error('Backend error:', error);
