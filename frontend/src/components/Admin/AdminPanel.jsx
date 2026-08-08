@@ -24,11 +24,11 @@ function generateUniqueCode() {
   return code;
 }
 
-// Format Class Badge (e.g. BSN - 4B)
+// Format Class Badge (e.g. BSN-4B)
 function formatClassBadge(year, section) {
   const numYear = year ? String(year).replace(/\D/g, '') : '4';
-  const sec = section || 'B';
-  return `BSN - ${numYear}${sec}`;
+  const sec = (section || 'B').toUpperCase();
+  return `BSN-${numYear}${sec}`;
 }
 
 export function AdminPanel({ onLogout }) {
@@ -453,21 +453,21 @@ export function AdminPanel({ onLogout }) {
                 <table className="w-full text-xs lg:text-sm table-fixed border-collapse">
                   <thead>
                     <tr className="border-b border-rose-200/80 bg-rose-50/50">
-                      <th className="w-[20%] text-left py-3 pl-6 pr-2 font-extrabold text-[#3b1427]">Name</th>
+                      <th className="w-[18%] text-left py-3 pl-3.5 pr-1 font-extrabold text-[#3b1427]">Name</th>
                       <th className="w-[11%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Class / Section</th>
-                      <th className="w-[24%] text-left py-3 px-2 font-extrabold text-[#3b1427]">Email</th>
+                      <th className="w-[23%] text-left py-3 px-2 font-extrabold text-[#3b1427]">Email</th>
                       <th className="w-[12%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Access Code</th>
                       <th className="w-[9%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Status</th>
                       <th className="w-[11%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Seat</th>
                       <th className="w-[8%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Registered</th>
-                      <th className="w-[10%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Actions</th>
+                      <th className="w-[12%] text-center py-3 pr-4 pl-1 font-extrabold text-[#3b1427]">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-rose-100/60 bg-white/60">
                     {filteredAttendees.map((attendee) => (
                       <tr key={attendee.id} className="hover:bg-rose-50/50 transition-colors">
                         {/* Name */}
-                        <td className="py-3 pl-6 pr-2 text-left text-[#3b1427] font-semibold truncate" title={attendee.fullname}>
+                        <td className="py-3 pl-3.5 pr-1 text-left text-[#3b1427] font-semibold truncate" title={attendee.fullname}>
                           {attendee.fullname}
                         </td>
 
@@ -520,7 +520,7 @@ export function AdminPanel({ onLogout }) {
                         </td>
 
                         {/* Actions */}
-                        <td className="py-3 px-1 text-center whitespace-nowrap">
+                        <td className="py-3 pr-4 pl-1 text-center whitespace-nowrap">
                           <div className="flex justify-center items-center gap-1.5">
                             <button
                               onClick={() => copyToClipboard(attendee.unique_code)}
@@ -578,57 +578,39 @@ export function AdminPanel({ onLogout }) {
                       )}
                     </div>
 
-                    {/* Email */}
-                    <div className="flex items-center gap-2 text-xs text-slate-700 bg-rose-50/50 px-3 py-2 rounded-xl">
-                      <Mail size={14} className="text-rose-500 shrink-0" />
-                      <span className="break-all font-medium">{attendee.email}</span>
-                    </div>
-
-                    {/* Access Code & Seat Info Grid */}
-                    <div className="grid grid-cols-2 gap-2.5">
-                      {/* Access Code */}
-                      <div className="bg-rose-50/80 p-2.5 rounded-xl border border-rose-100">
-                        <p className="text-[10px] text-rose-600 font-bold uppercase tracking-wider flex items-center gap-1 mb-1">
-                          <Key size={11} />
-                          Access Code
-                        </p>
-                        <code className="text-rose-700 font-mono font-extrabold text-xs tracking-wider block">
-                          {attendee.unique_code}
-                        </code>
+                    {/* Middle Info Row */}
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>
+                        <span className="text-slate-400 block text-[10px]">Email Address</span>
+                        <span className="text-slate-700 font-medium truncate block">{attendee.email}</span>
                       </div>
-
-                      {/* Seat info */}
-                      <div className="bg-rose-50/80 p-2.5 rounded-xl border border-rose-100">
-                        <p className="text-[10px] text-rose-600 font-bold uppercase tracking-wider flex items-center gap-1 mb-1">
-                          <Armchair size={11} />
-                          Seat Location
-                        </p>
-                        {attendee.seat_confirmed && attendee.table_number ? (
-                          <p className="text-xs font-mono font-bold text-[#3b1427] whitespace-nowrap truncate">
-                            Table {attendee.table_number} • Seat {attendee.seat_number}
-                          </p>
-                        ) : (
-                          <p className="text-xs text-slate-400 italic">Not selected</p>
-                        )}
+                      <div>
+                        <span className="text-slate-400 block text-[10px]">Seat Reserved</span>
+                        <span className="text-slate-700 font-semibold block">
+                          {attendee.seat_confirmed && attendee.table_number
+                            ? `Table ${attendee.table_number} • Seat ${attendee.seat_number}`
+                            : 'Not reserved'}
+                        </span>
                       </div>
                     </div>
 
                     {/* Bottom Actions Row */}
-                    <div className="flex justify-between items-center pt-1">
-                      <div className="flex items-center gap-1 text-[11px] text-slate-500 font-medium">
-                        <Calendar size={12} className="text-rose-400" />
-                        <span>{new Date(attendee.created_at).toLocaleDateString()}</span>
+                    <div className="flex justify-between items-center pt-2 border-t border-rose-100/60">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-slate-400">Code:</span>
+                        <code className="neu-pressed px-2 py-0.5 rounded text-rose-600 font-mono font-bold text-xs">
+                          {attendee.unique_code}
+                        </code>
                       </div>
-
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => copyToClipboard(attendee.unique_code)}
-                          className="px-3.5 py-1.5 bg-rose-600 text-white rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-sm active:scale-95 transition-all hover:bg-rose-700"
+                          className="neu-button px-2.5 py-1 rounded-xl text-rose-600 font-semibold text-xs inline-flex items-center gap-1 hover:text-rose-700"
                         >
                           {copiedCode === attendee.unique_code ? (
                             <>
-                              <Check size={13} />
-                              <span>Copied!</span>
+                              <Check size={13} className="text-emerald-600" />
+                              <span className="text-emerald-600 font-bold">Copied</span>
                             </>
                           ) : (
                             <>
@@ -655,14 +637,14 @@ export function AdminPanel({ onLogout }) {
         </div>
       </main>
 
-      {/* Custom Soft Pink Glassmorphic Delete Confirmation Modal */}
+      {/* Custom Soft Pink Glassmorphic Delete Confirmation Modal (NO EMOJIS) */}
       {attendeeToDelete && (
         <div className="fixed inset-0 bg-[#3b1427]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white/95 backdrop-blur-xl border border-rose-200/90 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-5 transform scale-100 transition-all">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
-                  <AlertTriangle size={20} />
+                  <Trash2 size={18} />
                 </div>
                 <div>
                   <h3 className="text-lg font-extrabold text-[#3b1427] font-heading">Delete Attendee</h3>
@@ -677,13 +659,14 @@ export function AdminPanel({ onLogout }) {
               </button>
             </div>
 
-            <div className="bg-rose-50/70 border border-rose-100 rounded-2xl p-4 text-xs sm:text-sm text-slate-700 leading-relaxed space-y-1.5">
+            <div className="bg-rose-50/80 border border-rose-200/80 rounded-2xl p-4 text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
               <p>
-                Are you sure you want to delete <strong className="text-[#3b1427]">{attendeeToDelete.fullname}</strong> (<span className="font-mono text-rose-700">{attendeeToDelete.email}</span>)?
+                Are you sure you want to delete <strong className="text-[#3b1427] font-bold">{attendeeToDelete.fullname}</strong> (<span className="font-mono text-rose-700 font-semibold">{attendeeToDelete.email}</span>)?
               </p>
-              <p className="text-xs text-rose-600 font-medium">
-                ⚠️ Their reserved seat will be automatically freed and available for other guests.
-              </p>
+              <div className="flex items-center gap-2 pt-1 border-t border-rose-100/80 text-xs text-rose-600 font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
+                <span>Their reserved seat will be automatically freed and available for other guests.</span>
+              </div>
             </div>
 
             <div className="flex items-center gap-3 pt-1">

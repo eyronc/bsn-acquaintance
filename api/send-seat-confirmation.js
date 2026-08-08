@@ -69,8 +69,12 @@ export default async function handler(req, res) {
                 <!-- Hero Header -->
                 <tr>
                   <td style="background: linear-gradient(135deg, #065f46 0%, #047857 50%, #3b1427 100%); padding: 40px 30px; text-align: center; color: #ffffff;">
+                    <!-- UCLM NSBO Sender Profile Emblem (SVG) -->
+                    <div style="text-align: center; margin-bottom: 16px;">
+                      <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><defs><linearGradient id='bg' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%23047857'/><stop offset='100%' stop-color='%23065f46'/></linearGradient></defs><circle cx='40' cy='40' r='38' fill='url(%23bg)' stroke='%23a7f3d0' stroke-width='3'/><path d='M40 18 C45 12, 56 14, 57 23 C58 32, 40 43, 40 43 C40 43, 22 32, 23 23 C24 14, 35 12, 40 18 Z' fill='%23ffffff'/><rect x='36' y='24' width='8' height='18' rx='2' fill='%23047857'/><rect x='31' y='29' width='18' height='8' rx='2' fill='%23047857'/><text x='40' y='62' font-family='sans-serif' font-size='9' font-weight='900' fill='%23ffffff' text-anchor='middle' letter-spacing='1'>UCLM NSBO</text></svg>" width="70" height="70" alt="UCLM NSBO Logo" style="display: inline-block; border-radius: 50%; box-shadow: 0 4px 14px rgba(0,0,0,0.25); border: 2px solid #a7f3d0;" />
+                    </div>
                     <div style="display: inline-block; background: rgba(52, 211, 153, 0.25); border: 1px solid rgba(52, 211, 153, 0.4); border-radius: 50px; padding: 6px 16px; margin-bottom: 16px;">
-                      <span style="color: #a7f3d0; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">🎉 SEAT RESERVATION CONFIRMED</span>
+                      <span style="color: #a7f3d0; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">SEAT RESERVATION CONFIRMED</span>
                     </div>
                     <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">
                       BSN Acquaintance Party 2026
@@ -102,7 +106,7 @@ export default async function handler(req, res) {
 
                       <div>
                         <a href="${eventUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #047857 100%); color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 12px; box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);">
-                          View Seat Map →
+                          View Seat Map
                         </a>
                       </div>
                     </div>
@@ -110,7 +114,7 @@ export default async function handler(req, res) {
                     <!-- Details Card -->
                     <div style="background: #fdf2f7; border-radius: 18px; padding: 24px; border: 1px solid #fbcfe8; margin-bottom: 24px; text-align: center;">
                       <h3 style="margin: 0 0 8px 0; color: #3b1427; font-size: 16px; font-weight: 800;">
-                        ✨ See You at the Enchanted Table!
+                        See You at the Event!
                       </h3>
                       <p style="margin: 0 0 12px 0; color: #831843; font-size: 13px; line-height: 1.6;">
                         Your seat is officially locked in. Please keep this email as your digital pass for entry at the event.
@@ -153,9 +157,10 @@ export default async function handler(req, res) {
         });
 
     const info = await transporter.sendMail({
-      from: `"BSN Party" <${EMAIL_USER}>`,
+      from: `"BSN Acquaintance Party" <${EMAIL_USER}>`,
       to: email,
       subject: 'Your Seat is Confirmed - BSN Acquaintance Party 2026',
+      text: `Hello ${fullname},\n\nYour seat reservation for the BSN Acquaintance Party 2026 is confirmed!\nTable: ${table_number}\nSeat: ${seat_number}\n\nView the seat map here: ${eventUrl}\n\nThank you,\nUCLM College of Nursing`,
       html: emailHtml,
     });
 
