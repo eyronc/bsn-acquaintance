@@ -116,7 +116,7 @@ export function AdminPanel({ onLogout }) {
       setAttendees([newAttendee, ...attendees]);
       setEmail('');
       setFullname('');
-      setYear('4th Year');
+      setYear('1st Year');
       setSection('A');
 
       // Send email with access code
@@ -151,6 +151,8 @@ export function AdminPanel({ onLogout }) {
       localStorage.setItem('bsn_mock_attendees', JSON.stringify(updated));
       setEmail('');
       setFullname('');
+      setYear('1st Year');
+      setSection('A');
 
       // Try sending email even in fallback
       await sendAccessCodeEmail(newAttendee);
