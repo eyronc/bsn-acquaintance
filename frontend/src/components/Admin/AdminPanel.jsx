@@ -27,15 +27,15 @@ function generateUniqueCode() {
 // Format Class Badge (e.g. BSN-4B)
 function formatClassBadge(year, section) {
   const numYear = year ? String(year).replace(/\D/g, '') : '4';
-  const sec = (section || 'B').toUpperCase();
+  const sec = (section || 'A').toUpperCase();
   return `BSN-${numYear}${sec}`;
 }
 
 export function AdminPanel({ onLogout }) {
   // Form State
   const [fullname, setFullname] = useState('');
-  const [year, setYear] = useState('4th Year');
-  const [section, setSection] = useState('B');
+  const [year, setYear] = useState('1st Year');
+  const [section, setSection] = useState('A');
   const [email, setEmail] = useState('');
 
   // Data & UI State
@@ -85,7 +85,7 @@ export function AdminPanel({ onLogout }) {
       if (local) {
         try {
           setAttendees(JSON.parse(local));
-        } catch (e) {}
+        } catch (e) { }
       }
     } finally {
       setFetchLoading(false);
@@ -101,12 +101,12 @@ export function AdminPanel({ onLogout }) {
 
       const { data, error } = await supabase
         .from('attendees')
-        .insert([{ 
-          email, 
-          fullname, 
-          year, 
-          section, 
-          unique_code: uniqueCode 
+        .insert([{
+          email,
+          fullname,
+          year,
+          section,
+          unique_code: uniqueCode
         }])
         .select();
 
@@ -117,7 +117,7 @@ export function AdminPanel({ onLogout }) {
       setEmail('');
       setFullname('');
       setYear('4th Year');
-      setSection('B');
+      setSection('A');
 
       // Send email with access code
       const emailResult = await sendAccessCodeEmail(newAttendee);
@@ -252,9 +252,9 @@ export function AdminPanel({ onLogout }) {
       <header className="neu-flat sticky top-0 z-40 mx-2 md:mx-6 my-2 rounded-2xl border border-rose-200/50">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex justify-between items-center gap-2 sm:gap-4">
           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
-            <img 
-              src="/uclmnursing.svg" 
-              alt="UCLM Nursing Emblem" 
+            <img
+              src="/uclmnursing.svg"
+              alt="UCLM Nursing Emblem"
               className="w-9 h-9 sm:w-12 sm:h-12 rounded-full neu-avatar object-contain p-1 flex-shrink-0"
             />
             <div className="min-w-0">
@@ -460,7 +460,7 @@ export function AdminPanel({ onLogout }) {
                       <th className="w-[10%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]">Status</th>
                       <th className="w-[13%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]">Seat</th>
                       <th className="w-[10%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]">Registered</th>
-                      <th className="w-[8%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]">Delete</th>
+                      <th className="w-[8%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-rose-100/60 bg-white/60">
@@ -483,24 +483,18 @@ export function AdminPanel({ onLogout }) {
                           {attendee.email}
                         </td>
 
-                        {/* Access Code */}
+                        {/* Access Code - Double Click to Copy */}
                         <td className="py-3 px-4 text-center">
-                          <div className="flex items-center justify-center gap-1.5">
-                            <code className="neu-pressed px-2.5 py-1 rounded-md text-rose-600 font-mono font-bold text-[11px] inline-block whitespace-nowrap">
-                              {attendee.unique_code}
-                            </code>
-                            <button
-                              onClick={() => copyToClipboard(attendee.unique_code)}
-                              className="p-1.5 hover:bg-rose-100 rounded-md transition-colors flex items-center justify-center text-rose-600"
-                              title="Copy Code"
-                            >
-                              {copiedCode === attendee.unique_code ? (
-                                <Check size={14} className="text-emerald-600" />
-                              ) : (
-                                <Copy size={14} />
-                              )}
-                            </button>
-                          </div>
+                          <code
+                            onDoubleClick={() => copyToClipboard(attendee.unique_code)}
+                            className={`neu-pressed px-2.5 py-1 rounded-md font-mono font-bold text-[11px] inline-block whitespace-nowrap cursor-pointer transition-all select-none ${copiedCode === attendee.unique_code
+                                ? 'bg-emerald-100 text-emerald-600'
+                                : 'bg-rose-100 text-rose-600 hover:bg-rose-200'
+                              }`}
+                            title="Double-click to copy"
+                          >
+                            {copiedCode === attendee.unique_code ? '✓ Copied!' : attendee.unique_code}
+                          </code>
                         </td>
 
                         {/* Status */}
@@ -552,8 +546,8 @@ export function AdminPanel({ onLogout }) {
               {/* Mobile Card View (sm and down) */}
               <div className="md:hidden space-y-3.5">
                 {filteredAttendees.map((attendee) => (
-                  <div 
-                    key={attendee.id} 
+                  <div
+                    key={attendee.id}
                     className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-rose-200/70 space-y-3 transition-all"
                   >
                     {/* Top Row: Full Name + Class Badge + Status */}
@@ -601,36 +595,25 @@ export function AdminPanel({ onLogout }) {
                     <div className="flex justify-between items-center pt-2 border-t border-rose-100/60">
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] text-slate-400">Code:</span>
-                        <code className="neu-pressed px-2 py-0.5 rounded text-rose-600 font-mono font-bold text-xs">
-                          {attendee.unique_code}
+                        <code
+                          onDoubleClick={() => copyToClipboard(attendee.unique_code)}
+                          className={`neu-pressed px-2 py-0.5 rounded font-mono font-bold text-xs cursor-pointer transition-all select-none ${copiedCode === attendee.unique_code
+                              ? 'bg-emerald-100 text-emerald-600'
+                              : 'bg-rose-100 text-rose-600'
+                            }`}
+                          title="Double-click to copy"
+                        >
+                          {copiedCode === attendee.unique_code ? '✓ Copied!' : attendee.unique_code}
                         </code>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => copyToClipboard(attendee.unique_code)}
-                          className="neu-button px-2.5 py-1 rounded-xl text-rose-600 font-semibold text-xs inline-flex items-center gap-1 hover:text-rose-700"
-                        >
-                          {copiedCode === attendee.unique_code ? (
-                            <>
-                              <Check size={13} className="text-emerald-600" />
-                              <span className="text-emerald-600 font-bold">Copied</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy size={13} />
-                              <span>Copy</span>
-                            </>
-                          )}
-                        </button>
-                        <button
-                          onClick={() => setAttendeeToDelete(attendee)}
-                          disabled={deleteLoading === attendee.id}
-                          className="p-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-xl transition-colors"
-                          title="Delete Attendee"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => setAttendeeToDelete(attendee)}
+                        disabled={deleteLoading === attendee.id}
+                        className="p-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-xl transition-colors"
+                        title="Delete Attendee"
+                      >
+                        <Trash2 size={15} />
+                      </button>
                     </div>
                   </div>
                 ))}
