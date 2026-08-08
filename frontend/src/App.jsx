@@ -10,8 +10,8 @@ function App() {
   const { user, isAuthenticated, isAdmin, studentLogin, adminLogin, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleStudentLogin = async (code) => {
-    await studentLogin(code);
+  const handleStudentLogin = async (email, code) => {
+    await studentLogin(email, code);
     navigate('/dashboard');
   };
 
