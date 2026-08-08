@@ -72,27 +72,51 @@ export function useSeats() {
         .select('id, seat_confirmed, table_number, seat_number, seat_confirmed_at')
         .eq('seat_confirmed', true);
 
-      if (!attendeesError && attendeesData && attendeesData.length > 0) {
-        const confirmedMap = new Map();
+      const confirmedMap = new Map();
+      if (!attendeesError && attendeesData) {
         attendeesData.forEach((att) => {
           if (att.table_number && att.seat_number) {
             confirmedMap.set(`T${att.table_number}-S${att.seat_number}`, att);
           }
         });
+      }
 
-        baseSeats = baseSeats.map((s) => {
-          const key = `T${s.table_number}-S${s.seat_number}`;
-          const att = confirmedMap.get(key);
-          if (att) {
-            return {
-              ...s,
-              attendee_id: att.id,
-              status: 'confirmed',
-              confirmed_at: att.seat_confirmed_at || s.confirmed_at,
-            };
+      // Synchronize baseSeats strictly with actual confirmed attendees
+      const orphanedSeatsToReset = [];
+      baseSeats = baseSeats.map((s) => {
+        const key = `T${s.table_number}-S${s.seat_number}`;
+        const att = confirmedMap.get(key);
+        if (att) {
+          return {
+            ...s,
+            attendee_id: att.id,
+            status: 'confirmed',
+            confirmed_at: att.seat_confirmed_at || s.confirmed_at,
+          };
+        } else {
+          // If seat was marked confirmed in DB but has no active attendee, reset to available
+          if (s.status === 'confirmed' || s.attendee_id) {
+            orphanedSeatsToReset.push(s);
           }
-          return s;
-        });
+          return {
+            ...s,
+            attendee_id: null,
+            status: 'available',
+            confirmed_at: null,
+          };
+        }
+      });
+
+      // Async cleanup orphaned seats in Supabase seats table if any found
+      if (orphanedSeatsToReset.length > 0) {
+        for (const orphan of orphanedSeatsToReset) {
+          supabase
+            .from('seats')
+            .update({ attendee_id: null, status: 'available', confirmed_at: null })
+            .eq('table_number', orphan.table_number)
+            .eq('seat_number', orphan.seat_number)
+            .then(() => {});
+        }
       }
 
       setSeats(baseSeats);

@@ -82,7 +82,11 @@ BEGIN
   END LOOP;
 END $$;
 
--- 4. Synchronize all existing confirmed attendees into the seats table in Supabase!
+-- 4. Clean up any orphaned seats and synchronize all active confirmed attendees
+UPDATE seats
+SET attendee_id = NULL, status = 'available', confirmed_at = NULL
+WHERE status = 'confirmed' AND (attendee_id IS NULL OR attendee_id NOT IN (SELECT id FROM attendees WHERE seat_confirmed = TRUE));
+
 UPDATE seats s
 SET 
   attendee_id = a.id,
@@ -92,6 +96,22 @@ FROM attendees a
 WHERE a.seat_confirmed = TRUE 
   AND a.table_number = s.table_number 
   AND a.seat_number = s.seat_number;
+
+-- 5. Trigger to automatically free seat when an attendee is deleted
+CREATE OR REPLACE FUNCTION free_seat_on_attendee_delete()
+RETURNS TRIGGER AS $$
+BEGIN
+  UPDATE seats
+  SET attendee_id = NULL, status = 'available', confirmed_at = NULL
+  WHERE attendee_id = OLD.id OR (table_number = OLD.table_number AND seat_number = OLD.seat_number);
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_free_seat_on_attendee_delete ON attendees;
+CREATE TRIGGER trigger_free_seat_on_attendee_delete
+BEFORE DELETE ON attendees
+FOR EACH ROW EXECUTE FUNCTION free_seat_on_attendee_delete();
 
 -- 5. Enable Row Level Security (RLS) & Grant Access Policies
 ALTER TABLE attendees ENABLE ROW LEVEL SECURITY;

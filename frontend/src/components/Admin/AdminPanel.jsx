@@ -172,6 +172,20 @@ export function AdminPanel({ onLogout }) {
     setDeleteLoading(attendee.id);
 
     try {
+      // 1. Release seat in seats table
+      if (attendee.table_number && attendee.seat_number) {
+        await supabase
+          .from('seats')
+          .update({ attendee_id: null, status: 'available', confirmed_at: null })
+          .eq('table_number', attendee.table_number)
+          .eq('seat_number', attendee.seat_number);
+      }
+      await supabase
+        .from('seats')
+        .update({ attendee_id: null, status: 'available', confirmed_at: null })
+        .eq('attendee_id', attendee.id);
+
+      // 2. Delete attendee record
       const { error } = await supabase
         .from('attendees')
         .delete()
@@ -197,9 +211,37 @@ export function AdminPanel({ onLogout }) {
   };
 
   const copyToClipboard = (code) => {
-    navigator.clipboard.writeText(code);
+    if (!code) return;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).catch(() => fallbackCopy(code));
+      } else {
+        fallbackCopy(code);
+      }
+    } catch (e) {
+      fallbackCopy(code);
+    }
     setCopiedCode(code);
-    setTimeout(() => setCopiedCode(null), 2000);
+    setToast({
+      message: `Copied code: ${code}`,
+      type: 'success',
+    });
+    setTimeout(() => setCopiedCode(null), 2200);
+  };
+
+  const fallbackCopy = (text) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    textArea.style.top = "-9999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+    } catch (err) {}
+    document.body.removeChild(textArea);
   };
 
   // Filter & Sort attendees dynamically
@@ -250,9 +292,9 @@ export function AdminPanel({ onLogout }) {
 
   return (
     <div className="min-h-screen bg-[#f7e5ee] text-[#3b1427] pb-12">
-      {/* Responsive Header */}
-      <header className="neu-flat sticky top-0 z-40 mx-2 md:mx-6 my-2 rounded-2xl border border-rose-200/50">
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex justify-between items-center gap-2 sm:gap-4">
+      {/* Responsive Fixed Header */}
+      <header className="sticky top-0 z-50 bg-[#f7e5ee]/95 backdrop-blur-md border-b border-rose-200/60 shadow-sm py-3 px-3 sm:px-6 mb-6">
+        <div className="max-w-7xl mx-auto flex justify-between items-center gap-2 sm:gap-4">
           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
             <img
               src="/uclmnursing.svg"
@@ -260,8 +302,8 @@ export function AdminPanel({ onLogout }) {
               className="w-9 h-9 sm:w-12 sm:h-12 rounded-full neu-avatar object-contain p-1 flex-shrink-0"
             />
             <div className="min-w-0">
-              <h1 className="text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading truncate leading-tight">Admin Panel</h1>
-              <p className="text-rose-600 font-bold text-[11px] sm:text-sm truncate">BSN Party 2026</p>
+              <h1 className="text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading truncate leading-tight tracking-tight">Admin Panel</h1>
+              <p className="text-rose-600 font-bold text-[11px] sm:text-sm truncate tracking-wider uppercase">BSN Party 2026</p>
             </div>
           </div>
 
@@ -475,7 +517,7 @@ export function AdminPanel({ onLogout }) {
 
                         {/* Class / Section */}
                         <td className="py-3 px-4 text-center">
-                          <span className="font-mono font-bold text-[11px] px-2.5 py-1 bg-rose-100 text-rose-800 rounded-md border border-rose-200 inline-block whitespace-nowrap">
+                          <span className="font-mono font-bold text-[11px] px-2.5 py-1 bg-rose-100 text-rose-800 rounded-md border border-rose-200 inline-block whitespace-nowrap tracking-wider">
                             {formatClassBadge(attendee.year, attendee.section)}
                           </span>
                         </td>
@@ -485,28 +527,29 @@ export function AdminPanel({ onLogout }) {
                           {attendee.email}
                         </td>
 
-                        {/* Access Code - Double Click to Copy */}
+                        {/* Access Code - Click Once to Copy */}
                         <td className="py-3 px-4 text-center">
-                          <code
-                            onDoubleClick={() => copyToClipboard(attendee.unique_code)}
-                            className={`neu-pressed px-2.5 py-1 rounded-md font-mono font-bold text-[11px] inline-flex items-center justify-center whitespace-nowrap cursor-pointer transition-all select-none w-[110px] ${copiedCode === attendee.unique_code
-                                ? 'bg-emerald-100 text-emerald-600'
-                                : 'bg-rose-100 text-rose-600 hover:bg-rose-200'
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard(attendee.unique_code)}
+                            className={`neu-pressed px-2.5 py-1 rounded-md font-mono font-bold text-[11px] inline-flex items-center justify-center whitespace-nowrap cursor-pointer transition-all select-none tracking-widest active:scale-95 ${copiedCode === attendee.unique_code
+                                ? 'bg-emerald-100 text-emerald-600 border border-emerald-300'
+                                : 'bg-rose-100 text-rose-600 hover:bg-rose-200 border border-rose-200'
                               }`}
-                            title="Double-click to copy"
+                            title="Click to copy code"
                           >
                             {copiedCode === attendee.unique_code ? '✓ Copied!' : attendee.unique_code}
-                          </code>
+                          </button>
                         </td>
 
                         {/* Status */}
                         <td className="py-3 px-4 text-center">
                           {attendee.seat_confirmed ? (
-                            <span className="inline-flex items-center justify-center px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-[11px] whitespace-nowrap w-[85px]">
+                            <span className="inline-flex items-center justify-center px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-[11px] whitespace-nowrap tracking-wider">
                               Confirmed
                             </span>
                           ) : (
-                            <span className="inline-flex items-center justify-center px-2.5 py-1 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-[11px] whitespace-nowrap w-[85px]">
+                            <span className="inline-flex items-center justify-center px-2.5 py-1 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-[11px] whitespace-nowrap tracking-wider">
                               Pending
                             </span>
                           )}
@@ -596,17 +639,18 @@ export function AdminPanel({ onLogout }) {
                     {/* Bottom Actions Row */}
                     <div className="flex justify-between items-center pt-2 border-t border-rose-100/60">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-slate-400">Code:</span>
-                        <code
-                          onDoubleClick={() => copyToClipboard(attendee.unique_code)}
-                          className={`neu-pressed px-2 py-0.5 rounded font-mono font-bold text-xs cursor-pointer transition-all select-none ${copiedCode === attendee.unique_code
-                              ? 'bg-emerald-100 text-emerald-600'
-                              : 'bg-rose-100 text-rose-600'
+                        <span className="text-[10px] text-slate-400 font-bold tracking-wider uppercase">Code:</span>
+                        <button
+                          type="button"
+                          onClick={() => copyToClipboard(attendee.unique_code)}
+                          className={`neu-pressed px-2.5 py-1 rounded font-mono font-bold text-xs cursor-pointer transition-all select-none tracking-widest active:scale-95 ${copiedCode === attendee.unique_code
+                              ? 'bg-emerald-100 text-emerald-600 border border-emerald-300'
+                              : 'bg-rose-100 text-rose-600 border border-rose-200'
                             }`}
-                          title="Double-click to copy"
+                          title="Click to copy code"
                         >
                           {copiedCode === attendee.unique_code ? '✓ Copied!' : attendee.unique_code}
-                        </code>
+                        </button>
                       </div>
                       <button
                         onClick={() => setAttendeeToDelete(attendee)}

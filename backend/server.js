@@ -86,7 +86,7 @@ app.post('/api/send-access-code', async (req, res) => {
                 <!-- Logo & Hero Header -->
                 <tr>
                   <td style="background: linear-gradient(135deg, #3b1427 0%, #581c37 50%, #831843 100%); padding: 32px 30px 24px 30px; text-align: center; color: #ffffff;">
-                    <img src="https://bsn-acquaintance.vercel.app/uclmnsbo.jpg" alt="UCLM NSBO Logo" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(244, 114, 182, 0.3); margin-bottom: 12px; display: inline-block;">
+                    <img src="https://bsn-acquaintance.vercel.app/uclmnsbo.jpg" width="60" height="60" alt="UCLM NSBO Logo" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(244, 114, 182, 0.3); margin-bottom: 12px; display: inline-block;">
                     
                     <div style="display: inline-block; background: rgba(244, 114, 182, 0.2); border: 1px solid rgba(244, 114, 182, 0.4); border-radius: 50px; padding: 6px 16px; margin-bottom: 16px;">
                       <span style="color: #fbcfe8; font-size: 11px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; font-family: 'Poppins', system-ui, -apple-system, sans-serif;">Official Event Pass</span>
@@ -247,7 +247,7 @@ app.post('/api/send-seat-confirmation', async (req, res) => {
                 <!-- Logo & Hero Header -->
                 <tr>
                   <td style="background: linear-gradient(135deg, #065f46 0%, #047857 50%, #3b1427 100%); padding: 32px 30px 24px 30px; text-align: center; color: #ffffff;">
-                    <img src="https://bsn-acquaintance.vercel.app/uclmnsbo.jpg" alt="UCLM NSBO Logo" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid rgba(52, 211, 153, 0.3); margin-bottom: 12px; display: inline-block;">
+                    <img src="https://bsn-acquaintance.vercel.app/uclmnsbo.jpg" width="60" height="60" alt="UCLM NSBO Logo" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(52, 211, 153, 0.3); margin-bottom: 12px; display: inline-block;">
                     
                     <div style="display: inline-block; background: rgba(52, 211, 153, 0.25); border: 1px solid rgba(52, 211, 153, 0.4); border-radius: 50px; padding: 6px 16px; margin-bottom: 16px;">
                       <span style="color: #a7f3d0; font-size: 11px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; font-family: 'Poppins', system-ui, -apple-system, sans-serif;">Seat Reservation Confirmed</span>
