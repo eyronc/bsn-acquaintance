@@ -453,70 +453,70 @@ export function AdminPanel({ onLogout }) {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-rose-200/80">
-                      <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Name</th>
-                      <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Class / Section</th>
-                      <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Email</th>
-                      <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Access Code</th>
-                      <th className="text-center py-3 px-4 font-bold text-[#3b1427]">Status</th>
-                      <th className="text-center py-3 px-4 font-bold text-[#3b1427]">Seat</th>
-                      <th className="text-left py-3 px-4 font-bold text-[#3b1427]">Registered</th>
-                      <th className="text-center py-3 px-4 font-bold text-[#3b1427]">Actions</th>
+                      <th className="text-left py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Name</th>
+                      <th className="text-left py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Class / Section</th>
+                      <th className="text-left py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Email</th>
+                      <th className="text-left py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Access Code</th>
+                      <th className="text-center py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Status</th>
+                      <th className="text-center py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Seat</th>
+                      <th className="text-left py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Registered</th>
+                      <th className="text-center py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-rose-100/60">
                     {filteredAttendees.map((attendee) => (
                       <tr key={attendee.id} className="hover:bg-rose-50/40 transition-colors">
-                        <td className="py-4 px-4 text-[#3b1427] font-semibold">{attendee.fullname}</td>
-                        <td className="py-4 px-4">
-                          <span className="font-mono font-bold text-xs px-2.5 py-1 bg-rose-100 text-rose-800 rounded-lg border border-rose-200">
+                        <td className="py-4 px-4 text-[#3b1427] font-semibold whitespace-nowrap">{attendee.fullname}</td>
+                        <td className="py-4 px-4 whitespace-nowrap">
+                          <span className="font-mono font-bold text-xs px-2.5 py-1 bg-rose-100 text-rose-800 rounded-lg border border-rose-200 whitespace-nowrap">
                             {formatClassBadge(attendee.year, attendee.section)}
                           </span>
                         </td>
-                        <td className="py-4 px-4 text-slate-600 text-xs">{attendee.email}</td>
-                        <td className="py-4 px-4">
-                          <code className="neu-pressed px-3 py-1 rounded-lg text-rose-600 font-mono font-bold text-xs">
+                        <td className="py-4 px-4 text-slate-600 text-xs whitespace-nowrap">{attendee.email}</td>
+                        <td className="py-4 px-4 whitespace-nowrap">
+                          <code className="neu-pressed px-3 py-1 rounded-lg text-rose-600 font-mono font-bold text-xs whitespace-nowrap">
                             {attendee.unique_code}
                           </code>
                         </td>
-                        <td className="py-4 px-4 text-center">
+                        <td className="py-4 px-4 text-center whitespace-nowrap">
                           {attendee.seat_confirmed ? (
-                            <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-xs">
+                            <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-xs whitespace-nowrap">
                               Confirmed
                             </span>
                           ) : (
-                            <span className="inline-block px-3 py-1 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-xs">
+                            <span className="inline-block px-3 py-1 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-xs whitespace-nowrap">
                               Pending
                             </span>
                           )}
                         </td>
-                        <td className="py-4 px-4 text-center">
+                        <td className="py-4 px-4 text-center whitespace-nowrap">
                           {attendee.seat_confirmed && attendee.table_number ? (
-                            <span className="font-mono font-bold text-[#3b1427] text-xs px-2.5 py-1 bg-rose-100/60 rounded-lg">
+                            <span className="inline-block font-mono font-bold text-[#3b1427] text-xs px-2.5 py-1 bg-rose-100/70 border border-rose-200/80 rounded-lg whitespace-nowrap shadow-sm">
                               Table {attendee.table_number} • Seat {attendee.seat_number}
                             </span>
                           ) : (
                             <span className="text-slate-400 text-xs">—</span>
                           )}
                         </td>
-                        <td className="py-4 px-4 text-slate-500 text-xs font-medium">
+                        <td className="py-4 px-4 text-slate-500 text-xs font-medium whitespace-nowrap">
                           {new Date(attendee.created_at).toLocaleDateString()}
                         </td>
-                        <td className="py-4 px-4 text-center">
-                          <div className="flex justify-center items-center gap-2">
+                        <td className="py-4 px-4 text-center whitespace-nowrap">
+                          <div className="flex justify-center items-center gap-2 whitespace-nowrap">
                             <button
                               onClick={() => copyToClipboard(attendee.unique_code)}
-                              className="neu-button px-3 py-1.5 rounded-lg text-rose-600 font-semibold text-xs inline-flex items-center gap-1.5 hover:text-rose-700"
+                              className="neu-button px-3 py-1.5 rounded-lg text-rose-600 font-semibold text-xs inline-flex items-center gap-1.5 hover:text-rose-700 whitespace-nowrap shrink-0"
                             >
-                              {copiedCode === attendee.unique_code ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
-                              {copiedCode === attendee.unique_code ? 'Copied!' : 'Copy Code'}
+                              {copiedCode === attendee.unique_code ? <Check size={14} className="text-emerald-600 shrink-0" /> : <Copy size={14} className="shrink-0" />}
+                              <span className="whitespace-nowrap shrink-0">{copiedCode === attendee.unique_code ? 'Copied!' : 'Copy Code'}</span>
                             </button>
                             <button
                               onClick={() => handleDeleteAttendee(attendee)}
                               disabled={deleteLoading === attendee.id}
-                              className="px-2.5 py-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-lg font-semibold text-xs transition-colors flex items-center gap-1"
+                              className="px-2.5 py-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-lg font-semibold text-xs transition-colors flex items-center gap-1 shrink-0"
                               title="Delete Attendee & Release Seat"
                             >
-                              <Trash2 size={14} />
+                              <Trash2 size={14} className="shrink-0" />
                             </button>
                           </div>
                         </td>
@@ -584,7 +584,7 @@ export function AdminPanel({ onLogout }) {
                           Seat Location
                         </p>
                         {attendee.seat_confirmed && attendee.table_number ? (
-                          <p className="text-xs font-mono font-bold text-[#3b1427]">
+                          <p className="text-xs font-mono font-bold text-[#3b1427] whitespace-nowrap truncate">
                             Table {attendee.table_number} • Seat {attendee.seat_number}
                           </p>
                         ) : (
