@@ -58,9 +58,13 @@ export async function sendAccessCodeEmail(attendee) {
     };
   } catch (error) {
     console.error('Email service error:', error);
+    const isLocal = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+    const message = isLocal && error.name === 'TypeError'
+      ? 'Backend email service is not running on http://localhost:3001. Run "npm --prefix backend dev" to start it.'
+      : (error.message || 'Network error sending email');
     return {
       success: false,
-      message: error.message || 'Network error sending email',
+      message,
     };
   }
 }

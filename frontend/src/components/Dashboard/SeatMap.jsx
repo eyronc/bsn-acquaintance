@@ -6,7 +6,7 @@ const SeatButton = memo(({ seat, index, status, isSelected, onSeatSelect }) => {
   const xPct = Math.cos(angle) * radiusPct;
   const yPct = Math.sin(angle) * radiusPct;
 
-  const isClickable = status === 'available' || status === 'selected' || isSelected;
+  const isClickable = status === 'available' || isSelected;
 
   let classes = 'neu-seat-available font-extrabold cursor-pointer';
   
@@ -21,7 +21,7 @@ const SeatButton = memo(({ seat, index, status, isSelected, onSeatSelect }) => {
   return (
     <button
       onClick={() => {
-        if (isSelected || status === 'selected') {
+        if (isSelected) {
           onSeatSelect(null);
         } else if (isClickable) {
           onSeatSelect(seat);
@@ -33,11 +33,15 @@ const SeatButton = memo(({ seat, index, status, isSelected, onSeatSelect }) => {
         top: `calc(50% + ${yPct}%)`,
         transform: 'translate(-50%, -50%)',
       }}
-      className={`w-8 xs:w-9 sm:w-11 md:w-12 h-8 xs:h-9 sm:h-11 md:h-12 rounded-xl text-xs sm:text-sm flex items-center justify-center active:scale-95 ${classes}`}
-      disabled={!isClickable && !isSelected && status !== 'selected'}
-      title={`Table ${seat.table_number} • Seat ${seat.seat_number} (${status})`}
+      className={`w-8 xs:w-9 sm:w-11 md:w-12 h-8 xs:h-9 sm:h-11 md:h-12 rounded-xl text-xs sm:text-sm flex items-center justify-center active:scale-95 transition-all ${classes}`}
+      disabled={!isClickable}
+      title={
+        status === 'confirmed' 
+          ? `Table ${seat.table_number} • Seat ${seat.seat_number} (Occupied / Confirmed)` 
+          : `Table ${seat.table_number} • Seat ${seat.seat_number} (${status})`
+      }
     >
-      {seat.seat_number}
+      {status === 'confirmed' ? '✓' : seat.seat_number}
     </button>
   );
 });
@@ -50,8 +54,12 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
   }
 
   const getSeatStatus = (seat) => {
-    if ((userSeat && userSeat.id === seat.id) || selectedSeat?.id === seat.id) return 'selected';
-    if (seat.status === 'confirmed') return 'confirmed';
+    if (selectedSeat?.id === seat.id || (selectedSeat?.table_number === seat.table_number && selectedSeat?.seat_number === seat.seat_number)) {
+      return 'selected';
+    }
+    if (seat.status === 'confirmed' || seat.attendee_id) {
+      return 'confirmed';
+    }
     if (seat.status === 'reserved') {
       if (currentUserId && seat.attendee_id === currentUserId) return 'selected';
       return 'reserved';
@@ -68,7 +76,7 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
         <p className="text-slate-600 text-sm md:text-base font-medium">Click an available seat around the table, then confirm your selection</p>
       </div>
 
-      {/* Legend */}
+      {/* Updated Legend matching real UI behavior */}
       <div className="flex flex-wrap justify-center gap-4 md:gap-8 mb-8 text-xs md:text-sm px-4">
         <div className="flex items-center gap-2.5">
           <div className="w-6 h-6 neu-seat-available rounded-lg"></div>
@@ -79,58 +87,58 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
           <span className="text-[#3b1427] font-semibold">Selected</span>
         </div>
         <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 neu-pressed rounded-lg"></div>
-          <span className="text-[#3b1427] font-semibold">Reserved</span>
-        </div>
-        <div className="flex items-center gap-2.5">
           <div className="w-6 h-6 neu-pressed text-pink-600 rounded-lg flex items-center justify-center font-bold text-xs">✓</div>
-          <span className="text-[#3b1427] font-semibold">Confirmed</span>
+          <span className="text-[#3b1427] font-semibold">Occupied / Confirmed</span>
         </div>
       </div>
 
       {/* Tables Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 max-w-6xl mx-auto px-2 md:px-4">
-        {[1, 2, 3, 4, 5, 6].map((tableNum) => (
-          <div key={tableNum} className="flex flex-col items-center">
-            {/* Table Container */}
-            <div className="relative w-[300px] xs:w-[350px] sm:w-[400px] md:w-[440px] h-[300px] xs:h-[350px] sm:h-[400px] md:h-[440px] flex items-center justify-center">
-              
-              {/* Table Center Circle */}
-              <div className="absolute w-[50%] h-[50%] neu-circle rounded-full flex items-center justify-center">
-                <div className="text-center p-3">
-                  <p className="text-[#3b1427] font-extrabold text-lg sm:text-xl md:text-2xl font-heading">
-                    Table {tableNum}
-                  </p>
-                  <p className="text-pink-600 font-bold text-xs sm:text-sm mt-0.5">
-                    BSN Banquet
-                  </p>
+        {[1, 2, 3, 4, 5, 6].map((tableNum) => {
+          const confirmedCount = (tableSeats[tableNum] || []).filter((s) => s.status === 'confirmed' || s.attendee_id).length;
+          
+          return (
+            <div key={tableNum} className="flex flex-col items-center">
+              {/* Table Container */}
+              <div className="relative w-[300px] xs:w-[350px] sm:w-[400px] md:w-[440px] h-[300px] xs:h-[350px] sm:h-[400px] md:h-[440px] flex items-center justify-center">
+                
+                {/* Table Center Circle */}
+                <div className="absolute w-[50%] h-[50%] neu-circle rounded-full flex items-center justify-center">
+                  <div className="text-center p-3">
+                    <p className="text-[#3b1427] font-extrabold text-lg sm:text-xl md:text-2xl font-heading">
+                      Table {tableNum}
+                    </p>
+                    <p className="text-pink-600 font-bold text-xs sm:text-sm mt-0.5">
+                      BSN Banquet
+                    </p>
+                  </div>
                 </div>
+
+                {/* Seats positioned circularly */}
+                {(tableSeats[tableNum] || []).map((seat, index) => {
+                  const status = getSeatStatus(seat);
+                  const isSelected = status === 'selected';
+
+                  return (
+                    <SeatButton
+                      key={seat.id}
+                      seat={seat}
+                      index={index}
+                      status={status}
+                      isSelected={isSelected}
+                      onSeatSelect={onSeatSelect}
+                    />
+                  );
+                })}
               </div>
 
-              {/* Seats positioned circularly */}
-              {tableSeats[tableNum].map((seat, index) => {
-                const status = getSeatStatus(seat);
-                const isSelected = selectedSeat?.id === seat.id;
-
-                return (
-                  <SeatButton
-                    key={seat.id}
-                    seat={seat}
-                    index={index}
-                    status={status}
-                    isSelected={isSelected}
-                    onSeatSelect={onSeatSelect}
-                  />
-                );
-              })}
+              {/* Table Confirmed Stats */}
+              <div className="mt-3 neu-pressed px-4 py-1.5 rounded-full text-xs text-pink-600 font-bold">
+                {confirmedCount}/10 Confirmed
+              </div>
             </div>
-
-            {/* Table Confirmed Stats */}
-            <div className="mt-3 neu-pressed px-4 py-1.5 rounded-full text-xs text-pink-600 font-bold">
-              {tableSeats[tableNum].filter((s) => s.status === 'confirmed').length}/10 Confirmed
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

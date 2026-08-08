@@ -32,8 +32,9 @@ export function AdminLogin({ onLogin, onBackToStudent }) {
               alt="UCLM Nursing Emblem" 
               className="w-20 h-20 md:w-24 md:h-24 rounded-full neu-avatar p-2 object-contain"
             />
-            <div className="absolute bottom-0 right-1/3 bg-rose-600 text-white p-1.5 rounded-full neu-flat-sm">
-              <Lock size={16} />
+            {/* Exact Original Position (bottom-0 right-1/3) with high-contrast visible lock */}
+            <div className="absolute bottom-0 right-1/3 bg-rose-600 text-white p-1.5 rounded-full border-2 border-white shadow-md flex items-center justify-center">
+              <Lock size={15} className="text-white stroke-[2.5]" />
             </div>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold text-[#3b1427] font-heading mb-1">Admin Portal</h1>
@@ -57,12 +58,20 @@ export function AdminLogin({ onLogin, onBackToStudent }) {
           <button
             type="submit"
             disabled={loading}
-            className="neu-button-primary w-full mt-6 py-3.5 rounded-xl font-bold text-white flex items-center justify-center gap-2 text-sm md:text-base disabled:opacity-50"
+            className="neu-button-primary w-full mt-6 py-3.5 rounded-xl font-bold text-white flex items-center justify-center gap-2 text-sm md:text-base disabled:opacity-50 active:scale-95 transition-transform"
           >
             <Lock size={18} />
             {loading ? 'Verifying...' : 'Enter Admin Panel'}
           </button>
         </form>
+
+        {/* Navigation back to Student Login */}
+        <button
+          onClick={onBackToStudent}
+          className="w-full mt-4 py-2.5 text-center text-rose-700 hover:text-rose-900 font-semibold rounded-xl text-xs sm:text-sm transition-colors"
+        >
+          ← Back to Student Login
+        </button>
       </div>
 
       {toast && <Toast {...toast} onClose={() => setToast(null)} />}
