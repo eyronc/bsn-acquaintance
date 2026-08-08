@@ -6,6 +6,7 @@
 
 * {
   font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+  font-weight: 600;
 }
 
 html {
@@ -21,6 +22,9 @@ body {
   padding: 0;
   min-height: 100vh;
   background-attachment: fixed;
+  font-weight: 600;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
