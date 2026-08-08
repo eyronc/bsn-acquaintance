@@ -448,66 +448,66 @@ export function AdminPanel({ onLogout }) {
             </div>
           ) : (
             <>
-              {/* Desktop Table View (md and up) - Responsive without horizontal scrollbar */}
+              {/* Desktop Table View (md and up) - Clean & Balanced Spacing */}
               <div className="hidden md:block w-full overflow-hidden rounded-2xl border border-rose-200/80">
                 <table className="w-full text-xs lg:text-sm table-fixed border-collapse">
                   <thead>
                     <tr className="border-b border-rose-200/80 bg-rose-50/50">
-                      <th className="w-[18%] text-left py-3 pl-3.5 pr-1 font-extrabold text-[#3b1427]">Name</th>
-                      <th className="w-[11%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Class / Section</th>
-                      <th className="w-[23%] text-left py-3 px-2 font-extrabold text-[#3b1427]">Email</th>
-                      <th className="w-[12%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Access Code</th>
-                      <th className="w-[9%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Status</th>
-                      <th className="w-[11%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Seat</th>
-                      <th className="w-[8%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Registered</th>
-                      <th className="w-[12%] text-center py-3 pr-4 pl-1 font-extrabold text-[#3b1427]">Actions</th>
+                      <th className="w-[16%] text-left py-3.5 px-4 font-extrabold text-[#3b1427]">Name</th>
+                      <th className="w-[10%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]">Class</th>
+                      <th className="w-[22%] text-left py-3.5 px-4 font-extrabold text-[#3b1427]">Email</th>
+                      <th className="w-[11%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]">Code</th>
+                      <th className="w-[10%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]">Status</th>
+                      <th className="w-[13%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]">Seat</th>
+                      <th className="w-[10%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]">Registered</th>
+                      <th className="w-[8%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]">Delete</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-rose-100/60 bg-white/60">
                     {filteredAttendees.map((attendee) => (
                       <tr key={attendee.id} className="hover:bg-rose-50/50 transition-colors">
                         {/* Name */}
-                        <td className="py-3 pl-3.5 pr-1 text-left text-[#3b1427] font-semibold truncate" title={attendee.fullname}>
+                        <td className="py-3 px-4 text-left text-[#3b1427] font-semibold truncate" title={attendee.fullname}>
                           {attendee.fullname}
                         </td>
 
                         {/* Class / Section */}
-                        <td className="py-3 px-1 text-center whitespace-nowrap">
-                          <span className="font-mono font-bold text-[11px] px-2 py-0.5 bg-rose-100 text-rose-800 rounded-md border border-rose-200 inline-block">
+                        <td className="py-3 px-4 text-center">
+                          <span className="font-mono font-bold text-[11px] px-2.5 py-1 bg-rose-100 text-rose-800 rounded-md border border-rose-200 inline-block whitespace-nowrap">
                             {formatClassBadge(attendee.year, attendee.section)}
                           </span>
                         </td>
 
                         {/* Email */}
-                        <td className="py-3 px-2 text-left text-slate-600 text-xs truncate" title={attendee.email}>
+                        <td className="py-3 px-4 text-left text-slate-600 text-xs truncate" title={attendee.email}>
                           {attendee.email}
                         </td>
 
                         {/* Access Code */}
-                        <td className="py-3 px-1 text-center whitespace-nowrap">
-                          <code className="neu-pressed px-2 py-0.5 rounded-md text-rose-600 font-mono font-bold text-[11px] inline-block">
+                        <td className="py-3 px-4 text-center">
+                          <code className="neu-pressed px-2.5 py-1 rounded-md text-rose-600 font-mono font-bold text-[11px] inline-block whitespace-nowrap">
                             {attendee.unique_code}
                           </code>
                         </td>
 
                         {/* Status */}
-                        <td className="py-3 px-1 text-center whitespace-nowrap">
+                        <td className="py-3 px-4 text-center">
                           {attendee.seat_confirmed ? (
-                            <span className="inline-block px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-[11px]">
+                            <span className="inline-block px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-[11px] whitespace-nowrap">
                               Confirmed
                             </span>
                           ) : (
-                            <span className="inline-block px-2.5 py-0.5 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-[11px]">
+                            <span className="inline-block px-2.5 py-1 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-[11px] whitespace-nowrap">
                               Pending
                             </span>
                           )}
                         </td>
 
                         {/* Seat */}
-                        <td className="py-3 px-1 text-center whitespace-nowrap">
+                        <td className="py-3 px-4 text-center">
                           {attendee.seat_confirmed && attendee.table_number ? (
-                            <span className="inline-block font-mono font-bold text-[#3b1427] text-[11px] px-2 py-0.5 bg-rose-100/70 border border-rose-200/80 rounded-md shadow-sm">
-                              Table {attendee.table_number} • Seat {attendee.seat_number}
+                            <span className="inline-block font-mono font-bold text-[#3b1427] text-[11px] px-2.5 py-1 bg-rose-100/70 border border-rose-200/80 rounded-md shadow-sm whitespace-nowrap">
+                              T{attendee.table_number} • S{attendee.seat_number}
                             </span>
                           ) : (
                             <span className="text-slate-400 text-xs">—</span>
@@ -515,30 +515,20 @@ export function AdminPanel({ onLogout }) {
                         </td>
 
                         {/* Registered */}
-                        <td className="py-3 px-1 text-center text-slate-500 text-xs font-medium whitespace-nowrap">
+                        <td className="py-3 px-4 text-center text-slate-500 text-xs font-medium whitespace-nowrap">
                           {new Date(attendee.created_at).toLocaleDateString()}
                         </td>
 
-                        {/* Actions */}
-                        <td className="py-3 pr-4 pl-1 text-center whitespace-nowrap">
-                          <div className="flex justify-center items-center gap-1.5">
-                            <button
-                              onClick={() => copyToClipboard(attendee.unique_code)}
-                              className="neu-button px-2 py-1 rounded-md text-rose-600 font-semibold text-[11px] inline-flex items-center gap-1 hover:text-rose-700 shrink-0"
-                              title="Copy Access Code"
-                            >
-                              {copiedCode === attendee.unique_code ? <Check size={13} className="text-emerald-600 shrink-0" /> : <Copy size={13} className="shrink-0" />}
-                              <span className="whitespace-nowrap shrink-0">{copiedCode === attendee.unique_code ? 'Copied!' : 'Copy Code'}</span>
-                            </button>
-                            <button
-                              onClick={() => setAttendeeToDelete(attendee)}
-                              disabled={deleteLoading === attendee.id}
-                              className="p-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-md font-semibold text-xs transition-colors flex items-center justify-center shrink-0"
-                              title="Delete Attendee & Release Seat"
-                            >
-                              <Trash2 size={13} className="shrink-0" />
-                            </button>
-                          </div>
+                        {/* Delete Action */}
+                        <td className="py-3 px-4 text-center">
+                          <button
+                            onClick={() => setAttendeeToDelete(attendee)}
+                            disabled={deleteLoading === attendee.id}
+                            className="p-2 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-md font-semibold text-xs inline-flex items-center justify-center transition-colors shrink-0"
+                            title="Delete Attendee & Release Seat"
+                          >
+                            <Trash2 size={14} className="shrink-0" />
+                          </button>
                         </td>
                       </tr>
                     ))}
