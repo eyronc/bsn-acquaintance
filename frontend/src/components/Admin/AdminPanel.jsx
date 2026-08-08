@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { LogOut, Plus, Copy, Check, User, Mail, Key, Armchair, Calendar, Trash2, Search, Filter, ArrowUpDown, GraduationCap, School } from 'lucide-react';
+import { LogOut, Plus, Copy, Check, User, Mail, Key, Armchair, Calendar, Trash2, Search, Filter, ArrowUpDown, GraduationCap, School, AlertTriangle, X } from 'lucide-react';
 import { supabase } from '../../supabase/client';
 import { Toast } from '../UI/Toast';
 import { sendAccessCodeEmail } from '../../services/emailService';
@@ -45,6 +45,7 @@ export function AdminPanel({ onLogout }) {
   const [toast, setToast] = useState(null);
   const [copiedCode, setCopiedCode] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(null);
+  const [attendeeToDelete, setAttendeeToDelete] = useState(null);
 
   // Search, Filter & Sort State
   const [searchQuery, setSearchQuery] = useState('');
@@ -163,12 +164,11 @@ export function AdminPanel({ onLogout }) {
     }
   };
 
-  const handleDeleteAttendee = async (attendee) => {
-    if (!window.confirm(`Are you sure you want to delete ${attendee.fullname}? Their reserved seat will be automatically freed.`)) {
-      return;
-    }
-
+  const confirmDelete = async () => {
+    if (!attendeeToDelete) return;
+    const attendee = attendeeToDelete;
     setDeleteLoading(attendee.id);
+
     try {
       const { error } = await supabase
         .from('attendees')
@@ -183,7 +183,6 @@ export function AdminPanel({ onLogout }) {
         type: 'success',
       });
     } catch (err) {
-      console.error('Failed to delete attendee:', err);
       setAttendees((prev) => prev.filter((a) => a.id !== attendee.id));
       setToast({
         message: `Removed ${attendee.fullname}`,
@@ -191,6 +190,7 @@ export function AdminPanel({ onLogout }) {
       });
     } finally {
       setDeleteLoading(null);
+      setAttendeeToDelete(null);
     }
   };
 
@@ -448,75 +448,95 @@ export function AdminPanel({ onLogout }) {
             </div>
           ) : (
             <>
-              {/* Desktop Table View (md and up) */}
-              <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-sm">
+              {/* Desktop Table View (md and up) - All 8 Columns Centered & Responsive (No Horizontal Scrollbar) */}
+              <div className="hidden md:block w-full overflow-hidden rounded-2xl border border-rose-200/80">
+                <table className="w-full text-xs lg:text-sm table-fixed border-collapse">
                   <thead>
-                    <tr className="border-b border-rose-200/80">
-                      <th className="text-left py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Name</th>
-                      <th className="text-left py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Class / Section</th>
-                      <th className="text-left py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Email</th>
-                      <th className="text-left py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Access Code</th>
-                      <th className="text-center py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Status</th>
-                      <th className="text-center py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Seat</th>
-                      <th className="text-left py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Registered</th>
-                      <th className="text-center py-3 px-4 font-bold text-[#3b1427] whitespace-nowrap">Actions</th>
+                    <tr className="border-b border-rose-200/80 bg-rose-50/50">
+                      <th className="w-[17%] text-center py-3 px-2 font-extrabold text-[#3b1427]">Name</th>
+                      <th className="w-[12%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Class / Section</th>
+                      <th className="w-[20%] text-center py-3 px-2 font-extrabold text-[#3b1427]">Email</th>
+                      <th className="w-[13%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Access Code</th>
+                      <th className="w-[9%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Status</th>
+                      <th className="w-[11%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Seat</th>
+                      <th className="w-[8%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Registered</th>
+                      <th className="w-[10%] text-center py-3 px-1 font-extrabold text-[#3b1427]">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-rose-100/60">
+                  <tbody className="divide-y divide-rose-100/60 bg-white/60">
                     {filteredAttendees.map((attendee) => (
-                      <tr key={attendee.id} className="hover:bg-rose-50/40 transition-colors">
-                        <td className="py-4 px-4 text-[#3b1427] font-semibold whitespace-nowrap">{attendee.fullname}</td>
-                        <td className="py-4 px-4 whitespace-nowrap">
-                          <span className="font-mono font-bold text-xs px-2.5 py-1 bg-rose-100 text-rose-800 rounded-lg border border-rose-200 whitespace-nowrap">
+                      <tr key={attendee.id} className="hover:bg-rose-50/50 transition-colors">
+                        {/* Name */}
+                        <td className="py-3 px-2 text-center text-[#3b1427] font-semibold truncate" title={attendee.fullname}>
+                          {attendee.fullname}
+                        </td>
+
+                        {/* Class / Section */}
+                        <td className="py-3 px-1 text-center whitespace-nowrap">
+                          <span className="font-mono font-bold text-[11px] px-2 py-0.5 bg-rose-100 text-rose-800 rounded-md border border-rose-200 inline-block">
                             {formatClassBadge(attendee.year, attendee.section)}
                           </span>
                         </td>
-                        <td className="py-4 px-4 text-slate-600 text-xs whitespace-nowrap">{attendee.email}</td>
-                        <td className="py-4 px-4 whitespace-nowrap">
-                          <code className="neu-pressed px-3 py-1 rounded-lg text-rose-600 font-mono font-bold text-xs whitespace-nowrap">
+
+                        {/* Email */}
+                        <td className="py-3 px-2 text-center text-slate-600 text-xs truncate" title={attendee.email}>
+                          {attendee.email}
+                        </td>
+
+                        {/* Access Code */}
+                        <td className="py-3 px-1 text-center whitespace-nowrap">
+                          <code className="neu-pressed px-2 py-0.5 rounded-md text-rose-600 font-mono font-bold text-[11px] inline-block">
                             {attendee.unique_code}
                           </code>
                         </td>
-                        <td className="py-4 px-4 text-center whitespace-nowrap">
+
+                        {/* Status */}
+                        <td className="py-3 px-1 text-center whitespace-nowrap">
                           {attendee.seat_confirmed ? (
-                            <span className="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-xs whitespace-nowrap">
+                            <span className="inline-block px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-[11px]">
                               Confirmed
                             </span>
                           ) : (
-                            <span className="inline-block px-3 py-1 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-xs whitespace-nowrap">
+                            <span className="inline-block px-2.5 py-0.5 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-[11px]">
                               Pending
                             </span>
                           )}
                         </td>
-                        <td className="py-4 px-4 text-center whitespace-nowrap">
+
+                        {/* Seat */}
+                        <td className="py-3 px-1 text-center whitespace-nowrap">
                           {attendee.seat_confirmed && attendee.table_number ? (
-                            <span className="inline-block font-mono font-bold text-[#3b1427] text-xs px-2.5 py-1 bg-rose-100/70 border border-rose-200/80 rounded-lg whitespace-nowrap shadow-sm">
+                            <span className="inline-block font-mono font-bold text-[#3b1427] text-[11px] px-2 py-0.5 bg-rose-100/70 border border-rose-200/80 rounded-md shadow-sm">
                               Table {attendee.table_number} • Seat {attendee.seat_number}
                             </span>
                           ) : (
                             <span className="text-slate-400 text-xs">—</span>
                           )}
                         </td>
-                        <td className="py-4 px-4 text-slate-500 text-xs font-medium whitespace-nowrap">
+
+                        {/* Registered */}
+                        <td className="py-3 px-1 text-center text-slate-500 text-xs font-medium whitespace-nowrap">
                           {new Date(attendee.created_at).toLocaleDateString()}
                         </td>
-                        <td className="py-4 px-4 text-center whitespace-nowrap">
-                          <div className="flex justify-center items-center gap-2 whitespace-nowrap">
+
+                        {/* Actions */}
+                        <td className="py-3 px-1 text-center whitespace-nowrap">
+                          <div className="flex justify-center items-center gap-1.5">
                             <button
                               onClick={() => copyToClipboard(attendee.unique_code)}
-                              className="neu-button px-3 py-1.5 rounded-lg text-rose-600 font-semibold text-xs inline-flex items-center gap-1.5 hover:text-rose-700 whitespace-nowrap shrink-0"
+                              className="neu-button px-2 py-1 rounded-md text-rose-600 font-semibold text-[11px] inline-flex items-center gap-1 hover:text-rose-700 shrink-0"
+                              title="Copy Access Code"
                             >
-                              {copiedCode === attendee.unique_code ? <Check size={14} className="text-emerald-600 shrink-0" /> : <Copy size={14} className="shrink-0" />}
+                              {copiedCode === attendee.unique_code ? <Check size={13} className="text-emerald-600 shrink-0" /> : <Copy size={13} className="shrink-0" />}
                               <span className="whitespace-nowrap shrink-0">{copiedCode === attendee.unique_code ? 'Copied!' : 'Copy Code'}</span>
                             </button>
                             <button
-                              onClick={() => handleDeleteAttendee(attendee)}
+                              onClick={() => setAttendeeToDelete(attendee)}
                               disabled={deleteLoading === attendee.id}
-                              className="px-2.5 py-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-lg font-semibold text-xs transition-colors flex items-center gap-1 shrink-0"
+                              className="p-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-md font-semibold text-xs transition-colors flex items-center justify-center shrink-0"
                               title="Delete Attendee & Release Seat"
                             >
-                              <Trash2 size={14} className="shrink-0" />
+                              <Trash2 size={13} className="shrink-0" />
                             </button>
                           </div>
                         </td>
@@ -618,7 +638,7 @@ export function AdminPanel({ onLogout }) {
                           )}
                         </button>
                         <button
-                          onClick={() => handleDeleteAttendee(attendee)}
+                          onClick={() => setAttendeeToDelete(attendee)}
                           disabled={deleteLoading === attendee.id}
                           className="p-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-xl transition-colors"
                           title="Delete Attendee"
@@ -634,6 +654,62 @@ export function AdminPanel({ onLogout }) {
           )}
         </div>
       </main>
+
+      {/* Custom Soft Pink Glassmorphic Delete Confirmation Modal */}
+      {attendeeToDelete && (
+        <div className="fixed inset-0 bg-[#3b1427]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white/95 backdrop-blur-xl border border-rose-200/90 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-5 transform scale-100 transition-all">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
+                  <AlertTriangle size={20} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-extrabold text-[#3b1427] font-heading">Delete Attendee</h3>
+                  <p className="text-xs text-rose-500 font-semibold uppercase tracking-wider">Confirm Removal</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setAttendeeToDelete(null)}
+                className="text-slate-400 hover:text-slate-600 p-1 rounded-xl hover:bg-rose-50 transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="bg-rose-50/70 border border-rose-100 rounded-2xl p-4 text-xs sm:text-sm text-slate-700 leading-relaxed space-y-1.5">
+              <p>
+                Are you sure you want to delete <strong className="text-[#3b1427]">{attendeeToDelete.fullname}</strong> (<span className="font-mono text-rose-700">{attendeeToDelete.email}</span>)?
+              </p>
+              <p className="text-xs text-rose-600 font-medium">
+                ⚠️ Their reserved seat will be automatically freed and available for other guests.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 pt-1">
+              <button
+                onClick={() => setAttendeeToDelete(null)}
+                disabled={deleteLoading === attendeeToDelete.id}
+                className="flex-1 py-2.5 px-4 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs sm:text-sm hover:bg-slate-50 active:scale-[0.98] transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                disabled={deleteLoading === attendeeToDelete.id}
+                className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 text-white font-bold text-xs sm:text-sm hover:from-rose-700 hover:to-pink-700 active:scale-[0.98] transition-all shadow-md flex items-center justify-center gap-2"
+              >
+                {deleteLoading === attendeeToDelete.id ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Trash2 size={16} />
+                )}
+                {deleteLoading === attendeeToDelete.id ? 'Deleting...' : 'Delete Guest'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {toast && <Toast {...toast} onClose={() => setToast(null)} />}
     </div>
