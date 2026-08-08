@@ -21,18 +21,6 @@ export function AdminLogin({ onLogin, onBackToStudent }) {
     }
   };
 
-  // Dev mode: Skip admin login
-  const handleDevSkip = () => {
-    const adminUser = { 
-      id: 'dev-admin', 
-      fullname: 'Dev Admin', 
-      email: 'dev-admin@example.com', 
-      role: 'admin' 
-    };
-    localStorage.setItem('bsn_user', JSON.stringify(adminUser));
-    window.location.reload();
-  };
-
   return (
     <div className="min-h-screen bg-[#f7e5ee] flex items-center justify-center p-4 md:p-6">
       <div className="neu-flat-lg rounded-3xl p-6 md:p-8 w-full max-w-md">
@@ -83,14 +71,6 @@ export function AdminLogin({ onLogin, onBackToStudent }) {
           className="w-full mt-4 py-2.5 text-center text-rose-700 hover:text-rose-900 font-semibold rounded-xl text-xs sm:text-sm transition-colors"
         >
           ← Back to Student Login
-        </button>
-
-        {/* Dev Skip Button */}
-        <button
-          onClick={handleDevSkip}
-          className="neu-button w-full mt-2 py-2 text-center text-[#3b1427] font-semibold rounded-xl text-xs hover:text-rose-600 opacity-60 hover:opacity-100"
-        >
-          Dev: Skip to Admin Panel
         </button>
       </div>
 

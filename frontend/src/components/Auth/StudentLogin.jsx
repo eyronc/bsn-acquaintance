@@ -21,18 +21,6 @@ export function StudentLogin({ onLogin }) {
     }
   };
 
-  // Dev mode: Skip login
-  const handleDevSkip = () => {
-    const demoUser = { 
-      id: 'dev-user', 
-      fullname: 'Dev Student', 
-      email: 'dev@example.com', 
-      role: 'student' 
-    };
-    localStorage.setItem('bsn_user', JSON.stringify(demoUser));
-    window.location.reload();
-  };
-
   return (
     <div className="min-h-screen bg-[#f7e5ee] flex items-center justify-center p-4 md:p-6">
       <div className="neu-flat-lg rounded-3xl p-6 md:p-8 w-full max-w-md">
@@ -93,18 +81,10 @@ export function StudentLogin({ onLogin }) {
         </form>
 
         {/* Footer */}
-        <div className="space-y-3 mt-6">
+        <div className="mt-6">
           <p className="text-center text-slate-600 text-xs">
             Registration not found? Contact the event organizer
           </p>
-
-          {/* Dev Skip Button */}
-          <button
-            onClick={handleDevSkip}
-            className="neu-button w-full py-2.5 text-center text-[#3b1427] font-semibold rounded-xl text-xs hover:text-rose-600"
-          >
-            Dev: Skip to Dashboard
-          </button>
         </div>
       </div>
 
