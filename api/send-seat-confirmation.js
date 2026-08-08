@@ -76,10 +76,10 @@ export default async function handler(req, res) {
                     <div style="display: inline-block; background: rgba(52, 211, 153, 0.25); border: 1px solid rgba(52, 211, 153, 0.4); border-radius: 50px; padding: 6px 16px; margin-bottom: 16px;">
                       <span style="color: #a7f3d0; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">SEAT RESERVATION CONFIRMED</span>
                     </div>
-                    <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">
+                    <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">
                       BSN Acquaintance Party 2026
                     </h1>
-                    <p style="margin: 8px 0 0 0; color: #6ee7b7; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
+                    <p style="margin: 8px 0 0 0; color: #6ee7b7; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
                       UCLM College of Nursing
                     </p>
                   </td>
@@ -89,17 +89,17 @@ export default async function handler(req, res) {
                 <tr>
                   <td style="padding: 36px 30px 20px 30px;">
                     <div style="text-align: center; margin-bottom: 28px;">
-                      <p style="margin: 0 0 6px 0; color: #047857; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Seat Reserved For</p>
-                      <h2 style="margin: 0; color: #3b1427; font-size: 24px; font-weight: 800;">${fullname}</h2>
+                      <p style="margin: 0 0 6px 0; color: #047857; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Seat Reserved For</p>
+                      <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; color: #3b1427; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">${fullname}</h2>
                     </div>
 
                     <!-- Ticket Stub Container -->
                     <div style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 2px solid #10b981; border-radius: 20px; padding: 28px 20px; text-align: center; margin-bottom: 30px; box-shadow: 0 8px 20px rgba(16, 185, 129, 0.12);">
-                      <p style="margin: 0 0 12px 0; color: #065f46; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Your Reserved Seat Location</p>
+                      <p style="margin: 0 0 12px 0; color: #065f46; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Your Reserved Seat Location</p>
                       
                       <!-- Seat Badge Grid -->
-                      <div style="display: inline-block; background: #ffffff; border-radius: 16px; padding: 18px 28px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15); border: 1px solid #a7f3d0; margin-bottom: 16px;">
-                        <span style="font-family: 'Courier New', Courier, monospace; font-size: 28px; font-weight: 800; color: #047857; letter-spacing: 2px;">
+                      <div style="display: inline-block; background: #ffffff; border-radius: 16px; padding: 16px 24px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15); border: 1px solid #a7f3d0; margin-bottom: 16px;">
+                        <span style="font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; font-size: 24px; font-weight: 700; color: #047857; letter-spacing: -0.5px;">
                           TABLE ${table_number} &bull; SEAT ${seat_number}
                         </span>
                       </div>

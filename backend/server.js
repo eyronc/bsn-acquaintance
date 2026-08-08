@@ -91,10 +91,10 @@ app.post('/api/send-access-code', async (req, res) => {
                     <div style="display: inline-block; background: rgba(244, 114, 182, 0.2); border: 1px solid rgba(244, 114, 182, 0.4); border-radius: 50px; padding: 6px 16px; margin-bottom: 16px;">
                       <span style="color: #fbcfe8; font-size: 11px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; font-family: 'Poppins', system-ui, -apple-system, sans-serif;">Official Event Pass</span>
                     </div>
-                    <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: 0.5px; color: #ffffff; line-height: 1.2; font-family: 'Playfair Display', serif;">
+                    <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">
                       BSN Acquaintance Party 2026
                     </h1>
-                    <p style="margin: 8px 0 0 0; color: #f472b6; font-size: 13px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; font-family: 'Poppins', system-ui, -apple-system, sans-serif;">
+                    <p style="margin: 8px 0 0 0; color: #f472b6; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
                       UCLM College of Nursing
                     </p>
                   </td>
@@ -104,8 +104,8 @@ app.post('/api/send-access-code', async (req, res) => {
                 <tr>
                   <td style="padding: 36px 30px 20px 30px;">
                     <div style="text-align: center; margin-bottom: 28px;">
-                      <p style="margin: 0 0 6px 0; color: #9f1239; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; font-family: 'Poppins', system-ui, -apple-system, sans-serif;">Welcome Guest</p>
-                      <h2 style="margin: 0; color: #3b1427; font-size: 24px; font-weight: 600; letter-spacing: 0.3px; font-family: 'Playfair Display', serif;">${fullname}</h2>
+                      <p style="margin: 0 0 6px 0; color: #9f1239; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">Welcome Guest</p>
+                      <h2 style="margin: 0; color: #3b1427; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">${fullname}</h2>
                     </div>
 
                     <!-- Ticket Code Container -->
@@ -252,10 +252,10 @@ app.post('/api/send-seat-confirmation', async (req, res) => {
                     <div style="display: inline-block; background: rgba(52, 211, 153, 0.25); border: 1px solid rgba(52, 211, 153, 0.4); border-radius: 50px; padding: 6px 16px; margin-bottom: 16px;">
                       <span style="color: #a7f3d0; font-size: 11px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; font-family: 'Poppins', system-ui, -apple-system, sans-serif;">Seat Reservation Confirmed</span>
                     </div>
-                    <h1 style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: 0.5px; color: #ffffff; line-height: 1.2; font-family: 'Playfair Display', serif;">
+                    <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">
                       BSN Acquaintance Party 2026
                     </h1>
-                    <p style="margin: 8px 0 0 0; color: #6ee7b7; font-size: 13px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; font-family: 'Poppins', system-ui, -apple-system, sans-serif;">
+                    <p style="margin: 8px 0 0 0; color: #6ee7b7; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">
                       UCLM College of Nursing
                     </p>
                   </td>
@@ -265,8 +265,8 @@ app.post('/api/send-seat-confirmation', async (req, res) => {
                 <tr>
                   <td style="padding: 36px 30px 20px 30px;">
                     <div style="text-align: center; margin-bottom: 28px;">
-                      <p style="margin: 0 0 6px 0; color: #047857; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; font-family: 'Poppins', system-ui, -apple-system, sans-serif;">Seat Reserved For</p>
-                      <h2 style="margin: 0; color: #3b1427; font-size: 24px; font-weight: 600; letter-spacing: 0.3px; font-family: 'Playfair Display', serif;">${fullname}</h2>
+                      <p style="margin: 0 0 6px 0; color: #047857; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">Seat Reserved For</p>
+                      <h2 style="margin: 0; color: #3b1427; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;">${fullname}</h2>
                     </div>
 
                     <!-- Ticket Stub Container -->

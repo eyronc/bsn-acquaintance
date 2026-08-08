@@ -77,10 +77,10 @@ export default async function handler(req, res) {
                     <div style="display: inline-block; background: rgba(244, 114, 182, 0.2); border: 1px solid rgba(244, 114, 182, 0.4); border-radius: 50px; padding: 6px 16px; margin-bottom: 16px;">
                       <span style="color: #fbcfe8; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">Official Event Pass</span>
                     </div>
-                    <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">
+                    <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">
                       BSN Acquaintance Party 2026
                     </h1>
-                    <p style="margin: 8px 0 0 0; color: #f472b6; font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
+                    <p style="margin: 8px 0 0 0; color: #f472b6; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
                       UCLM College of Nursing
                     </p>
                   </td>
@@ -90,16 +90,16 @@ export default async function handler(req, res) {
                 <tr>
                   <td style="padding: 36px 30px 20px 30px;">
                     <div style="text-align: center; margin-bottom: 28px;">
-                      <p style="margin: 0 0 6px 0; color: #9f1239; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Welcome Guest</p>
-                      <h2 style="margin: 0; color: #3b1427; font-size: 24px; font-weight: 800;">${fullname}</h2>
+                      <p style="margin: 0 0 6px 0; color: #9f1239; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Welcome Guest</p>
+                      <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; color: #3b1427; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">${fullname}</h2>
                     </div>
 
                     <!-- Ticket Code Container -->
                     <div style="background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%); border: 2px dashed #f472b6; border-radius: 20px; padding: 28px 20px; text-align: center; margin-bottom: 30px;">
-                      <p style="margin: 0 0 10px 0; color: #831843; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Your Unique Access Code</p>
+                      <p style="margin: 0 0 10px 0; color: #831843; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Your Unique Access Code</p>
                       
-                      <div style="background: #ffffff; border-radius: 14px; padding: 16px 20px; display: inline-block; box-shadow: inset 0 2px 4px rgba(0,0,0,0.04), 0 4px 12px rgba(244, 114, 182, 0.15); margin-bottom: 16px;">
-                        <code style="font-family: 'Courier New', Courier, monospace; font-size: 32px; font-weight: 800; color: #db2777; letter-spacing: 4px; display: block;">${unique_code}</code>
+                      <div style="background: #ffffff; border-radius: 14px; padding: 14px 24px; display: inline-block; box-shadow: inset 0 2px 4px rgba(0,0,0,0.04), 0 4px 12px rgba(244, 114, 182, 0.15); margin-bottom: 16px;">
+                        <code style="font-family: 'Plus Jakarta Sans', 'Inter', monospace; font-size: 28px; font-weight: 700; color: #db2777; letter-spacing: 1px; display: block;">${unique_code}</code>
                       </div>
 
                       <div>
