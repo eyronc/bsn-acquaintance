@@ -74,7 +74,7 @@ export default async function handler(req, res) {
                       <img src="https://bsn-acquaintance.vercel.app/uclmnsbo.jpg" width="70" height="70" alt="UCLM NSBO Logo" style="display: inline-block; width: 70px; height: 70px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 14px rgba(0,0,0,0.25); border: 2px solid #a7f3d0;" />
                     </div>
                     <div style="display: inline-block; background: rgba(52, 211, 153, 0.25); border: 1px solid rgba(52, 211, 153, 0.4); border-radius: 50px; padding: 6px 16px; margin-bottom: 16px;">
-                      <span style="color: #a7f3d0; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">SEAT RESERVATION CONFIRMED</span>
+                      <span style="color: #a7f3d0; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;">SEAT RESERVATION CONFIRMED</span>
                     </div>
                     <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">
                       BSN Acquaintance Party 2026
@@ -105,7 +105,7 @@ export default async function handler(req, res) {
                       </div>
 
                       <div>
-                        <a href="${eventUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #047857 100%); color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 12px; box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);">
+                        <a href="${eventUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #047857 100%); color: #ffffff; text-decoration: none; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 14px; font-weight: 600; padding: 12px 28px; border-radius: 12px; box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);">
                           View Seat Map
                         </a>
                       </div>
@@ -113,7 +113,7 @@ export default async function handler(req, res) {
 
                     <!-- Details Card -->
                     <div style="background: #fdf2f7; border-radius: 18px; padding: 24px; border: 1px solid #fbcfe8; margin-bottom: 24px; text-align: center;">
-                      <h3 style="margin: 0 0 8px 0; color: #3b1427; font-size: 16px; font-weight: 800;">
+                      <h3 style="margin: 0 0 8px 0; color: #3b1427; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 16px; font-weight: 600;">
                         See You at the Event!
                       </h3>
                       <p style="margin: 0 0 12px 0; color: #831843; font-size: 13px; line-height: 1.6;">

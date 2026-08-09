@@ -75,7 +75,7 @@ export default async function handler(req, res) {
                       <img src="https://bsn-acquaintance.vercel.app/uclmnsbo.jpg" width="70" height="70" alt="UCLM NSBO Logo" style="display: inline-block; width: 70px; height: 70px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 14px rgba(0,0,0,0.25); border: 2px solid #fbcfe8;" />
                     </div>
                     <div style="display: inline-block; background: rgba(244, 114, 182, 0.2); border: 1px solid rgba(244, 114, 182, 0.4); border-radius: 50px; padding: 6px 16px; margin-bottom: 16px;">
-                      <span style="color: #fbcfe8; font-size: 11px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;">Official Event Pass</span>
+                      <span style="color: #fbcfe8; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;">Official Event Pass</span>
                     </div>
                     <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 26px; font-weight: 700; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">
                       BSN Acquaintance Party 2026
@@ -103,7 +103,7 @@ export default async function handler(req, res) {
                       </div>
 
                       <div>
-                        <a href="${eventUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 12px; box-shadow: 0 6px 18px rgba(236, 72, 153, 0.35);">
+                        <a href="${eventUrl}" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); color: #ffffff; text-decoration: none; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 14px; font-weight: 600; padding: 12px 28px; border-radius: 12px; box-shadow: 0 6px 18px rgba(236, 72, 153, 0.35);">
                           Access Portal & Choose Seat
                         </a>
                       </div>
@@ -111,7 +111,7 @@ export default async function handler(req, res) {
 
                     <!-- Login Instructions Card -->
                     <div style="background: #fdf2f7; border-radius: 18px; padding: 24px; border: 1px solid #fbcfe8; margin-bottom: 24px;">
-                      <h3 style="margin: 0 0 16px 0; color: #3b1427; font-size: 15px; font-weight: 800;">
+                      <h3 style="margin: 0 0 16px 0; color: #3b1427; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 15px; font-weight: 600;">
                         How to Complete Registration:
                       </h3>
                       
@@ -157,8 +157,8 @@ export default async function handler(req, res) {
                 <!-- Footer -->
                 <tr>
                   <td style="background: #fdf2f7; padding: 24px 30px; text-align: center; border-top: 1px solid #fbcfe8;">
-                    <p style="margin: 0 0 6px 0; color: #831843; font-size: 13px; font-weight: 700;">We look forward to seeing you!</p>
-                    <p style="margin: 0; color: #9f1239; font-size: 11px; font-weight: 500;">UCLM College of Nursing • BSN Acquaintance Party 2026</p>
+                    <p style="margin: 0 0 6px 0; color: #831843; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 600;">See You at the Event!</p>
+                    <p style="margin: 0; color: #9f1239; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 500;">UCLM College of Nursing • BSN Acquaintance Party 2026</p>
                   </td>
                 </tr>
 

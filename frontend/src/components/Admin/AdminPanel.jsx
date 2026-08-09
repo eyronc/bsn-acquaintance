@@ -240,7 +240,7 @@ export function AdminPanel({ onLogout }) {
     textArea.select();
     try {
       document.execCommand('copy');
-    } catch (err) {}
+    } catch (err) { }
     document.body.removeChild(textArea);
   };
 
@@ -532,8 +532,8 @@ export function AdminPanel({ onLogout }) {
                           <code
                             onClick={() => copyToClipboard(attendee.unique_code)}
                             className={`neu-pressed px-2.5 py-1 rounded-md font-mono font-bold text-[11px] inline-flex items-center justify-center whitespace-nowrap cursor-pointer transition-all select-none w-[110px] ${copiedCode === attendee.unique_code
-                                ? 'bg-emerald-100 text-emerald-600 border border-emerald-300'
-                                : 'bg-rose-100 text-rose-600 hover:bg-rose-200 border border-rose-200'
+                              ? 'bg-emerald-100 text-emerald-600 border border-emerald-300'
+                              : 'bg-rose-100 text-rose-600 hover:bg-rose-200 border border-rose-200'
                               }`}
                             title="Click to copy code"
                           >
@@ -642,8 +642,8 @@ export function AdminPanel({ onLogout }) {
                         <code
                           onClick={() => copyToClipboard(attendee.unique_code)}
                           className={`neu-pressed px-2 py-0.5 rounded font-mono font-bold text-xs cursor-pointer transition-all select-none ${copiedCode === attendee.unique_code
-                              ? 'bg-emerald-100 text-emerald-600 border border-emerald-300'
-                              : 'bg-rose-100 text-rose-600'
+                            ? 'bg-emerald-100 text-emerald-600 border border-emerald-300'
+                            : 'bg-rose-100 text-rose-600'
                             }`}
                           title="Click to copy code"
                         >
