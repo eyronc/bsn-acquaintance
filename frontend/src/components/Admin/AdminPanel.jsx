@@ -106,7 +106,8 @@ export function AdminPanel({ onLogout }) {
           fullname,
           year,
           section,
-          unique_code: uniqueCode
+          unique_code: uniqueCode,
+          payment_amount: 650
         }])
         .select();
 
@@ -144,6 +145,7 @@ export function AdminPanel({ onLogout }) {
         year,
         section,
         unique_code: uniqueCode,
+        payment_amount: 650,
         created_at: new Date().toISOString(),
       };
       const updated = [newAttendee, ...attendees];
@@ -314,7 +316,7 @@ export function AdminPanel({ onLogout }) {
       return `"${str}"`;
     };
 
-    // Header row
+    // Header row for liquidation CSV
     const headers = [
       'No.',
       'Full Name',
@@ -323,12 +325,18 @@ export function AdminPanel({ onLogout }) {
       'Section',
       'Email Address',
       'Access Code',
+      'Payment Fee',
       'Status',
       'Table Number',
       'Seat Number',
       'Seat Details',
       'Registration Date'
     ];
+
+    // Calculate totals for Liquidation Summary
+    const totalAmount = sortedExportData.reduce((sum, att) => sum + (Number(att.payment_amount) || 650), 0);
+    const confirmedCount = sortedExportData.filter(att => att.seat_confirmed).length;
+    const confirmedAmount = sortedExportData.filter(att => att.seat_confirmed).reduce((sum, att) => sum + (Number(att.payment_amount) || 650), 0);
 
     // Build data rows
     const rows = sortedExportData.map((att, index) => {
@@ -338,6 +346,7 @@ export function AdminPanel({ onLogout }) {
 
       const statusText = att.seat_confirmed ? 'Confirmed' : 'Pending';
       const formattedDate = att.created_at ? new Date(att.created_at).toLocaleString() : '';
+      const feeText = `₱${att.payment_amount || 650}`;
 
       return [
         index + 1,
@@ -347,6 +356,7 @@ export function AdminPanel({ onLogout }) {
         att.section || '',
         att.email || '',
         att.unique_code || '',
+        feeText,
         statusText,
         att.table_number || '-',
         att.seat_number || '-',
@@ -355,8 +365,19 @@ export function AdminPanel({ onLogout }) {
       ].map(escapeCSV).join(',');
     });
 
+    // Liquidation Summary Section at the bottom of CSV
+    const liquidationSummary = [
+      '',
+      ['=== BSN 2026 PARTY LIQUIDATION SUMMARY ==='].map(escapeCSV).join(','),
+      ['Total Registered Attendees', sortedExportData.length].map(escapeCSV).join(','),
+      ['Total Confirmed Seats', confirmedCount].map(escapeCSV).join(','),
+      ['Standard Fee Per Student', '₱650.00'].map(escapeCSV).join(','),
+      ['Total Expected Revenue', `₱${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`].map(escapeCSV).join(','),
+      ['Total Confirmed Revenue Collected', `₱${confirmedAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`].map(escapeCSV).join(',')
+    ];
+
     // Add UTF-8 BOM (\uFEFF) so Excel, Numbers, and Google Sheets open with perfect column alignment
-    const csvContent = '\uFEFF' + [headers.map(escapeCSV).join(','), ...rows].join('\n');
+    const csvContent = '\uFEFF' + [headers.map(escapeCSV).join(','), ...rows, ...liquidationSummary].join('\n');
 
     // Create blob and trigger automatic download
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -603,14 +624,15 @@ export function AdminPanel({ onLogout }) {
                 <table className="w-full text-xs lg:text-sm table-fixed border-collapse">
                   <thead>
                     <tr className="border-b border-rose-200/80 bg-rose-50/50">
-                      <th className="w-[16%] text-left py-3.5 px-4 font-extrabold text-[#3b1427]">Name</th>
-                      <th className="w-[10%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]">Class</th>
-                      <th className="w-[22%] text-left py-3.5 px-4 font-extrabold text-[#3b1427]">Email</th>
-                      <th className="w-[11%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]">Code</th>
-                      <th className="w-[10%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]">Status</th>
-                      <th className="w-[13%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]">Seat</th>
-                      <th className="w-[10%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]">Registered</th>
-                      <th className="w-[8%] text-center py-3.5 px-4 font-extrabold text-[#3b1427]"></th>
+                      <th className="w-[15%] text-left py-3.5 px-4 font-extrabold text-[#3b1427]">Name</th>
+                      <th className="w-[9%] text-center py-3.5 px-3 font-extrabold text-[#3b1427]">Class</th>
+                      <th className="w-[20%] text-left py-3.5 px-4 font-extrabold text-[#3b1427]">Email</th>
+                      <th className="w-[11%] text-center py-3.5 px-3 font-extrabold text-[#3b1427]">Code</th>
+                      <th className="w-[10%] text-center py-3.5 px-3 font-extrabold text-[#3b1427]">Payment</th>
+                      <th className="w-[10%] text-center py-3.5 px-3 font-extrabold text-[#3b1427]">Status</th>
+                      <th className="w-[12%] text-center py-3.5 px-3 font-extrabold text-[#3b1427]">Seat</th>
+                      <th className="w-[8%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Registered</th>
+                      <th className="w-[5%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-rose-100/60 bg-white/60">
@@ -634,10 +656,10 @@ export function AdminPanel({ onLogout }) {
                         </td>
 
                         {/* Access Code - Click Once to Copy */}
-                        <td className="py-3 px-4 text-center">
+                        <td className="py-3 px-3 text-center">
                           <code
                             onClick={() => copyToClipboard(attendee.unique_code)}
-                            className={`neu-pressed px-2.5 py-1 rounded-md font-mono font-bold text-[11px] inline-flex items-center justify-center whitespace-nowrap cursor-pointer transition-all select-none w-[110px] ${copiedCode === attendee.unique_code
+                            className={`neu-pressed px-2 py-1 rounded-md font-mono font-bold text-[11px] inline-flex items-center justify-center whitespace-nowrap cursor-pointer transition-all select-none w-[105px] ${copiedCode === attendee.unique_code
                               ? 'bg-emerald-100 text-emerald-600 border border-emerald-300'
                               : 'bg-rose-100 text-rose-600 hover:bg-rose-200 border border-rose-200'
                               }`}
@@ -645,6 +667,13 @@ export function AdminPanel({ onLogout }) {
                           >
                             {copiedCode === attendee.unique_code ? '✓ Copied!' : attendee.unique_code}
                           </code>
+                        </td>
+
+                        {/* Payment */}
+                        <td className="py-3 px-3 text-center">
+                          <span className="inline-flex items-center justify-center px-2.5 py-1 bg-emerald-100/90 text-emerald-800 border border-emerald-300/60 rounded-full font-extrabold text-[11px] whitespace-nowrap">
+                            ₱{attendee.payment_amount || 650}
+                          </span>
                         </td>
 
                         {/* Status */}
@@ -732,6 +761,10 @@ export function AdminPanel({ onLogout }) {
                         <span className="text-slate-700 font-medium truncate block">{attendee.email}</span>
                       </div>
                       <div>
+                        <span className="text-slate-400 block text-[10px]">Payment Fee</span>
+                        <span className="text-emerald-700 font-extrabold block">₱{attendee.payment_amount || 650}</span>
+                      </div>
+                      <div className="col-span-2">
                         <span className="text-slate-400 block text-[10px]">Seat Reserved</span>
                         <span className="text-slate-700 font-semibold block">
                           {attendee.seat_confirmed && attendee.table_number
