@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS attendees (
   year VARCHAR(20) NOT NULL DEFAULT '4th Year',
   section VARCHAR(10) NOT NULL DEFAULT 'B',
   unique_code VARCHAR(20) UNIQUE NOT NULL,
+  payment_amount NUMERIC(10,2) DEFAULT 650.00,
   seat_confirmed BOOLEAN DEFAULT FALSE,
   table_number INT,
   seat_number INT,
@@ -22,10 +23,12 @@ CREATE TABLE IF NOT EXISTS attendees (
 -- Ensure all columns exist on attendees table
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS year VARCHAR(20) NOT NULL DEFAULT '4th Year';
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS section VARCHAR(10) NOT NULL DEFAULT 'B';
+ALTER TABLE attendees ADD COLUMN IF NOT EXISTS payment_amount NUMERIC(10,2) DEFAULT 650.00;
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS seat_confirmed BOOLEAN DEFAULT FALSE;
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS table_number INT;
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS seat_number INT;
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS seat_confirmed_at TIMESTAMP WITH TIME ZONE;
+UPDATE attendees SET payment_amount = 650.00 WHERE payment_amount IS NULL;
 
 -- Update any existing attendees without year/section to 4th Year Section B (BSN - 4B)
 UPDATE attendees 
