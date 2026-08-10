@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { LogOut, Plus, Copy, Check, User, Mail, Key, Armchair, Calendar, Trash2, Search, Filter, ArrowUpDown, GraduationCap, School, AlertTriangle, X } from 'lucide-react';
+import { LogOut, Plus, Copy, Check, User, Mail, Key, Armchair, Calendar, Trash2, Search, Filter, ArrowUpDown, GraduationCap, School, AlertTriangle, X, Download } from 'lucide-react';
 import { supabase } from '../../supabase/client';
 import { Toast } from '../UI/Toast';
 import { sendAccessCodeEmail } from '../../services/emailService';
@@ -290,6 +290,93 @@ export function AdminPanel({ onLogout }) {
   // Dynamic section options based on selected form year
   const currentSections = SECTIONS_BY_YEAR[year] || [];
 
+  // Export Attendees to nicely formatted & organized CSV file
+  const handleExportCSV = () => {
+    if (!filteredAttendees || filteredAttendees.length === 0) {
+      setToast({ message: 'No attendees available to export.', type: 'error' });
+      return;
+    }
+
+    // Automatically sort list by Class (Year & Section) then Full Name for a neat, organized CSV
+    const sortedExportData = [...filteredAttendees].sort((a, b) => {
+      const classA = formatClassBadge(a.year, a.section);
+      const classB = formatClassBadge(b.year, b.section);
+      if (classA !== classB) {
+        return classA.localeCompare(classB);
+      }
+      return (a.fullname || '').localeCompare(b.fullname || '');
+    });
+
+    // Helper to safely escape CSV cell content
+    const escapeCSV = (value) => {
+      if (value === null || value === undefined) return '""';
+      const str = String(value).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    // Header row
+    const headers = [
+      'No.',
+      'Full Name',
+      'Class & Section',
+      'Year Level',
+      'Section',
+      'Email Address',
+      'Access Code',
+      'Status',
+      'Table Number',
+      'Seat Number',
+      'Seat Details',
+      'Registration Date'
+    ];
+
+    // Build data rows
+    const rows = sortedExportData.map((att, index) => {
+      const seatInfo = att.seat_confirmed && att.table_number && att.seat_number
+        ? `Table ${att.table_number} • Seat ${att.seat_number}`
+        : 'Unreserved';
+
+      const statusText = att.seat_confirmed ? 'Confirmed' : 'Pending';
+      const formattedDate = att.created_at ? new Date(att.created_at).toLocaleString() : '';
+
+      return [
+        index + 1,
+        att.fullname || '',
+        formatClassBadge(att.year, att.section),
+        att.year || '',
+        att.section || '',
+        att.email || '',
+        att.unique_code || '',
+        statusText,
+        att.table_number || '-',
+        att.seat_number || '-',
+        seatInfo,
+        formattedDate
+      ].map(escapeCSV).join(',');
+    });
+
+    // Add UTF-8 BOM (\uFEFF) so Excel, Numbers, and Google Sheets open with perfect column alignment
+    const csvContent = '\uFEFF' + [headers.map(escapeCSV).join(','), ...rows].join('\n');
+
+    // Create blob and trigger automatic download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', `BSN_2026_Attendees_${todayStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    setToast({
+      message: `Exported ${sortedExportData.length} attendees to CSV successfully!`,
+      type: 'success'
+    });
+  };
+
   return (
     <div className="min-h-screen bg-[#f7e5ee] text-[#3b1427] pb-12">
       {/* Responsive Fixed Header */}
@@ -406,7 +493,7 @@ export function AdminPanel({ onLogout }) {
 
         {/* Registered Attendees Card */}
         <div className="neu-flat-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-rose-200/60 space-y-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
             <div>
               <h2 className="text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading">
                 Registered Attendees
@@ -416,9 +503,20 @@ export function AdminPanel({ onLogout }) {
               </p>
             </div>
 
-            <span className="px-3.5 py-1.5 bg-rose-100 text-rose-800 font-extrabold text-xs sm:text-sm rounded-full neu-flat">
-              {filteredAttendees.length} Shown
-            </span>
+            <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
+              <button
+                onClick={handleExportCSV}
+                className="neu-button px-3.5 sm:px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 active:scale-95 transition-all shadow-sm border border-emerald-500/30"
+                title="Export attendees to CSV spreadsheet"
+              >
+                <Download size={15} className="shrink-0" />
+                <span className="font-bold">Export CSV</span>
+              </button>
+
+              <span className="px-3.5 py-1.5 bg-rose-100 text-rose-800 font-extrabold text-xs sm:text-sm rounded-full neu-flat shrink-0">
+                {filteredAttendees.length} Shown
+              </span>
+            </div>
           </div>
 
           {/* Search, Filter & Sort Control Bar */}
