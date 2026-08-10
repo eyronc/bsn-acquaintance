@@ -362,10 +362,18 @@ export function AdminPanel({ onLogout }) {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    const todayStr = new Date().toISOString().split('T')[0];
+
+    // Format date as: Month DD, YYYY (e.g. August 10, 2026) without underscores
+    const today = new Date();
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    const dateFormatted = `${monthNames[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
+    const fileName = `BSN-2026 Attendees (${dateFormatted}).csv`;
 
     link.setAttribute('href', url);
-    link.setAttribute('download', `BSN_2026_Attendees_${todayStr}.csv`);
+    link.setAttribute('download', fileName);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -506,11 +514,11 @@ export function AdminPanel({ onLogout }) {
             <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
               <button
                 onClick={handleExportCSV}
-                className="neu-button px-3.5 sm:px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 active:scale-95 transition-all shadow-sm border border-emerald-500/30"
+                className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:from-emerald-700 active:to-teal-700 text-white font-extrabold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5 border border-emerald-400/40 active:scale-95 cursor-pointer"
                 title="Export attendees to CSV spreadsheet"
               >
-                <Download size={15} className="shrink-0" />
-                <span className="font-bold">Export CSV</span>
+                <Download size={16} className="text-white shrink-0" />
+                <span className="text-white font-extrabold tracking-wide">Export CSV</span>
               </button>
 
               <span className="px-3.5 py-1.5 bg-rose-100 text-rose-800 font-extrabold text-xs sm:text-sm rounded-full neu-flat shrink-0">
