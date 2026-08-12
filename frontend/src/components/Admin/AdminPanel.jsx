@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { LogOut, Plus, Copy, Check, User, Mail, Key, Armchair, Calendar, Trash2, Search, Filter, ArrowUpDown, GraduationCap, School, AlertTriangle, X, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import { supabase } from '../../supabase/client';
 import { Toast } from '../UI/Toast';
 import { sendAccessCodeEmail } from '../../services/emailService';
@@ -292,14 +293,14 @@ export function AdminPanel({ onLogout }) {
   // Dynamic section options based on selected form year
   const currentSections = SECTIONS_BY_YEAR[year] || [];
 
-  // Export Attendees to nicely formatted & organized CSV file
+  // Export Attendees & Liquidation to a multi-sheet Excel (.xlsx) file
   const handleExportCSV = () => {
     if (!filteredAttendees || filteredAttendees.length === 0) {
       setToast({ message: 'No attendees available to export.', type: 'error' });
       return;
     }
 
-    // Automatically sort list by Class (Year & Section) then Full Name for a neat, organized CSV
+    // Automatically sort list by Class (Year & Section) then Full Name for a neat, organized sheet
     const sortedExportData = [...filteredAttendees].sort((a, b) => {
       const classA = formatClassBadge(a.year, a.section);
       const classB = formatClassBadge(b.year, b.section);
@@ -309,15 +310,10 @@ export function AdminPanel({ onLogout }) {
       return (a.fullname || '').localeCompare(b.fullname || '');
     });
 
-    // Helper to safely escape CSV cell content
-    const escapeCSV = (value) => {
-      if (value === null || value === undefined) return '""';
-      const str = String(value).replace(/"/g, '""');
-      return `"${str}"`;
-    };
-
-    // Header row for liquidation CSV
-    const headers = [
+    // ==========================================
+    // SHEET 1: "Attendee List"
+    // ==========================================
+    const attendeeHeaders = [
       'No.',
       'Full Name',
       'Class & Section',
@@ -333,13 +329,7 @@ export function AdminPanel({ onLogout }) {
       'Registration Date'
     ];
 
-    // Calculate totals for Liquidation Summary
-    const totalAmount = sortedExportData.reduce((sum, att) => sum + (Number(att.payment_amount) || 650), 0);
-    const confirmedCount = sortedExportData.filter(att => att.seat_confirmed).length;
-    const confirmedAmount = sortedExportData.filter(att => att.seat_confirmed).reduce((sum, att) => sum + (Number(att.payment_amount) || 650), 0);
-
-    // Build data rows
-    const rows = sortedExportData.map((att, index) => {
+    const attendeeRows = sortedExportData.map((att, index) => {
       const seatInfo = att.seat_confirmed && att.table_number && att.seat_number
         ? `Table ${att.table_number} • Seat ${att.seat_number}`
         : 'Unreserved';
@@ -362,46 +352,81 @@ export function AdminPanel({ onLogout }) {
         att.seat_number || '-',
         seatInfo,
         formattedDate
-      ].map(escapeCSV).join(',');
+      ];
     });
 
-    // Liquidation Summary Section at the bottom of CSV
-    const liquidationSummary = [
-      '',
-      ['=== BSN 2026 PARTY LIQUIDATION SUMMARY ==='].map(escapeCSV).join(','),
-      ['Total Registered Attendees', sortedExportData.length].map(escapeCSV).join(','),
-      ['Total Confirmed Seats', confirmedCount].map(escapeCSV).join(','),
-      ['Standard Fee Per Student', '₱650.00'].map(escapeCSV).join(','),
-      ['Total Expected Revenue', `₱${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`].map(escapeCSV).join(','),
-      ['Total Confirmed Revenue Collected', `₱${confirmedAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`].map(escapeCSV).join(',')
+    const ws1Data = [attendeeHeaders, ...attendeeRows];
+    const ws1 = XLSX.utils.aoa_to_sheet(ws1Data);
+
+    // Set column widths for Sheet 1
+    ws1['!cols'] = [
+      { wch: 6 },   // No.
+      { wch: 25 },  // Full Name
+      { wch: 18 },  // Class & Section
+      { wch: 14 },  // Year Level
+      { wch: 10 },  // Section
+      { wch: 30 },  // Email Address
+      { wch: 16 },  // Access Code
+      { wch: 14 },  // Payment Fee
+      { wch: 14 },  // Status
+      { wch: 14 },  // Table Number
+      { wch: 14 },  // Seat Number
+      { wch: 24 },  // Seat Details
+      { wch: 22 }   // Registration Date
     ];
 
-    // Add UTF-8 BOM (\uFEFF) so Excel, Numbers, and Google Sheets open with perfect column alignment
-    const csvContent = '\uFEFF' + [headers.map(escapeCSV).join(','), ...rows, ...liquidationSummary].join('\n');
+    // ==========================================
+    // SHEET 2: "Liquidation Summary"
+    // ==========================================
+    const totalAmount = sortedExportData.reduce((sum, att) => sum + (Number(att.payment_amount) || 650), 0);
+    const confirmedCount = sortedExportData.filter(att => att.seat_confirmed).length;
+    const pendingCount = sortedExportData.length - confirmedCount;
+    const confirmedAmount = sortedExportData.filter(att => att.seat_confirmed).reduce((sum, att) => sum + (Number(att.payment_amount) || 650), 0);
+    const pendingAmount = totalAmount - confirmedAmount;
 
-    // Create blob and trigger automatic download
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
+    const ws2Data = [
+      ['BSN 2026 PARTY LIQUIDATION SUMMARY REPORT'],
+      ['UCLM College of Nursing'],
+      [''],
+      ['FINANCIAL METRIC', 'DETAILS / VALUE'],
+      ['Total Registered Attendees', sortedExportData.length],
+      ['Total Confirmed Seats', confirmedCount],
+      ['Pending Registrations', pendingCount],
+      ['Standard Ticket Fee', '₱650.00'],
+      ['Total Expected Revenue', `₱${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`],
+      ['Total Confirmed Revenue Collected', `₱${confirmedAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`],
+      ['Pending Unconfirmed Revenue', `₱${pendingAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`]
+    ];
 
-    // Format date as: Month DD, YYYY (e.g. August 10, 2026) without underscores
+    const ws2 = XLSX.utils.aoa_to_sheet(ws2Data);
+
+    // Set column widths for Sheet 2
+    ws2['!cols'] = [
+      { wch: 38 },  // Metric
+      { wch: 25 }   // Value
+    ];
+
+    // Create Excel Workbook
+    const wb = XLSX.utils.book_new();
+
+    // Append sheets with explicit custom sheet names
+    XLSX.utils.book_append_sheet(wb, ws1, 'Attendee List');
+    XLSX.utils.book_append_sheet(wb, ws2, 'Liquidation Summary');
+
+    // Format date as: Month DD, YYYY (e.g. August 12, 2026) without underscores
     const today = new Date();
     const monthNames = [
       'January', 'February', 'March', 'April', 'May', 'June',
       'July', 'August', 'September', 'October', 'November', 'December'
     ];
     const dateFormatted = `${monthNames[today.getMonth()]} ${today.getDate()}, ${today.getFullYear()}`;
-    const fileName = `BSN-2026 Attendees (${dateFormatted}).csv`;
+    const fileName = `BSN-2026 Attendees (${dateFormatted}).xlsx`;
 
-    link.setAttribute('href', url);
-    link.setAttribute('download', fileName);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    // Download the multi-sheet Excel file (.xlsx)
+    XLSX.writeFile(wb, fileName);
 
     setToast({
-      message: `Exported ${sortedExportData.length} attendees to CSV successfully!`,
+      message: `Exported Excel workbook with 2 sheets ("Attendee List" & "Liquidation Summary")!`,
       type: 'success'
     });
   };
@@ -536,10 +561,10 @@ export function AdminPanel({ onLogout }) {
               <button
                 onClick={handleExportCSV}
                 className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:from-emerald-700 active:to-teal-700 text-white font-extrabold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5 border border-emerald-400/40 active:scale-95 cursor-pointer"
-                title="Export attendees to CSV spreadsheet"
+                title="Export attendees & liquidation to Excel workbook (.xlsx)"
               >
                 <Download size={16} className="text-white shrink-0" />
-                <span className="text-white font-extrabold tracking-wide">Export CSV</span>
+                <span className="text-white font-extrabold tracking-wide">Export Excel</span>
               </button>
 
               <span className="px-3.5 py-1.5 bg-rose-100 text-rose-800 font-extrabold text-xs sm:text-sm rounded-full neu-flat shrink-0">
