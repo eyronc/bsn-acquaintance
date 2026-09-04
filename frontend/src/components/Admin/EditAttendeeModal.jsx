@@ -11,6 +11,8 @@ const SECTIONS_BY_YEAR = {
   '4th Year': ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
 };
 
+import { getSocietyTheme } from '../../utils/societyTheme';
+
 export const PRESET_SOCIETIES = [
   'Society A',
   'Society B',
@@ -21,7 +23,7 @@ export const PRESET_SOCIETIES = [
   'Society G',
 ];
 
-export function EditAttendeeModal({ isOpen, attendee, onClose, onUpdated, setToast }) {
+export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, onUpdated, setToast }) {
   const [fullname, setFullname] = useState('');
   const [email, setEmail] = useState('');
   const [year, setYear] = useState('1st Year');
@@ -29,7 +31,7 @@ export function EditAttendeeModal({ isOpen, attendee, onClose, onUpdated, setToa
   const [society, setSociety] = useState('Society A');
   const [customSociety, setCustomSociety] = useState('');
   const [isCustomSociety, setIsCustomSociety] = useState(false);
-  const [paymentAmount, setPaymentAmount] = useState(650);
+  const [paymentAmount, setPaymentAmount] = useState(950);
   const [clearSeatChecked, setClearSeatChecked] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -39,7 +41,7 @@ export function EditAttendeeModal({ isOpen, attendee, onClose, onUpdated, setToa
       setEmail(attendee.email || '');
       setYear(attendee.year || '1st Year');
       setSection(attendee.section || 'A');
-      setPaymentAmount(attendee.payment_amount || 650);
+      setPaymentAmount(attendee.payment_amount || 950);
       setClearSeatChecked(false);
 
       const soc = attendee.society || 'Society A';
@@ -55,7 +57,7 @@ export function EditAttendeeModal({ isOpen, attendee, onClose, onUpdated, setToa
     }
   }, [attendee]);
 
-  if (!isOpen || !attendee) return null;
+  if (isOpen === false || !attendee) return null;
 
   const handleYearChange = (newYear) => {
     setYear(newYear);
@@ -89,7 +91,7 @@ export function EditAttendeeModal({ isOpen, attendee, onClose, onUpdated, setToa
         year,
         section,
         society: finalSociety,
-        payment_amount: Number(paymentAmount) || 650,
+        payment_amount: Number(paymentAmount) || 950,
         updated_at: new Date().toISOString(),
       };
 
@@ -137,11 +139,14 @@ export function EditAttendeeModal({ isOpen, attendee, onClose, onUpdated, setToa
         localStorage.setItem('bsn_mock_attendees', JSON.stringify(updatedLocal));
       } catch (e) {}
 
-      onUpdated(updatedRecord);
-      setToast({
-        message: `Updated attendee record for ${fullname}!`,
-        type: 'success',
-      });
+      if (onSave) onSave(updatedRecord);
+      if (onUpdated) onUpdated(updatedRecord);
+      if (setToast) {
+        setToast({
+          message: `Updated attendee record for ${fullname}!`,
+          type: 'success',
+        });
+      }
       onClose();
     } catch (err) {
       console.warn('Update exception:', err.message);
@@ -153,7 +158,7 @@ export function EditAttendeeModal({ isOpen, attendee, onClose, onUpdated, setToa
         year,
         section,
         society: finalSociety,
-        payment_amount: Number(paymentAmount) || 650,
+        payment_amount: Number(paymentAmount) || 950,
         ...(clearSeatChecked ? { seat_confirmed: false, table_code: null, table_number: null, seat_number: null } : {}),
       };
 
@@ -163,11 +168,14 @@ export function EditAttendeeModal({ isOpen, attendee, onClose, onUpdated, setToa
         localStorage.setItem('bsn_mock_attendees', JSON.stringify(updatedLocal));
       } catch (e) {}
 
-      onUpdated(updatedRecord);
-      setToast({
-        message: `Updated ${fullname} locally (Supabase notice: check connection).`,
-        type: 'success',
-      });
+      if (onSave) onSave(updatedRecord);
+      if (onUpdated) onUpdated(updatedRecord);
+      if (setToast) {
+        setToast({
+          message: `Updated ${fullname} locally.`,
+          type: 'success',
+        });
+      }
       onClose();
     } finally {
       setSaving(false);

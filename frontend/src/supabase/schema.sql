@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS attendees (
   section VARCHAR(10) NOT NULL DEFAULT 'B',
   society VARCHAR(100) NOT NULL DEFAULT 'Society A',
   unique_code VARCHAR(20) UNIQUE NOT NULL,
-  payment_amount NUMERIC(10,2) DEFAULT 650.00,
+  payment_amount NUMERIC(10,2) DEFAULT 950.00,
   seat_confirmed BOOLEAN DEFAULT FALSE,
   table_number INT,
   table_code VARCHAR(20),
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS attendees (
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS year VARCHAR(20) NOT NULL DEFAULT '4th Year';
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS section VARCHAR(10) NOT NULL DEFAULT 'B';
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS society VARCHAR(100) NOT NULL DEFAULT 'Society A';
-ALTER TABLE attendees ADD COLUMN IF NOT EXISTS payment_amount NUMERIC(10,2) DEFAULT 650.00;
+ALTER TABLE attendees ADD COLUMN IF NOT EXISTS payment_amount NUMERIC(10,2) DEFAULT 950.00;
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS seat_confirmed BOOLEAN DEFAULT FALSE;
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS table_number INT;
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS table_code VARCHAR(20);
@@ -35,7 +35,7 @@ ALTER TABLE attendees ADD COLUMN IF NOT EXISTS seat_number INT;
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS seat_confirmed_at TIMESTAMP WITH TIME ZONE;
 ALTER TABLE attendees ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
 
-UPDATE attendees SET payment_amount = 650.00 WHERE payment_amount IS NULL;
+UPDATE attendees SET payment_amount = 950.00 WHERE payment_amount IS NULL OR payment_amount = 650.00;
 UPDATE attendees SET society = 'Society A' WHERE society IS NULL OR society = '';
 
 -- 2. Create Seats table (id format "table-A-01-seat-01")
