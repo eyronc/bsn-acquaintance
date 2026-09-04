@@ -26,9 +26,9 @@ export function ConfirmModal({ isOpen, seat, onConfirm, onCancel, loading }) {
       ]}
     >
       {/* Seat Info */}
-      <div className="mb-5 p-5 neu-pressed rounded-2xl bg-gradient-to-br from-[#f9eaf1] to-[#fce7f3] border border-pink-200/60 transition-all duration-300">
+      <div className="mb-5 p-5 neu-pressed rounded-2xl bg-[var(--neu-bg)] border border-[var(--neu-border)] transition-all duration-300">
         <p className="text-slate-500 font-semibold mb-1 text-xs md:text-sm">Your Selected Seat</p>
-        <p className="text-2xl md:text-3xl font-extrabold text-pink-600 font-heading">
+        <p className="text-2xl md:text-3xl font-extrabold text-[var(--neu-accent)] font-heading">
           Table {seat?.table_code || seat?.table_number} • Seat {seat?.seat_number}
         </p>
       </div>
@@ -47,16 +47,16 @@ export function ConfirmModal({ isOpen, seat, onConfirm, onCancel, loading }) {
       {/* Acknowledgment Checkbox */}
       <label className={`flex items-start gap-3 cursor-pointer p-4 neu-flat rounded-2xl transition-all duration-300 ease-out select-none ${
         agreed 
-          ? 'bg-[#fce7f3] border-2 border-pink-400 shadow-md scale-[1.01]' 
-          : 'bg-[#f9eaf1] border border-pink-200/50 hover:border-pink-300'
+          ? 'border-2 border-[var(--neu-accent)] shadow-md scale-[1.01]' 
+          : 'border border-[var(--neu-border)]'
       }`}>
         <input
           type="checkbox"
           checked={agreed}
           onChange={(e) => setAgreed(e.target.checked)}
-          className="mt-0.5 w-5 h-5 rounded accent-pink-600 cursor-pointer flex-shrink-0 transition-transform duration-200 active:scale-90"
+          className="mt-0.5 w-5 h-5 rounded cursor-pointer flex-shrink-0 transition-transform duration-200 active:scale-90 accent-[var(--neu-accent)]"
         />
-        <span className="text-xs md:text-sm text-[#3b1427] leading-relaxed font-medium">
+        <span className="text-xs md:text-sm text-[var(--neu-text)] leading-relaxed font-medium">
           I understand that this seat selection is <strong>final and cannot be changed</strong> after confirmation.
         </span>
       </label>

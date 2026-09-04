@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, memo } from 'react';
 import { STAGE_TABLE_CONFIG } from '../../hooks/useSeats';
 import { FloorPlanModal } from './FloorPlanModal';
-import { Map, Lock, Check, Search, Download, Sparkles, ChevronLeft, ChevronRight, Layers, ArrowRight } from 'lucide-react';
+import { Map, Lock, Search, ChevronLeft, ChevronRight, Layers, ArrowRight } from 'lucide-react';
 import { getSocietyTheme } from '../../utils/societyTheme';
 
 const SeatButton = memo(({ seat, index, status, isSelected, isRestricted, onSeatSelect, onRestrictedClick }) => {
@@ -19,9 +19,9 @@ const SeatButton = memo(({ seat, index, status, isSelected, isRestricted, onSeat
   } else if (isSelected || status === 'selected') {
     classes = 'bg-emerald-500 text-white font-extrabold ring-4 ring-emerald-300 scale-125 z-20 shadow-xl shadow-emerald-500/30';
   } else if (status === 'confirmed') {
-    classes = 'neu-pressed text-pink-600 cursor-not-allowed font-bold opacity-80';
+    classes = 'neu-pressed text-[var(--neu-accent)] border border-[var(--neu-border)] cursor-not-allowed font-bold opacity-75';
   } else if (status === 'reserved') {
-    classes = 'neu-pressed text-purple-400 cursor-not-allowed opacity-60';
+    classes = 'neu-pressed text-[var(--neu-text)] opacity-40 cursor-not-allowed';
   }
 
   return (
@@ -48,13 +48,13 @@ const SeatButton = memo(({ seat, index, status, isSelected, isRestricted, onSeat
       disabled={!isClickable && !isSelected && !isRestricted}
       title={
         isRestricted
-          ? `Table ${seat.table_code} • Seat ${seat.seat_number} (Restricted to ${seat.society})`
+          ? `Table ${seat.table_code} • Seat ${seat.seat_number} (Reserved for ${seat.society})`
           : status === 'confirmed'
           ? `Table ${seat.table_code} • Seat ${seat.seat_number} (Occupied)`
           : `Table ${seat.table_code} • Seat ${seat.seat_number} (${status})`
       }
     >
-      {status === 'confirmed' ? '✓' : isRestricted && status === 'available' ? '🔒' : seat.seat_number}
+      {status === 'confirmed' ? '✓' : seat.seat_number}
     </button>
   );
 });
@@ -148,68 +148,46 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
 
   const handleRestrictedSeatClick = (seat) => {
     setRestrictionNotice(
-      `Table ${seat.table_code} belongs to ${seat.society}. Since you are in ${normalizedUserSociety}, you can only select and reserve seats within ${normalizedUserSociety}.`
+      `Table ${seat.table_code} belongs to ${seat.society}. Since you are in ${normalizedUserSociety}, you can only select seats within ${normalizedUserSociety}.`
     );
     setTimeout(() => setRestrictionNotice(null), 5000);
   };
 
   return (
-    <div className="space-y-6 md:space-y-8 py-2 md:py-4">
-      {/* Header & Floor Plan Download Trigger */}
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white/60 backdrop-blur-sm p-4 sm:p-6 rounded-3xl border border-rose-200/80 shadow-sm">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 bg-rose-100 text-rose-800 text-xs font-extrabold rounded-md uppercase tracking-wider">
-              STAGE.png Reference
-            </span>
-            <span className="text-xs text-slate-500 font-semibold">10 Seats per Circular Table</span>
-          </div>
-          <h2 className="text-xl sm:text-3xl font-extrabold text-[#3b1427] font-heading">
-            Hall Seat Selection
-          </h2>
-          <p className="text-slate-600 text-xs sm:text-sm font-medium">
-            Browse tables by Society zone and select your reservation seat
-          </p>
+    <div className="space-y-5 sm:space-y-6 py-2 md:py-4 max-w-7xl mx-auto px-2 sm:px-4">
+      {/* Visual Stage Area (Clean Architectural Bar - No Sparkles) */}
+      <div className="relative text-center my-2 sm:my-3 px-2">
+        <div className="w-full max-w-xs sm:max-w-sm mx-auto py-2.5 px-4 bg-slate-900 border-2 border-slate-700 rounded-2xl flex items-center justify-center shadow-md">
+          <span className="text-white font-black tracking-[0.25em] text-xs uppercase select-none">
+            MAIN EVENT STAGE
+          </span>
         </div>
-
-        {/* View & Download Floor Plan Button */}
-        <button
-          onClick={() => setShowFloorPlanModal(true)}
-          className="w-full md:w-auto px-4 py-2.5 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all cursor-pointer shrink-0"
-        >
-          <Map size={18} />
-          <span>View & Download Floor Plan</span>
-        </button>
-      </div>
-
-      {/* Visual Stage Area (Representing Stage in STAGE.png) */}
-      <div className="relative text-center my-4">
-        <div className="w-full max-w-xl mx-auto h-12 sm:h-14 bg-slate-900 border-2 border-rose-500/80 rounded-2xl flex items-center justify-center shadow-lg shadow-rose-950/20">
-          <div className="flex items-center gap-2 text-white font-extrabold tracking-[0.25em] text-xs sm:text-sm uppercase">
-            <Sparkles size={16} className="text-rose-400" />
-            <span>MAIN EVENT STAGE</span>
-            <Sparkles size={16} className="text-rose-400" />
-          </div>
-        </div>
-        <div className="text-[11px] text-slate-500 mt-1 font-semibold">
+        <p className="text-[10px] sm:text-[11px] text-[var(--neu-text)]/60 mt-1 font-semibold text-center">
           Tables in Row A face directly toward the stage
-        </div>
+        </p>
       </div>
 
       {/* Society Selection Tabs */}
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center justify-between gap-2 px-1">
-          <div className="flex items-center gap-2">
-            <Layers size={16} className="text-rose-600" />
-            <span className="text-xs sm:text-sm font-bold text-[#3b1427]">Select Society / Hall Zone:</span>
+      <div className="space-y-2.5 text-center sm:text-left">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 px-1">
+          <div className="flex items-center justify-center gap-2">
+            <Layers size={16} className="text-[var(--neu-accent)] shrink-0" />
+            <span className="text-xs sm:text-sm font-bold text-[var(--neu-text)]">Select Society / Hall Zone:</span>
           </div>
-          <div className={`text-xs font-semibold px-3 py-1 rounded-full border shadow-sm ${userSocTheme.bgLight} ${userSocTheme.text} ${userSocTheme.border}`}>
+          <div
+            className="text-xs font-semibold px-3 py-1 rounded-full border shadow-sm mx-auto sm:mx-0"
+            style={{
+              backgroundColor: userSocTheme.badge.bg,
+              color: userSocTheme.badge.text,
+              borderColor: userSocTheme.badge.border,
+            }}
+          >
             Your Assigned Society: <strong className="font-extrabold">{normalizedUserSociety}</strong>
           </div>
         </div>
 
-        {/* Society Navigation Pill Tabs with Dedicated Light Pastel Themes */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
+        {/* Society Navigation Pill Tabs with Dedicated Neumorphic Borders & Colors per Society */}
+        <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-2 px-1 scrollbar-thin max-w-full">
           {STAGE_TABLE_CONFIG.map((conf) => {
             const isSelected = normalizeSociety(activeSociety) === normalizeSociety(conf.society);
             const isUserSoc = normalizeSociety(conf.society) === normalizedUserSociety;
@@ -223,18 +201,28 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
                   setPage(1);
                   setSearchTable('');
                 }}
-                className={`px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 active:scale-95 cursor-pointer ${
+                style={{
+                  borderColor: isSelected ? confTheme.accentColor : confTheme.badge.border,
+                  color: isSelected ? confTheme.accentColor : confTheme.textDark,
+                }}
+                className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
                   isSelected
-                    ? confTheme.tabActive
-                    : confTheme.tabInactive
+                    ? 'neu-pressed border-2 scale-[0.98]'
+                    : 'neu-button border hover:scale-[1.02]'
                 }`}
               >
                 <span>{conf.society}</span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-white/25 text-white' : 'bg-white/70 text-slate-700'}`}>
+                <span
+                  className="text-[10px] px-2 py-0.5 rounded-full font-extrabold shadow-xs"
+                  style={{
+                    backgroundColor: isSelected ? confTheme.accentColor : confTheme.badge.bg,
+                    color: isSelected ? '#ffffff' : confTheme.badge.text,
+                  }}
+                >
                   Row {conf.row}
                 </span>
                 {isUserSoc && (
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-white" title="Your Assigned Society" />
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200" title="Your Assigned Society" />
                 )}
               </button>
             );
@@ -242,15 +230,19 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
         </div>
       </div>
 
-      {/* Society Access Notification Banner */}
-      {!isCurrentSocietyAllowed ? (
-        <div className="neu-pressed p-3.5 sm:p-4 rounded-2xl border border-amber-300 bg-amber-50/80 text-amber-900 text-xs sm:text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
-          <div className="flex items-start gap-2.5">
-            <Lock size={18} className="text-amber-600 shrink-0 mt-0.5" />
+      {/* Society Access Notification Banner - Redesigned Neumorphic Pill Card */}
+      {!isCurrentSocietyAllowed && (
+        <div className="neu-flat p-3.5 sm:p-4 rounded-2xl border border-[var(--neu-border)] max-w-xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-amber-100/90 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0">
+              <Lock size={16} />
+            </div>
             <div>
-              <p className="font-extrabold">Viewing {activeSociety} (Browse Only)</p>
-              <p className="text-amber-800 text-xs mt-0.5">
-                You belong to <strong>{normalizedUserSociety}</strong>. You can only pick and reserve seats within <strong>{normalizedUserSociety}</strong> tables.
+              <p className="text-xs sm:text-sm font-extrabold text-[var(--neu-text)]">
+                Viewing {activeSociety} <span className="text-amber-700 font-bold">(Browse Only)</span>
+              </p>
+              <p className="text-[11px] text-[var(--neu-text)]/70 font-medium">
+                You belong to <strong className="text-[var(--neu-accent)]">{normalizedUserSociety}</strong>. You can only pick seats in your assigned tables.
               </p>
             </div>
           </div>
@@ -260,39 +252,27 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
               setPage(1);
               setSearchTable('');
             }}
-            className="neu-button px-3.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 text-[#3b1427] hover:text-rose-600 active:scale-95 shrink-0 cursor-pointer shadow-sm border border-amber-300/80"
+            className="neu-button px-3.5 py-1.5 rounded-xl font-bold text-xs text-[var(--neu-text)] hover:text-[var(--neu-accent)] flex items-center gap-1.5 shrink-0 active:scale-95 shadow-sm border border-[var(--neu-border)] cursor-pointer"
           >
-            <span>Jump to {normalizedUserSociety}</span>
-            <ArrowRight size={14} />
+            <span>Back to {normalizedUserSociety}</span>
+            <ArrowRight size={13} />
           </button>
-        </div>
-      ) : (
-        <div className={`p-3 sm:p-3.5 rounded-2xl border ${activeSocTheme.bgLight} ${activeSocTheme.border} ${activeSocTheme.text} text-xs sm:text-sm flex items-center justify-between gap-2 shadow-sm`}>
-          <div className="flex items-center gap-2">
-            <Check size={18} className="text-emerald-600 shrink-0" />
-            <span>
-              You are in <strong>{normalizedUserSociety}</strong>. All available seats below are open for your reservation!
-            </span>
-          </div>
-          <span className="text-[11px] font-mono font-extrabold bg-white/80 px-2.5 py-0.5 rounded-full border border-emerald-300 text-emerald-800">
-            ELIGIBLE
-          </span>
         </div>
       )}
 
       {/* Click Restriction Toast Banner */}
       {restrictionNotice && (
-        <div className="p-3 bg-amber-100/90 border border-amber-300 text-amber-900 text-xs sm:text-sm rounded-xl flex items-center gap-2 animate-in fade-in shadow-md">
-          <Lock size={16} className="text-amber-700 shrink-0" />
+        <div className="p-3 bg-amber-100/90 border border-amber-300 text-amber-900 text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 animate-in fade-in shadow-md max-w-lg mx-auto text-center">
+          <Lock size={15} className="text-amber-700 shrink-0" />
           <span className="font-semibold">{restrictionNotice}</span>
         </div>
       )}
 
       {/* Filter & Pagination Control Bar */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 bg-white/70 backdrop-blur-sm p-3 rounded-2xl border border-rose-200/70">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 neu-flat p-3 rounded-2xl border border-[var(--neu-border)] w-full mx-auto">
         {/* Table Search */}
         <div className="relative w-full sm:w-64">
-          <Search size={15} className="absolute left-3 top-2.5 text-rose-400" />
+          <Search size={15} className="absolute left-3 top-2.5 text-[var(--neu-accent)]" />
           <input
             type="text"
             value={searchTable}
@@ -301,12 +281,12 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
               setPage(1);
             }}
             placeholder={`Filter ${activeSociety} tables (e.g. ${activeSociety.replace('Society ', '')}-01)...`}
-            className="w-full pl-8 pr-3 py-1.5 bg-rose-50/50 border border-rose-200 rounded-xl text-xs font-semibold text-[#3b1427] focus:outline-none focus:ring-2 focus:ring-rose-400"
+            className="w-full pl-8 pr-3 py-1.5 bg-[var(--neu-bg)] border border-[var(--neu-border)] rounded-xl text-xs font-semibold text-[var(--neu-text)] placeholder:text-[var(--neu-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--neu-accent)]"
           />
         </div>
 
         {/* Page Switcher */}
-        <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto text-xs font-bold text-[#3b1427]">
+        <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto text-xs font-bold text-[var(--neu-text)]">
           <span>
             Tables {filteredTables.length > 0 ? (page - 1) * TABLES_PER_PAGE + 1 : 0} -{' '}
             {Math.min(page * TABLES_PER_PAGE, filteredTables.length)} of {filteredTables.length}
@@ -315,16 +295,16 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page <= 1}
-              className="p-1.5 neu-button rounded-lg disabled:opacity-40"
+              className="p-1.5 neu-button rounded-lg text-[var(--neu-text)] border border-[var(--neu-border)] disabled:opacity-40 cursor-pointer"
               title="Previous tables"
             >
               <ChevronLeft size={16} />
             </button>
-            <span className="px-2 font-mono">{page}/{totalPages}</span>
+            <span className="px-2 font-mono text-[var(--neu-text)]">{page}/{totalPages}</span>
             <button
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page >= totalPages}
-              className="p-1.5 neu-button rounded-lg disabled:opacity-40"
+              className="p-1.5 neu-button rounded-lg text-[var(--neu-text)] border border-[var(--neu-border)] disabled:opacity-40 cursor-pointer"
               title="Next tables"
             >
               <ChevronRight size={16} />
@@ -333,54 +313,54 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="flex flex-wrap justify-center gap-3 sm:gap-6 text-xs font-semibold px-2">
+      {/* Legend (Zero emojis) */}
+      <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs font-semibold px-2 mx-auto">
         <div className="flex items-center gap-2">
           <div className="w-5 h-5 neu-seat-available rounded-full"></div>
-          <span className="text-[#3b1427]">Available</span>
+          <span className="text-[var(--neu-text)]">Available</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-5 h-5 bg-emerald-500 rounded-full shadow-sm"></div>
-          <span className="text-[#3b1427]">Selected</span>
+          <span className="text-[var(--neu-text)]">Selected</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-5 h-5 neu-pressed text-pink-600 rounded-full flex items-center justify-center font-bold text-[10px]">✓</div>
-          <span className="text-[#3b1427]">Occupied</span>
+          <div className="w-5 h-5 neu-pressed text-[var(--neu-accent)] border border-[var(--neu-border)] rounded-full flex items-center justify-center font-bold text-[10px]">✓</div>
+          <span className="text-[var(--neu-text)]">Occupied</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-5 h-5 neu-pressed text-slate-400 rounded-full flex items-center justify-center text-[10px]">🔒</div>
-          <span className="text-[#3b1427]">Restricted Society</span>
+          <div className="w-5 h-5 neu-pressed text-slate-400 rounded-full flex items-center justify-center font-bold text-[10px] border border-slate-300/60 opacity-60">1</div>
+          <span className="text-slate-500">Other Society</span>
         </div>
       </div>
 
-      {/* Tables Grid (2 to 3 columns, clean layout) */}
+      {/* Tables Grid */}
       {paginatedTables.length === 0 ? (
-        <div className="text-center py-12 neu-flat rounded-3xl p-6">
-          <p className="text-base font-bold text-[#3b1427]">No tables found matching "{searchTable}"</p>
-          <p className="text-xs text-slate-500 mt-1">Try clearing your search query or selecting a different Society tab.</p>
+        <div className="text-center py-12 neu-flat rounded-3xl p-6 max-w-lg mx-auto border border-[var(--neu-border)]">
+          <p className="text-base font-bold text-[var(--neu-text)]">No tables found matching "{searchTable}"</p>
+          <p className="text-xs text-[var(--neu-text)]/60 mt-1">Try clearing your search query or selecting a different Society tab.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 max-w-7xl mx-auto px-1 sm:px-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 max-w-7xl mx-auto px-1 sm:px-2 justify-items-center">
           {paginatedTables.map((table) => {
             const confirmedCount = table.seats.filter((s) => s.status === 'confirmed' || s.attendee_id).length;
             const isTableRestricted = !isCurrentSocietyAllowed;
             const tableTheme = getSocietyTheme(table.society);
 
             return (
-              <div key={table.code} className="flex flex-col items-center">
+              <div key={table.code} className="flex flex-col items-center justify-center w-full max-w-[340px] mx-auto">
                 {/* Table Round Neumorphic Container */}
-                <div className={`relative w-[270px] xs:w-[300px] sm:w-[320px] md:w-[340px] h-[270px] xs:h-[300px] sm:h-[320px] md:h-[340px] flex items-center justify-center rounded-full transition-all`}>
+                <div className="relative w-[280px] xs:w-[300px] sm:w-[320px] md:w-[340px] h-[280px] xs:h-[300px] sm:h-[320px] md:h-[340px] flex items-center justify-center rounded-full transition-all mx-auto">
                   
                   {/* Center Table Deck with Light Society Theme */}
-                  <div className={`absolute w-[50%] h-[50%] neu-circle rounded-full flex items-center justify-center z-10 select-none border-2 shadow-inner ${tableTheme.border} ${tableTheme.bgLight}`}>
+                  <div className={`absolute w-[50%] h-[50%] neu-circle rounded-full flex items-center justify-center z-10 select-none border-2 shadow-inner ${tableTheme.tableBorder} ${tableTheme.tableBg}`}>
                     <div className="text-center p-2">
-                      <p className={`font-extrabold text-base sm:text-xl font-heading leading-tight ${tableTheme.textDark}`}>
+                      <p className={`font-extrabold text-base sm:text-xl font-heading leading-tight ${tableTheme.tableText}`}>
                         Table {table.code}
                       </p>
-                      <p className={`font-extrabold text-[10px] sm:text-xs mt-0.5 truncate max-w-[100px] mx-auto ${tableTheme.text}`}>
+                      <p className={`font-extrabold text-[10px] sm:text-xs mt-0.5 truncate max-w-[100px] mx-auto ${tableTheme.tableText}`}>
                         {table.society}
                       </p>
-                      <span className="inline-block mt-1 text-[9px] font-bold text-slate-600 bg-white/70 px-2 py-0.5 rounded-full border border-rose-200/50">
+                      <span className="inline-block mt-1 text-[9px] font-bold text-slate-600 bg-white/80 px-2 py-0.5 rounded-full border border-black/10">
                         {confirmedCount}/10 Taken
                       </span>
                     </div>
@@ -407,8 +387,8 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
                 </div>
 
                 {/* Table Footer Status */}
-                <div className="mt-2 text-center">
-                  <span className={`px-3.5 py-1 rounded-full text-[11px] font-bold border ${tableTheme.bgLight} ${tableTheme.textDark} ${tableTheme.borderLight} shadow-sm`}>
+                <div className="mt-2.5 text-center">
+                  <span className={`px-3.5 py-1 rounded-full text-[11px] font-bold border ${tableTheme.tableBg} ${tableTheme.tableText} ${tableTheme.tableBorder} shadow-sm`}>
                     Table {table.code} &bull; {10 - confirmedCount} Seats Available
                   </span>
                 </div>
@@ -422,6 +402,7 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
       <FloorPlanModal
         isOpen={showFloorPlanModal}
         onClose={() => setShowFloorPlanModal(false)}
+        society={userSociety || normalizedUserSociety}
       />
     </div>
   );

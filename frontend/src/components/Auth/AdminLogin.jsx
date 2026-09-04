@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Lock } from 'lucide-react';
 import { Toast } from '../UI/Toast';
 
@@ -6,6 +6,11 @@ export function AdminLogin({ onLogin, onBackToStudent }) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
+
+  // Admin login page always remains 100% pink
+  useEffect(() => {
+    document.documentElement.removeAttribute('data-society');
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

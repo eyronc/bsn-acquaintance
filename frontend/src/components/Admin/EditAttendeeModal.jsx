@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, Edit3, User, Mail, School, BookOpen, Layers, DollarSign, Armchair, AlertCircle } from 'lucide-react';
+import { X, Save, Edit3, User, Mail, School, BookOpen, Layers, Armchair, AlertCircle } from 'lucide-react';
 import { supabase } from '../../supabase/client';
 
 const YEAR_OPTIONS = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
@@ -317,7 +317,7 @@ export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, on
               Payment Ticket Amount (₱)
             </label>
             <div className="relative">
-              <DollarSign size={15} className="absolute left-3.5 top-3.5 text-rose-400" />
+              <span className="absolute left-3.5 top-2.5 text-rose-500 font-extrabold text-sm select-none">₱</span>
               <input
                 type="number"
                 value={paymentAmount}

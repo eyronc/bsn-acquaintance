@@ -18,10 +18,19 @@ export function formatTableCode(rowLetter, number) {
 }
 
 // Seat ID generator (e.g. "table-A-01-seat-01")
-export function formatSeatId(tableCode, seatNumber) {
+export const formatSeatId = (tableCode, seatNumber) => {
   const sPad = String(seatNumber).padStart(2, '0');
   return `table-${tableCode}-seat-${sPad}`;
-}
+};
+
+export const getEffectiveTableCode = (att) => {
+  if (!att) return 'A-01';
+  if (att.table_code) return att.table_code;
+  const soc = att.society || 'Society A';
+  const match = String(soc).match(/[A-G]/i);
+  const rowLetter = match ? match[0].toUpperCase() : 'A';
+  return `${rowLetter}-${String(att.table_number || 1).padStart(2, '0')}`;
+};
 
 // Generate base seats for all tables defined in STAGE.png (10 seats per table)
 export function createFreshBaseSeats() {
@@ -107,7 +116,7 @@ export function useSeats() {
       const confirmedMap = new Map();
       if (!attendeesError && attendeesData) {
         attendeesData.forEach((att) => {
-          const code = att.table_code || (att.table_number ? `A-${String(att.table_number).padStart(2, '0')}` : null);
+          const code = getEffectiveTableCode(att);
           if (code && att.seat_number) {
             confirmedMap.set(`${code}-S${att.seat_number}`, att);
           }
@@ -119,7 +128,7 @@ export function useSeats() {
         const localAttendees = JSON.parse(localStorage.getItem('bsn_mock_attendees') || '[]');
         localAttendees.forEach((att) => {
           if (att.seat_confirmed && (att.table_code || att.table_number) && att.seat_number) {
-            const code = att.table_code || `A-${String(att.table_number).padStart(2, '0')}`;
+            const code = getEffectiveTableCode(att);
             const key = `${code}-S${att.seat_number}`;
             if (!confirmedMap.has(key)) {
               confirmedMap.set(key, att);
@@ -215,7 +224,7 @@ export function useSeats() {
         .single();
 
       if (attendeeData && attendeeData.seat_confirmed) {
-        const tableCode = attendeeData.table_code || `A-${String(attendeeData.table_number || 1).padStart(2, '0')}`;
+        const tableCode = getEffectiveTableCode(attendeeData);
         return {
           id: formatSeatId(tableCode, attendeeData.seat_number),
           table_code: tableCode,
@@ -234,7 +243,7 @@ export function useSeats() {
       const localAttendees = JSON.parse(localStorage.getItem('bsn_mock_attendees') || '[]');
       const localAtt = localAttendees.find((a) => a.id === attendeeId);
       if (localAtt && localAtt.seat_confirmed) {
-        const tableCode = localAtt.table_code || `A-${String(localAtt.table_number || 1).padStart(2, '0')}`;
+        const tableCode = getEffectiveTableCode(localAtt);
         return {
           id: formatSeatId(tableCode, localAtt.seat_number),
           table_code: tableCode,

@@ -1,17 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, Download, ZoomIn, ZoomOut, RotateCcw, Image as ImageIcon, Move } from 'lucide-react';
+import { getSocietyTheme } from '../../utils/societyTheme';
 
-export function FloorPlanModal({ isOpen, onClose }) {
-  const [zoom, setZoom] = useState(1);
+export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
+  const [zoom, setZoom] = useState(0.5);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
   const containerRef = useRef(null);
 
+  const isAdmin = !society || society === 'admin';
+  const socTheme = !isAdmin ? getSocietyTheme(society) : null;
+
   // Reset position & zoom when modal opens
   useEffect(() => {
     if (isOpen) {
-      setZoom(1);
+      setZoom(0.5);
       setPosition({ x: 0, y: 0 });
       setIsDragging(false);
     }
@@ -48,7 +52,7 @@ export function FloorPlanModal({ isOpen, onClose }) {
   const handleZoomIn = () => setZoom((prev) => Math.min(Number((prev + 0.25).toFixed(2)), 3));
   const handleZoomOut = () => setZoom((prev) => Math.max(Number((prev - 0.25).toFixed(2)), 0.5));
   const handleReset = () => {
-    setZoom(1);
+    setZoom(0.5);
     setPosition({ x: 0, y: 0 });
   };
 
@@ -107,20 +111,53 @@ export function FloorPlanModal({ isOpen, onClose }) {
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 bg-[#3b1427]/70 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200"
+      className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[9999] flex items-center justify-center p-2.5 sm:p-6 animate-in fade-in duration-200"
     >
-      <div className="bg-[#f7e5ee] border border-rose-200/90 rounded-3xl p-4 sm:p-6 max-w-5xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden gap-3 sm:gap-4">
+      <div
+        className={`rounded-3xl p-4 sm:p-6 max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden gap-3 sm:gap-4 border ${
+          isAdmin
+            ? 'bg-[#fdf8fa] border-rose-200'
+            : `${socTheme.cardBg} ${socTheme.border}`
+        }`}
+      >
         {/* Modal Header */}
-        <div className="flex-shrink-0 flex items-center justify-between border-b border-rose-200/80 pb-3">
-          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0 shadow-sm">
+        <div
+          className={`flex-shrink-0 flex items-center justify-between pb-3 border-b ${
+            isAdmin ? 'border-rose-200/80' : socTheme.border
+          }`}
+        >
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 text-left">
+            <div
+              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border ${
+                isAdmin
+                  ? 'bg-rose-100 border-rose-200 text-rose-600'
+                  : 'bg-white/80'
+              }`}
+              style={
+                !isAdmin
+                  ? {
+                      backgroundColor: socTheme.badge.bg,
+                      borderColor: socTheme.badge.border,
+                      color: socTheme.badge.text,
+                    }
+                  : undefined
+              }
+            >
               <ImageIcon size={20} />
             </div>
-            <div className="min-w-0">
-              <h3 className="text-base sm:text-xl font-extrabold text-[#3b1427] font-heading truncate">
+            <div className="min-w-0 text-left">
+              <h3
+                className={`text-base sm:text-xl font-extrabold font-heading truncate text-left ${
+                  isAdmin ? 'text-[#3b1427]' : socTheme.textDark
+                }`}
+              >
                 Event Hall & Stage Floor Plan
               </h3>
-              <p className="text-[11px] sm:text-xs text-rose-600 font-semibold truncate">
+              <p
+                className={`text-[11px] sm:text-xs font-semibold truncate text-left ${
+                  isAdmin ? 'text-rose-600' : socTheme.subtext
+                }`}
+              >
                 Official layout map for BSN Acquaintance Party 2026
               </p>
             </div>
@@ -138,7 +175,9 @@ export function FloorPlanModal({ isOpen, onClose }) {
 
             <button
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-700 hover:bg-rose-200/60 rounded-xl transition-colors cursor-pointer"
+              className={`p-2 text-slate-400 hover:text-slate-700 rounded-xl transition-colors cursor-pointer ${
+                isAdmin ? 'hover:bg-rose-200/60' : 'hover:bg-black/5'
+              }`}
               aria-label="Close modal"
             >
               <X size={20} />
@@ -148,11 +187,33 @@ export function FloorPlanModal({ isOpen, onClose }) {
 
         {/* Zoom Controls Bar & Drag Instructions */}
         <div className="flex-shrink-0 flex items-center justify-between text-xs font-semibold px-1">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 text-left">
             <span className="text-slate-600 font-medium">
-              Zoom: <strong className="text-rose-700 font-bold">{Math.round(zoom * 100)}%</strong>
+              Zoom:{' '}
+              <strong
+                className={`font-bold ${
+                  isAdmin ? 'text-rose-700' : socTheme.textDark
+                }`}
+              >
+                {Math.round(zoom * 100)}%
+              </strong>
             </span>
-            <span className="hidden sm:inline-flex items-center gap-1 text-[11px] px-2 py-0.5 bg-rose-100/70 text-rose-700 rounded-full font-bold">
+            <span
+              className={`hidden sm:inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-bold border ${
+                isAdmin
+                  ? 'bg-rose-100/70 text-rose-700 border-rose-200/50'
+                  : ''
+              }`}
+              style={
+                !isAdmin
+                  ? {
+                      backgroundColor: socTheme.badge.bg,
+                      color: socTheme.badge.text,
+                      borderColor: socTheme.badge.border,
+                    }
+                  : undefined
+              }
+            >
               <Move size={12} />
               Drag to pan freely
             </span>
@@ -161,14 +222,18 @@ export function FloorPlanModal({ isOpen, onClose }) {
           <div className="flex items-center gap-1.5">
             <button
               onClick={handleZoomOut}
-              className="p-1.5 neu-button rounded-lg text-slate-700 hover:text-rose-600 active:scale-95 cursor-pointer"
+              className={`p-1.5 neu-button rounded-lg text-slate-700 active:scale-95 cursor-pointer ${
+                isAdmin ? 'hover:text-rose-600' : ''
+              }`}
               title="Zoom out"
             >
               <ZoomOut size={16} />
             </button>
             <button
               onClick={handleReset}
-              className="px-2.5 py-1.5 neu-button rounded-lg text-slate-700 hover:text-rose-600 text-xs active:scale-95 flex items-center gap-1 cursor-pointer"
+              className={`px-2.5 py-1.5 neu-button rounded-lg text-slate-700 text-xs active:scale-95 flex items-center gap-1 cursor-pointer ${
+                isAdmin ? 'hover:text-rose-600' : ''
+              }`}
               title="Reset position and zoom"
             >
               <RotateCcw size={14} />
@@ -176,7 +241,9 @@ export function FloorPlanModal({ isOpen, onClose }) {
             </button>
             <button
               onClick={handleZoomIn}
-              className="p-1.5 neu-button rounded-lg text-slate-700 hover:text-rose-600 active:scale-95 cursor-pointer"
+              className={`p-1.5 neu-button rounded-lg text-slate-700 active:scale-95 cursor-pointer ${
+                isAdmin ? 'hover:text-rose-600' : ''
+              }`}
               title="Zoom in"
             >
               <ZoomIn size={16} />
@@ -184,7 +251,7 @@ export function FloorPlanModal({ isOpen, onClose }) {
           </div>
         </div>
 
-        {/* Interactive Draggable Canvas (NO Sliders / Scrollbars) */}
+        {/* Interactive Draggable Canvas */}
         <div
           ref={containerRef}
           onMouseDown={handleMouseDown}
@@ -194,9 +261,11 @@ export function FloorPlanModal({ isOpen, onClose }) {
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          className={`flex-1 min-h-0 w-full overflow-hidden rounded-2xl neu-pressed bg-slate-900/10 border border-rose-200/60 relative select-none ${
-            isDragging ? 'cursor-grabbing' : 'cursor-grab'
-          }`}
+          className={`flex-1 min-h-0 w-full overflow-hidden rounded-2xl neu-pressed relative select-none border ${
+            isAdmin
+              ? 'bg-[#eef4f8] border-rose-200/70'
+              : `bg-white/60 ${socTheme.border}`
+          } ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
           title="Click and drag anywhere to pan the map"
         >
           {/* Draggable & Scalable Inner Map Wrapper */}
@@ -212,21 +281,29 @@ export function FloorPlanModal({ isOpen, onClose }) {
               src="/STAGE.png"
               alt="Official Event Stage Floor Plan"
               draggable={false}
-              className="rounded-xl shadow-xl max-w-[95%] max-h-[90%] object-contain select-none block pointer-events-none border border-rose-200/50"
+              className={`rounded-xl shadow-xl max-w-[95%] max-h-[90%] object-contain select-none block pointer-events-none border ${
+                isAdmin ? 'border-rose-200/50' : socTheme.border
+              }`}
             />
-          </div>
-
-          {/* Quick Helper Pill Badge Overlay */}
-          <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 bg-[#3b1427]/70 backdrop-blur-md text-white text-[10px] sm:text-xs font-semibold px-3 py-1 rounded-full pointer-events-none shadow-md flex items-center gap-1.5">
-            <Move size={12} className="text-rose-400" />
-            <span>Click and drag to pan • Scroll or buttons to zoom</span>
           </div>
         </div>
 
         {/* Footer Note */}
-        <div className="flex-shrink-0 pt-1 flex flex-col sm:flex-row justify-between items-center text-[11px] sm:text-xs text-slate-500 gap-1 px-1 border-t border-rose-200/60">
-          <span className="truncate">Stage located center top. Tables arranged in rows A through G.</span>
-          <span className="font-semibold text-rose-600 shrink-0">Click "Download Map" to save the high-res image.</span>
+        <div
+          className={`flex-shrink-0 pt-1 flex flex-col sm:flex-row justify-between items-center text-[11px] sm:text-xs text-slate-500 gap-1 px-1 border-t ${
+            isAdmin ? 'border-rose-200/60' : socTheme.border
+          }`}
+        >
+          <span className="truncate text-left">
+            Stage located center top. Tables arranged in rows A through G.
+          </span>
+          <span
+            className={`font-semibold shrink-0 ${
+              isAdmin ? 'text-rose-600' : socTheme.subtext
+            }`}
+          >
+            Click "Download Map" to save the high-res image.
+          </span>
         </div>
       </div>
     </div>

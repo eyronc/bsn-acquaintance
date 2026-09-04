@@ -16,14 +16,14 @@ export function Toast({ message, type = 'success', onClose, duration = 3500 }) {
   };
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md z-50 flex items-start gap-3 p-3.5 bg-white/95 backdrop-blur-md neu-flat-lg rounded-2xl border border-rose-200/80 shadow-2xl animate-toast-enter text-[#3b1427]">
+    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-md z-50 flex items-start gap-3 p-3.5 bg-white/95 backdrop-blur-md neu-flat-lg rounded-2xl border border-[var(--neu-border)] shadow-2xl animate-toast-enter text-[var(--neu-text)]">
       {icons[type]}
       <div className="flex-1 min-w-0 pr-1">
-        <span className="text-[#3b1427] font-semibold text-xs sm:text-sm leading-relaxed block break-words">{message}</span>
+        <span className="text-[var(--neu-text)] font-semibold text-xs sm:text-sm leading-relaxed block break-words">{message}</span>
       </div>
       <button 
         onClick={onClose} 
-        className="text-slate-400 hover:text-rose-600 transition-colors shrink-0 p-0.5 rounded-lg hover:bg-rose-50 -mr-0.5 mt-0.5"
+        className="text-slate-400 hover:text-[var(--neu-accent)] transition-colors shrink-0 p-0.5 rounded-lg hover:bg-[var(--neu-bg)] -mr-0.5 mt-0.5"
         aria-label="Close notification"
       >
         <X size={16} />

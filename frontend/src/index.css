@@ -8,21 +8,106 @@
   font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
 }
 
+/* ==========================================================================
+   DYNAMIC SOCIETY NEUMORPHIC THEME SYSTEM (ALL LIGHT PALETTES)
+   ========================================================================== */
+
+:root {
+  --neu-bg: #f7e5ee;
+  --neu-shadow-dark: #dcaec4;
+  --neu-shadow-light: rgba(255, 255, 255, 0.5);
+  --neu-text: #3b1427;
+  --neu-accent: #e11d48;
+  --neu-accent-hover: #be123c;
+  --neu-border: #f2c7d9;
+}
+
+[data-society="Society A"] {
+  --neu-bg: #e8f5ed;
+  --neu-shadow-dark: #c2e2cc;
+  --neu-shadow-light: rgba(255, 255, 255, 0.45);
+  --neu-text: #064e3b;
+  --neu-accent: #10b981;
+  --neu-accent-hover: #059669;
+  --neu-border: #a7f3d0;
+}
+
+[data-society="Society B"] {
+  --neu-bg: #f0f7fc;
+  --neu-shadow-dark: #c5ddf3;
+  --neu-shadow-light: rgba(255, 255, 255, 0.45);
+  --neu-text: #0c4a6e;
+  --neu-accent: #0ea5e9;
+  --neu-accent-hover: #0284c7;
+  --neu-border: #bae6fd;
+}
+
+[data-society="Society C"] {
+  --neu-bg: #f3ecfb;
+  --neu-shadow-dark: #d6c4f3;
+  --neu-shadow-light: rgba(255, 255, 255, 0.45);
+  --neu-text: #4c1d95;
+  --neu-accent: #8b5cf6;
+  --neu-accent-hover: #7c3aed;
+  --neu-border: #ddd6fe;
+}
+
+[data-society="Society D"] {
+  --neu-bg: #faf4e4;
+  --neu-shadow-dark: #e8d9b8;
+  --neu-shadow-light: rgba(255, 255, 255, 0.45);
+  --neu-text: #78350f;
+  --neu-accent: #d97706;
+  --neu-accent-hover: #b45309;
+  --neu-border: #fde68a;
+}
+
+[data-society="Society E"] {
+  --neu-bg: #fae9f0;
+  --neu-shadow-dark: #e2c0d1;
+  --neu-shadow-light: rgba(255, 255, 255, 0.45);
+  --neu-text: #881337;
+  --neu-accent: #e11d48;
+  --neu-accent-hover: #be123c;
+  --neu-border: #fecdd3;
+}
+
+[data-society="Society F"] {
+  --neu-bg: #e8f8f5;
+  --neu-shadow-dark: #bee7df;
+  --neu-shadow-light: rgba(255, 255, 255, 0.45);
+  --neu-text: #134e4a;
+  --neu-accent: #0d9488;
+  --neu-accent-hover: #0f766e;
+  --neu-border: #99f6e4;
+}
+
+[data-society="Society G"] {
+  --neu-bg: #fbf0e6;
+  --neu-shadow-dark: #ebd0be;
+  --neu-shadow-light: rgba(255, 255, 255, 0.45);
+  --neu-text: #7c2d12;
+  --neu-accent: #ea580c;
+  --neu-accent-hover: #c2410c;
+  --neu-border: #fed7aa;
+}
+
 html {
   scroll-behavior: smooth;
-  background: linear-gradient(135deg, #FDE8F0 0%, #FDF2F7 45%, #FFFFFF 100%);
+  background: var(--neu-bg);
   min-height: 100vh;
+  transition: background-color 0.3s ease;
 }
 
 body {
-  background: linear-gradient(135deg, #FDE8F0 0%, #FDF2F7 45%, #FFFFFF 100%);
-  color: #3b1427;
+  background: var(--neu-bg);
+  color: var(--neu-text);
   margin: 0;
   padding: 0;
   min-height: 100vh;
-  background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #root {
@@ -31,7 +116,7 @@ body {
   background: transparent;
 }
 
-/* UNIFIED CLEAN DROPDOWN SELECT STYLING FOR ALL SELECT BOXES */
+/* UNIFIED CLEAN DROPDOWN SELECT STYLING */
 select {
   appearance: none !important;
   -webkit-appearance: none !important;
@@ -44,97 +129,104 @@ select {
   cursor: pointer;
 }
 
-/* ORIGINAL SOFT PINK & WHITE NEUMORPHIC SYSTEM FOR TABLES & CHAIRS */
-/* Base Surface: #f9eaf1 | Dark Shadow: #dcaec4 | Light Highlight: #ffffff */
+/* ==========================================================================
+   THEMED NEUMORPHIC PRIMITIVES
+   ========================================================================== */
 
 .neu-flat {
-  background: #f9eaf1;
-  box-shadow: 8px 8px 18px #dcaec4, -8px -8px 18px #ffffff;
+  background: var(--neu-bg);
+  box-shadow: 6px 6px 14px var(--neu-shadow-dark), -2px -2px 6px var(--neu-shadow-light);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .neu-flat-sm {
-  background: #f9eaf1;
-  box-shadow: 4px 4px 10px #dcaec4, -4px -4px 10px #ffffff;
+  background: var(--neu-bg);
+  box-shadow: 3px 3px 8px var(--neu-shadow-dark), -1.5px -1.5px 4px var(--neu-shadow-light);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .neu-flat-lg {
-  background: #f9eaf1;
-  box-shadow: 14px 14px 28px #dcaec4, -14px -14px 28px #ffffff;
+  background: var(--neu-bg);
+  box-shadow: 10px 10px 22px var(--neu-shadow-dark), -3px -3px 8px var(--neu-shadow-light);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .neu-circle {
-  background: #f9eaf1;
-  box-shadow: 8px 8px 20px #dcaec4, -8px -8px 20px #ffffff;
+  background: var(--neu-bg);
+  box-shadow: 6px 6px 16px var(--neu-shadow-dark), -2px -2px 6px var(--neu-shadow-light);
   border-radius: 9999px !important;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .neu-pressed {
-  background: #f9eaf1;
-  box-shadow: inset 4px 4px 8px #dcaec4, inset -4px -4px 8px #ffffff;
+  background: var(--neu-bg);
+  box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -1px -1px 4px var(--neu-shadow-light);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .neu-pressed-sm {
-  background: #f9eaf1;
-  box-shadow: inset 2px 2px 5px #dcaec4, inset -2px -2px 5px #ffffff;
+  background: var(--neu-bg);
+  box-shadow: inset 2px 2px 4px var(--neu-shadow-dark), inset -1px -1px 3px var(--neu-shadow-light);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .neu-input {
-  background: #f9eaf1;
-  box-shadow: inset 3px 3px 6px #dcaec4, inset -3px -3px 6px #ffffff;
-  border: 1px solid transparent;
+  background: var(--neu-bg);
+  box-shadow: inset 2px 2px 5px var(--neu-shadow-dark), inset -1px -1px 3px var(--neu-shadow-light);
+  border: 1px solid var(--neu-border);
   transition: all 0.2s ease-in-out;
 }
 
 .neu-input:focus {
   outline: none;
-  box-shadow: inset 4px 4px 8px #dcaec4, inset -4px -4px 8px #ffffff, 0 0 0 2px #ec4899;
+  box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -1px -1px 4px var(--neu-shadow-light), 0 0 0 2px var(--neu-accent);
 }
 
 .neu-button {
-  background: #f9eaf1;
-  box-shadow: 6px 6px 12px #dcaec4, -6px -6px 12px #ffffff;
-  color: #3b1427;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  background: var(--neu-bg);
+  box-shadow: 3.5px 3.5px 9px var(--neu-shadow-dark), -1.5px -1.5px 5px var(--neu-shadow-light);
+  color: var(--neu-text);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background 0.3s ease;
 }
 
 .neu-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 8px 8px 16px #d3a1bb, -8px -8px 16px #ffffff;
+  box-shadow: 5px 5px 12px var(--neu-shadow-dark), -2px -2px 6px var(--neu-shadow-light);
 }
 
 .neu-button:active:not(:disabled) {
   transform: translateY(0);
-  box-shadow: inset 3px 3px 6px #dcaec4, inset -3px -3px 6px #ffffff;
+  box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -1px -1px 4px var(--neu-shadow-light);
 }
 
-/* HIGH-CONTRAST SEAT HOVER MICRO-ANIMATION */
+/* THEMED SEATS */
 .neu-seat-available {
-  background: #f9eaf1;
-  color: #3b1427 !important;
-  box-shadow: 5px 5px 12px #dcaec4, -5px -5px 12px #ffffff;
+  background: var(--neu-bg);
+  color: var(--neu-text) !important;
+  box-shadow: 3px 3px 7px var(--neu-shadow-dark), -1.5px -1.5px 4px var(--neu-shadow-light);
   transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.18s ease, color 0.18s ease, box-shadow 0.2s ease;
   will-change: transform;
 }
 
 .neu-seat-available:hover {
-  background-color: #ec4899 !important;
+  background-color: var(--neu-accent) !important;
   color: #ffffff !important;
-  transform: scale(1.24);
-  box-shadow: 0 10px 24px rgba(236, 72, 153, 0.45), 0 0 15px rgba(236, 72, 153, 0.3);
+  transform: scale(1.22);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   z-index: 30;
 }
 
 .neu-button-primary {
-  background: linear-gradient(145deg, #ec4899, #be185d);
-  box-shadow: 6px 6px 14px rgba(236, 72, 153, 0.35), -6px -6px 14px #ffffff;
+  background: var(--neu-accent);
+  box-shadow: 4px 4px 10px var(--neu-shadow-dark), -1.5px -1.5px 5px var(--neu-shadow-light);
   color: white;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .neu-button-primary:hover:not(:disabled) {
-  background: linear-gradient(145deg, #db2777, #9d174d);
+  background: var(--neu-accent-hover);
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 8px 8px 20px rgba(236, 72, 153, 0.45), -8px -8px 20px #ffffff;
+  box-shadow: 6px 6px 14px var(--neu-shadow-dark), -2px -2px 6px var(--neu-shadow-light);
 }
 
 .neu-button-primary:active:not(:disabled) {
@@ -143,22 +235,26 @@ select {
 }
 
 .neu-avatar {
-  background: #f9eaf1;
-  box-shadow: 5px 5px 12px #dcaec4, -5px -5px 12px #ffffff;
+  background: var(--neu-bg);
+  box-shadow: 3px 3px 8px var(--neu-shadow-dark), -1.5px -1.5px 4px var(--neu-shadow-light);
   border-radius: 9999px !important;
 }
 
-/* Custom Scrollbar */
+/* SLIM IN-CONTAINER SCROLLBAR */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f9eaf1;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #ec4899;
-  border-radius: 4px;
+  background: var(--neu-shadow-dark);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neu-accent);
 }
