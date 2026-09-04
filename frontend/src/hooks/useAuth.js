@@ -21,7 +21,7 @@ export function useAuth() {
       
       const { data, error } = await supabase
         .from('attendees')
-        .select('id, email, fullname, unique_code')
+        .select('id, email, fullname, unique_code, society')
         .eq('email', email)
         .eq('unique_code', code)
         .maybeSingle();
