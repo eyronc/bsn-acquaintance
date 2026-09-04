@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { LogOut, Plus, Copy, Check, User, Mail, Key, Armchair, Calendar, Trash2, Search, Filter, ArrowUpDown, GraduationCap, School, AlertTriangle, X, Download } from 'lucide-react';
+import { LogOut, Plus, Copy, Check, User, Mail, Key, Armchair, Calendar, Trash2, Search, Filter, ArrowUpDown, GraduationCap, School, AlertTriangle, X, Download, Edit3, Map } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { supabase } from '../../supabase/client';
 import { Toast } from '../UI/Toast';
 import { sendAccessCodeEmail } from '../../services/emailService';
+import { EditAttendeeModal, PRESET_SOCIETIES } from './EditAttendeeModal';
+import { FloorPlanModal } from '../Dashboard/FloorPlanModal';
 
 // Year levels and their corresponding valid sections
 const YEAR_OPTIONS = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
@@ -37,6 +39,9 @@ export function AdminPanel({ onLogout }) {
   const [fullname, setFullname] = useState('');
   const [year, setYear] = useState('1st Year');
   const [section, setSection] = useState('A');
+  const [society, setSociety] = useState('Society A');
+  const [customSociety, setCustomSociety] = useState('');
+  const [isCustomSociety, setIsCustomSociety] = useState(false);
   const [email, setEmail] = useState('');
 
   // Data & UI State
@@ -47,11 +52,14 @@ export function AdminPanel({ onLogout }) {
   const [copiedCode, setCopiedCode] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(null);
   const [attendeeToDelete, setAttendeeToDelete] = useState(null);
+  const [attendeeToEdit, setAttendeeToEdit] = useState(null);
+  const [showFloorPlanModal, setShowFloorPlanModal] = useState(false);
 
   // Search, Filter & Sort State
   const [searchQuery, setSearchQuery] = useState('');
   const [yearFilter, setYearFilter] = useState('All');
   const [sectionFilter, setSectionFilter] = useState('All');
+  const [societyFilter, setSocietyFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
   const [sortBy, setSortBy] = useState('newest');
 
@@ -99,6 +107,7 @@ export function AdminPanel({ onLogout }) {
 
     try {
       const uniqueCode = generateUniqueCode();
+      const finalSociety = isCustomSociety ? (customSociety.trim() || 'Society A') : society;
 
       const { data, error } = await supabase
         .from('attendees')
@@ -107,6 +116,7 @@ export function AdminPanel({ onLogout }) {
           fullname,
           year,
           section,
+          society: finalSociety,
           unique_code: uniqueCode,
           payment_amount: 650
         }])
@@ -120,13 +130,16 @@ export function AdminPanel({ onLogout }) {
       setFullname('');
       setYear('1st Year');
       setSection('A');
+      setSociety('Society A');
+      setCustomSociety('');
+      setIsCustomSociety(false);
 
       // Send email with access code
       const emailResult = await sendAccessCodeEmail(newAttendee);
 
       if (emailResult.success) {
         setToast({
-          message: `${fullname} (${formatClassBadge(year, section)}) registered! Email sent with access code.`,
+          message: `${fullname} (${formatClassBadge(year, section)} • ${finalSociety}) registered! Email sent with access code.`,
           type: 'success',
         });
       } else {
@@ -139,12 +152,14 @@ export function AdminPanel({ onLogout }) {
     } catch (error) {
       // Local fallback
       const uniqueCode = generateUniqueCode();
+      const finalSociety = isCustomSociety ? (customSociety.trim() || 'Society A') : society;
       const newAttendee = {
         id: `mock-${Date.now()}`,
         email,
         fullname,
         year,
         section,
+        society: finalSociety,
         unique_code: uniqueCode,
         payment_amount: 650,
         created_at: new Date().toISOString(),
@@ -156,6 +171,9 @@ export function AdminPanel({ onLogout }) {
       setFullname('');
       setYear('1st Year');
       setSection('A');
+      setSociety('Society A');
+      setCustomSociety('');
+      setIsCustomSociety(false);
 
       // Try sending email even in fallback
       await sendAccessCodeEmail(newAttendee);
@@ -259,7 +277,8 @@ export function AdminPanel({ onLogout }) {
           const emailMatch = att.email?.toLowerCase().includes(q);
           const codeMatch = att.unique_code?.toLowerCase().includes(q);
           const badgeMatch = badge.includes(q);
-          if (!nameMatch && !emailMatch && !codeMatch && !badgeMatch) return false;
+          const societyMatch = att.society?.toLowerCase().includes(q);
+          if (!nameMatch && !emailMatch && !codeMatch && !badgeMatch && !societyMatch) return false;
         }
 
         // Year filter
@@ -270,6 +289,11 @@ export function AdminPanel({ onLogout }) {
         // Section filter
         if (sectionFilter !== 'All') {
           if (att.section !== sectionFilter) return false;
+        }
+
+        // Society filter
+        if (societyFilter !== 'All') {
+          if (att.society !== societyFilter) return false;
         }
 
         // Status filter
@@ -288,7 +312,7 @@ export function AdminPanel({ onLogout }) {
         }
         return new Date(b.created_at) - new Date(a.created_at); // default 'newest'
       });
-  }, [attendees, searchQuery, yearFilter, sectionFilter, statusFilter, sortBy]);
+  }, [attendees, searchQuery, yearFilter, sectionFilter, societyFilter, statusFilter, sortBy]);
 
   // Dynamic section options based on selected form year
   const currentSections = SECTIONS_BY_YEAR[year] || [];
@@ -317,21 +341,23 @@ export function AdminPanel({ onLogout }) {
       'No.',
       'Full Name',
       'Class & Section',
+      'Society',
       'Year Level',
       'Section',
       'Email Address',
       'Access Code',
       'Payment Fee',
       'Status',
-      'Table Number',
+      'Table Code',
       'Seat Number',
       'Seat Details',
       'Registration Date'
     ];
 
     const attendeeRows = sortedExportData.map((att, index) => {
-      const seatInfo = att.seat_confirmed && att.table_number && att.seat_number
-        ? `Table ${att.table_number} • Seat ${att.seat_number}`
+      const tableLabel = att.table_code || (att.table_number ? `T-${att.table_number}` : '-');
+      const seatInfo = att.seat_confirmed && (att.table_code || att.table_number) && att.seat_number
+        ? `Table ${tableLabel} • Seat ${att.seat_number}`
         : 'Unreserved';
 
       const statusText = att.seat_confirmed ? 'Confirmed' : 'Pending';
@@ -342,13 +368,14 @@ export function AdminPanel({ onLogout }) {
         index + 1,
         att.fullname || '',
         formatClassBadge(att.year, att.section),
+        att.society || 'Society A',
         att.year || '',
         att.section || '',
         att.email || '',
         att.unique_code || '',
         feeText,
         statusText,
-        att.table_number || '-',
+        tableLabel,
         att.seat_number || '-',
         seatInfo,
         formattedDate
@@ -363,13 +390,14 @@ export function AdminPanel({ onLogout }) {
       { wch: 6 },   // No.
       { wch: 25 },  // Full Name
       { wch: 18 },  // Class & Section
+      { wch: 16 },  // Society
       { wch: 14 },  // Year Level
       { wch: 10 },  // Section
       { wch: 30 },  // Email Address
       { wch: 16 },  // Access Code
       { wch: 14 },  // Payment Fee
       { wch: 14 },  // Status
-      { wch: 14 },  // Table Number
+      { wch: 14 },  // Table Code
       { wch: 14 },  // Seat Number
       { wch: 24 },  // Seat Details
       { wch: 22 }   // Registration Date
@@ -448,14 +476,25 @@ export function AdminPanel({ onLogout }) {
             </div>
           </div>
 
-          <button
-            onClick={onLogout}
-            className="neu-button px-3 sm:px-5 py-2 text-rose-700 hover:text-rose-900 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 shrink-0 border border-rose-300/40 active:scale-95 transition-transform"
-            aria-label="Logout"
-          >
-            <LogOut size={16} className="text-rose-600" />
-            <span className="font-bold">Logout</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowFloorPlanModal(true)}
+              className="neu-button px-3 sm:px-4 py-2 text-rose-700 hover:text-rose-900 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shrink-0 border border-rose-300/40 active:scale-95 transition-transform cursor-pointer shadow-sm"
+              title="View Stage & Floor Plan"
+            >
+              <Map size={16} className="text-rose-600" />
+              <span className="font-bold hidden sm:inline">Floor Plan</span>
+            </button>
+
+            <button
+              onClick={onLogout}
+              className="neu-button px-3 sm:px-5 py-2 text-rose-700 hover:text-rose-900 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 shrink-0 border border-rose-300/40 active:scale-95 transition-transform"
+              aria-label="Logout"
+            >
+              <LogOut size={16} className="text-rose-600" />
+              <span className="font-bold">Logout</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -470,9 +509,9 @@ export function AdminPanel({ onLogout }) {
           </h2>
 
           <form onSubmit={handleCreateAttendee} className="space-y-4 sm:space-y-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
               {/* Full Name */}
-              <div className="sm:col-span-2 lg:col-span-1">
+              <div>
                 <label className="block text-[#3b1427] font-semibold mb-1.5 text-xs sm:text-sm">Full Name</label>
                 <input
                   type="text"
@@ -514,8 +553,41 @@ export function AdminPanel({ onLogout }) {
                 </select>
               </div>
 
+              {/* Society Selection */}
+              <div>
+                <label className="block text-[#3b1427] font-semibold mb-1.5 text-xs sm:text-sm">Society</label>
+                <select
+                  value={isCustomSociety ? '__CUSTOM__' : society}
+                  onChange={(e) => {
+                    if (e.target.value === '__CUSTOM__') {
+                      setIsCustomSociety(true);
+                    } else {
+                      setIsCustomSociety(false);
+                      setSociety(e.target.value);
+                    }
+                  }}
+                  required
+                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#3b1427] text-sm font-semibold"
+                >
+                  {PRESET_SOCIETIES.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                  <option value="__CUSTOM__">+ Custom Society...</option>
+                </select>
+                {isCustomSociety && (
+                  <input
+                    type="text"
+                    value={customSociety}
+                    onChange={(e) => setCustomSociety(e.target.value)}
+                    placeholder="Enter custom society"
+                    required
+                    className="neu-input w-full mt-2 px-3 py-1.5 rounded-xl text-xs text-[#3b1427] font-medium"
+                  />
+                )}
+              </div>
+
               {/* Email Address */}
-              <div className="sm:col-span-2 lg:col-span-1">
+              <div>
                 <label className="block text-[#3b1427] font-semibold mb-1.5 text-xs sm:text-sm">Email Address</label>
                 <input
                   type="email"
@@ -528,19 +600,24 @@ export function AdminPanel({ onLogout }) {
               </div>
             </div>
 
-            {/* Selected Class Preview Badge */}
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-rose-100/60 rounded-xl w-fit text-xs text-rose-800 font-bold">
-              <School size={14} className="text-rose-600" />
-              <span>Assigned Class: <code className="font-mono">{formatClassBadge(year, section)}</code></span>
+            {/* Selected Preview Badges */}
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-rose-100/60 rounded-xl text-xs text-rose-800 font-bold">
+                <School size={14} className="text-rose-600" />
+                <span>Class: <code className="font-mono">{formatClassBadge(year, section)}</code></span>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-100/60 rounded-xl text-xs text-purple-800 font-bold">
+                <span>Society: <code className="font-mono">{isCustomSociety ? (customSociety || 'Custom') : society}</code></span>
+              </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="neu-button-primary w-full py-3 sm:py-3.5 rounded-xl font-bold text-white flex items-center justify-center gap-2 text-sm sm:text-base disabled:opacity-50 active:scale-[0.99] transition-transform shadow-md"
+              className="neu-button-primary w-full py-3 sm:py-3.5 rounded-xl font-bold text-white flex items-center justify-center gap-2 text-sm sm:text-base disabled:opacity-50 active:scale-[0.99] transition-transform shadow-md cursor-pointer"
             >
               <Plus size={18} />
-              {loading ? 'Creating Attendee...' : `Create Attendee (${formatClassBadge(year, section)})`}
+              {loading ? 'Creating Attendee...' : `Create Attendee (${formatClassBadge(year, section)} • ${isCustomSociety ? (customSociety || 'Custom') : society})`}
             </button>
           </form>
         </div>
@@ -575,7 +652,7 @@ export function AdminPanel({ onLogout }) {
 
           {/* Search, Filter & Sort Control Bar */}
           <div className="bg-white/80 backdrop-blur-sm p-3.5 rounded-2xl border border-rose-200/70 space-y-3">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2.5">
               {/* Search Bar */}
               <div className="sm:col-span-2 relative">
                 <Search size={16} className="absolute left-3 top-3 text-rose-400" />
@@ -583,9 +660,23 @@ export function AdminPanel({ onLogout }) {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search name, email, code, BSN - 4B..."
+                  placeholder="Search name, email, code, BSN - 4B, society..."
                   className="w-full pl-9 pr-3 py-2 bg-rose-50/50 border border-rose-200/80 rounded-xl text-xs sm:text-sm font-medium text-[#3b1427] focus:outline-none focus:ring-2 focus:ring-rose-400"
                 />
+              </div>
+
+              {/* Society Filter */}
+              <div>
+                <select
+                  value={societyFilter}
+                  onChange={(e) => setSocietyFilter(e.target.value)}
+                  className="w-full px-3 py-2 bg-rose-50/50 border border-rose-200/80 rounded-xl text-xs sm:text-sm font-semibold text-[#3b1427]"
+                >
+                  <option value="All">All Societies</option>
+                  {PRESET_SOCIETIES.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
               </div>
 
               {/* Year Filter */}
@@ -649,15 +740,16 @@ export function AdminPanel({ onLogout }) {
                 <table className="w-full text-xs lg:text-sm table-fixed border-collapse">
                   <thead>
                     <tr className="border-b border-rose-200/80 bg-rose-50/50">
-                      <th className="w-[15%] text-left py-3.5 px-4 font-extrabold text-[#3b1427]">Name</th>
-                      <th className="w-[9%] text-center py-3.5 px-3 font-extrabold text-[#3b1427]">Class</th>
-                      <th className="w-[20%] text-left py-3.5 px-4 font-extrabold text-[#3b1427]">Email</th>
-                      <th className="w-[11%] text-center py-3.5 px-3 font-extrabold text-[#3b1427]">Code</th>
-                      <th className="w-[10%] text-center py-3.5 px-3 font-extrabold text-[#3b1427]">Payment</th>
-                      <th className="w-[10%] text-center py-3.5 px-3 font-extrabold text-[#3b1427]">Status</th>
-                      <th className="w-[12%] text-center py-3.5 px-3 font-extrabold text-[#3b1427]">Seat</th>
-                      <th className="w-[8%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Registered</th>
-                      <th className="w-[5%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]"></th>
+                      <th className="w-[14%] text-left py-3.5 px-4 font-extrabold text-[#3b1427]">Name</th>
+                      <th className="w-[8%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Class</th>
+                      <th className="w-[10%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Society</th>
+                      <th className="w-[17%] text-left py-3.5 px-3 font-extrabold text-[#3b1427]">Email</th>
+                      <th className="w-[10%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Code</th>
+                      <th className="w-[8%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Payment</th>
+                      <th className="w-[8%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Status</th>
+                      <th className="w-[11%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Seat</th>
+                      <th className="w-[7%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Registered</th>
+                      <th className="w-[7%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-rose-100/60 bg-white/60">
@@ -669,22 +761,29 @@ export function AdminPanel({ onLogout }) {
                         </td>
 
                         {/* Class / Section */}
-                        <td className="py-3 px-4 text-center">
-                          <span className="font-mono font-bold text-[11px] px-2.5 py-1 bg-rose-100 text-rose-800 rounded-md border border-rose-200 inline-block whitespace-nowrap">
+                        <td className="py-3 px-2 text-center">
+                          <span className="font-mono font-bold text-[11px] px-2 py-0.5 bg-rose-100 text-rose-800 rounded-md border border-rose-200 inline-block whitespace-nowrap">
                             {formatClassBadge(attendee.year, attendee.section)}
                           </span>
                         </td>
 
+                        {/* Society */}
+                        <td className="py-3 px-2 text-center">
+                          <span className="font-mono font-bold text-[11px] px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200/80 rounded-md inline-block whitespace-nowrap">
+                            {attendee.society || 'Society A'}
+                          </span>
+                        </td>
+
                         {/* Email */}
-                        <td className="py-3 px-4 text-left text-slate-600 text-xs truncate" title={attendee.email}>
+                        <td className="py-3 px-3 text-left text-slate-600 text-xs truncate" title={attendee.email}>
                           {attendee.email}
                         </td>
 
                         {/* Access Code - Click Once to Copy */}
-                        <td className="py-3 px-3 text-center">
+                        <td className="py-3 px-2 text-center">
                           <code
                             onClick={() => copyToClipboard(attendee.unique_code)}
-                            className={`neu-pressed px-2 py-1 rounded-md font-mono font-bold text-[11px] inline-flex items-center justify-center whitespace-nowrap cursor-pointer transition-all select-none w-[105px] ${copiedCode === attendee.unique_code
+                            className={`neu-pressed px-2 py-1 rounded-md font-mono font-bold text-[11px] inline-flex items-center justify-center whitespace-nowrap cursor-pointer transition-all select-none w-[95px] ${copiedCode === attendee.unique_code
                               ? 'bg-emerald-100 text-emerald-600 border border-emerald-300'
                               : 'bg-rose-100 text-rose-600 hover:bg-rose-200 border border-rose-200'
                               }`}
@@ -695,30 +794,30 @@ export function AdminPanel({ onLogout }) {
                         </td>
 
                         {/* Payment */}
-                        <td className="py-3 px-3 text-center">
-                          <span className="inline-flex items-center justify-center px-2.5 py-1 bg-emerald-100/90 text-emerald-800 border border-emerald-300/60 rounded-full font-extrabold text-[11px] whitespace-nowrap">
+                        <td className="py-3 px-2 text-center">
+                          <span className="inline-flex items-center justify-center px-2 py-0.5 bg-emerald-100/90 text-emerald-800 border border-emerald-300/60 rounded-full font-extrabold text-[11px] whitespace-nowrap">
                             ₱{attendee.payment_amount || 650}
                           </span>
                         </td>
 
                         {/* Status */}
-                        <td className="py-3 px-4 text-center">
+                        <td className="py-3 px-2 text-center">
                           {attendee.seat_confirmed ? (
-                            <span className="inline-flex items-center justify-center px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-[11px] whitespace-nowrap w-[85px]">
+                            <span className="inline-flex items-center justify-center px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-[11px] whitespace-nowrap">
                               Confirmed
                             </span>
                           ) : (
-                            <span className="inline-flex items-center justify-center px-2.5 py-1 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-[11px] whitespace-nowrap w-[85px]">
+                            <span className="inline-flex items-center justify-center px-2 py-0.5 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-[11px] whitespace-nowrap">
                               Pending
                             </span>
                           )}
                         </td>
 
                         {/* Seat */}
-                        <td className="py-3 px-4 text-center">
-                          {attendee.seat_confirmed && attendee.table_number ? (
-                            <span className="inline-block font-mono font-bold text-[#3b1427] text-[11px] px-2.5 py-1 bg-rose-100/70 border border-rose-200/80 rounded-md shadow-sm whitespace-nowrap">
-                              T{attendee.table_number} • S{attendee.seat_number}
+                        <td className="py-3 px-2 text-center">
+                          {attendee.seat_confirmed && (attendee.table_code || attendee.table_number) ? (
+                            <span className="inline-block font-mono font-bold text-[#3b1427] text-[11px] px-2 py-0.5 bg-rose-100/70 border border-rose-200/80 rounded-md shadow-sm whitespace-nowrap">
+                              {attendee.table_code || `T${attendee.table_number}`} • S{attendee.seat_number}
                             </span>
                           ) : (
                             <span className="text-slate-400 text-xs">—</span>
@@ -726,20 +825,29 @@ export function AdminPanel({ onLogout }) {
                         </td>
 
                         {/* Registered */}
-                        <td className="py-3 px-4 text-center text-slate-500 text-xs font-medium whitespace-nowrap">
+                        <td className="py-3 px-2 text-center text-slate-500 text-[11px] font-medium whitespace-nowrap">
                           {new Date(attendee.created_at).toLocaleDateString()}
                         </td>
 
-                        {/* Delete Action */}
-                        <td className="py-3 px-4 text-center">
-                          <button
-                            onClick={() => setAttendeeToDelete(attendee)}
-                            disabled={deleteLoading === attendee.id}
-                            className="p-2 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-md font-semibold text-xs inline-flex items-center justify-center transition-colors shrink-0"
-                            title="Delete Attendee & Release Seat"
-                          >
-                            <Trash2 size={14} className="shrink-0" />
-                          </button>
+                        {/* Actions (Edit & Delete) */}
+                        <td className="py-3 px-2 text-center">
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              onClick={() => setAttendeeToEdit(attendee)}
+                              className="p-1.5 bg-purple-100 hover:bg-purple-600 text-purple-700 hover:text-white rounded-md font-semibold text-xs inline-flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+                              title="Edit Attendee"
+                            >
+                              <Edit3 size={13} className="shrink-0" />
+                            </button>
+                            <button
+                              onClick={() => setAttendeeToDelete(attendee)}
+                              disabled={deleteLoading === attendee.id}
+                              className="p-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-md font-semibold text-xs inline-flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+                              title="Delete Attendee & Release Seat"
+                            >
+                              <Trash2 size={13} className="shrink-0" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -754,14 +862,16 @@ export function AdminPanel({ onLogout }) {
                     key={attendee.id}
                     className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-rose-200/70 space-y-3 transition-all"
                   >
-                    {/* Top Row: Full Name + Class Badge + Status */}
+                    {/* Top Row: Full Name + Class Badge + Society + Status */}
                     <div className="flex justify-between items-start gap-2 border-b border-rose-100 pb-2.5">
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5 text-rose-600 font-bold text-[10px] uppercase tracking-wider mb-0.5">
+                        <div className="flex flex-wrap items-center gap-1.5 text-rose-600 font-bold text-[10px] uppercase tracking-wider mb-0.5">
                           <User size={12} />
-                          <span>Attendee</span>
                           <span className="font-mono text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold">
                             {formatClassBadge(attendee.year, attendee.section)}
+                          </span>
+                          <span className="font-mono text-purple-700 bg-purple-100 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold">
+                            {attendee.society || 'Society A'}
                           </span>
                         </div>
                         <h3 className="text-base font-extrabold text-[#3b1427] truncate leading-snug">
@@ -792,8 +902,8 @@ export function AdminPanel({ onLogout }) {
                       <div className="col-span-2">
                         <span className="text-slate-400 block text-[10px]">Seat Reserved</span>
                         <span className="text-slate-700 font-semibold block">
-                          {attendee.seat_confirmed && attendee.table_number
-                            ? `Table ${attendee.table_number} • Seat ${attendee.seat_number}`
+                          {attendee.seat_confirmed && (attendee.table_code || attendee.table_number)
+                            ? `Table ${attendee.table_code || attendee.table_number} • Seat ${attendee.seat_number}`
                             : 'Not reserved'}
                         </span>
                       </div>
@@ -814,14 +924,24 @@ export function AdminPanel({ onLogout }) {
                           {copiedCode === attendee.unique_code ? '✓ Copied!' : attendee.unique_code}
                         </code>
                       </div>
-                      <button
-                        onClick={() => setAttendeeToDelete(attendee)}
-                        disabled={deleteLoading === attendee.id}
-                        className="p-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-xl transition-colors"
-                        title="Delete Attendee"
-                      >
-                        <Trash2 size={15} />
-                      </button>
+
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          onClick={() => setAttendeeToEdit(attendee)}
+                          className="p-1.5 bg-purple-100 hover:bg-purple-600 text-purple-700 hover:text-white rounded-xl transition-colors cursor-pointer"
+                          title="Edit Attendee"
+                        >
+                          <Edit3 size={15} />
+                        </button>
+                        <button
+                          onClick={() => setAttendeeToDelete(attendee)}
+                          disabled={deleteLoading === attendee.id}
+                          className="p-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-xl transition-colors cursor-pointer"
+                          title="Delete Attendee"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -830,6 +950,27 @@ export function AdminPanel({ onLogout }) {
           )}
         </div>
       </main>
+
+      {/* Edit Attendee Modal */}
+      {attendeeToEdit && (
+        <EditAttendeeModal
+          attendee={attendeeToEdit}
+          onClose={() => setAttendeeToEdit(null)}
+          onSave={(updated) => {
+            setAttendees((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
+            setToast({
+              message: `Updated ${updated.fullname}'s details successfully!`,
+              type: 'success',
+            });
+          }}
+        />
+      )}
+
+      {/* View Floor Plan Modal */}
+      <FloorPlanModal
+        isOpen={showFloorPlanModal}
+        onClose={() => setShowFloorPlanModal(false)}
+      />
 
       {/* Custom Soft Pink Glassmorphic Delete Confirmation Modal (NO EMOJIS) */}
       {attendeeToDelete && (
