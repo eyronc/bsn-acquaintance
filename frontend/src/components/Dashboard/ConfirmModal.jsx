@@ -29,7 +29,7 @@ export function ConfirmModal({ isOpen, seat, onConfirm, onCancel, loading }) {
       <div className="mb-5 p-5 neu-pressed rounded-2xl bg-gradient-to-br from-[#f9eaf1] to-[#fce7f3] border border-pink-200/60 transition-all duration-300">
         <p className="text-slate-500 font-semibold mb-1 text-xs md:text-sm">Your Selected Seat</p>
         <p className="text-2xl md:text-3xl font-extrabold text-pink-600 font-heading">
-          Table {seat?.table_number} • Seat {seat?.seat_number}
+          Table {seat?.table_code || seat?.table_number} • Seat {seat?.seat_number}
         </p>
       </div>
 

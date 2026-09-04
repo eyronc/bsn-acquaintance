@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { LogOut } from 'lucide-react';
+import { LogOut, Map } from 'lucide-react';
 import { useSeats } from '../../hooks/useSeats';
 import { SeatMap } from './SeatMap';
 import { ConfirmModal } from './ConfirmModal';
+import { FloorPlanModal } from './FloorPlanModal';
 import { Toast } from '../UI/Toast';
 import { sendSeatConfirmationEmail } from '../../services/emailService';
 
@@ -11,6 +12,7 @@ export function StudentDashboard({ user, onLogout }) {
   const [userSeat, setUserSeat] = useState(null);
   const [selectedSeat, setSelectedSeat] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showFloorPlanModal, setShowFloorPlanModal] = useState(false);
   const [toast, setToast] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
 
@@ -141,18 +143,34 @@ export function StudentDashboard({ user, onLogout }) {
               <h1 className="text-sm xs:text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading truncate leading-tight">
                 BSN 2026 <span className="text-rose-600 font-extrabold text-xs sm:text-base ml-0.5 sm:ml-1">Acquaintance Party</span>
               </h1>
-              <p className="text-slate-500 text-[11px] sm:text-sm truncate font-medium">Welcome, {user.fullname}!</p>
+              <div className="flex items-center gap-2 text-slate-500 text-[11px] sm:text-sm truncate font-medium">
+                <span>Welcome, {user.fullname}!</span>
+                <span className="px-2 py-0.5 bg-rose-100/80 text-rose-800 font-extrabold text-[10px] rounded-full">
+                  {user.society || 'Society A'}
+                </span>
+              </div>
             </div>
           </div>
 
-          <button
-            onClick={onLogout}
-            className="neu-button px-3 sm:px-5 py-2 text-[#3b1427] hover:text-rose-600 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 shrink-0 active:scale-95 transition-transform"
-            aria-label="Logout"
-          >
-            <LogOut size={16} className="text-rose-600 shrink-0" />
-            <span className="font-bold">Logout</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowFloorPlanModal(true)}
+              className="neu-button px-3 sm:px-4 py-2 text-rose-700 hover:text-rose-900 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shrink-0 border border-rose-300/40 active:scale-95 transition-transform cursor-pointer shadow-sm"
+              title="View Stage & Floor Plan"
+            >
+              <Map size={16} className="text-rose-600 shrink-0" />
+              <span className="font-bold hidden sm:inline">Floor Plan</span>
+            </button>
+
+            <button
+              onClick={onLogout}
+              className="neu-button px-3 sm:px-5 py-2 text-[#3b1427] hover:text-rose-600 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 shrink-0 active:scale-95 transition-transform"
+              aria-label="Logout"
+            >
+              <LogOut size={16} className="text-rose-600 shrink-0" />
+              <span className="font-bold">Logout</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -172,9 +190,9 @@ export function StudentDashboard({ user, onLogout }) {
                 Your Seat is Confirmed!
               </h2>
               <div className="neu-pressed px-6 py-4 rounded-2xl mb-6 inline-block">
-                <p className="text-slate-500 text-sm mb-1 font-medium">Your Reserved Seat</p>
+                <p className="text-slate-500 text-sm mb-1 font-medium">Your Reserved Seat &bull; {user.society || 'Society A'}</p>
                 <p className="text-2xl md:text-3xl font-extrabold text-rose-600 font-heading">
-                  Table {userSeat.table_number} • Seat {userSeat.seat_number}
+                  Table {userSeat.table_code || userSeat.table_number} • Seat {userSeat.seat_number}
                 </p>
               </div>
               <p className="text-slate-600 text-base md:text-lg font-medium">
@@ -183,7 +201,14 @@ export function StudentDashboard({ user, onLogout }) {
             </div>
 
             {/* Show seat map in read-only mode */}
-            <SeatMap seats={seats} selectedSeat={null} onSeatSelect={() => {}} userSeat={userSeat} currentUserId={user?.id} />
+            <SeatMap
+              seats={seats}
+              selectedSeat={null}
+              onSeatSelect={() => {}}
+              userSeat={userSeat}
+              currentUserId={user?.id}
+              userSociety={user.society || 'Society A'}
+            />
           </div>
         ) : (
           // Seat Selection State
@@ -194,6 +219,7 @@ export function StudentDashboard({ user, onLogout }) {
               onSeatSelect={handleSeatSelect}
               userSeat={userSeat}
               currentUserId={user?.id}
+              userSociety={user.society || 'Society A'}
             />
           </>
         )}
@@ -206,10 +232,16 @@ export function StudentDashboard({ user, onLogout }) {
             onClick={() => setShowConfirmModal(true)}
             className="w-full sm:w-auto px-6 py-3.5 neu-button-primary text-white font-bold rounded-2xl text-sm md:text-base shadow-2xl flex items-center justify-center gap-2 active:scale-95 transition-transform"
           >
-            Choose This Seat (Table {selectedSeat.table_number} • Seat {selectedSeat.seat_number})
+            Choose This Seat (Table {selectedSeat.table_code || selectedSeat.table_number} • Seat {selectedSeat.seat_number})
           </button>
         </div>
       )}
+
+      {/* Floor Plan Modal */}
+      <FloorPlanModal
+        isOpen={showFloorPlanModal}
+        onClose={() => setShowFloorPlanModal(false)}
+      />
 
       {/* Confirmation Modal */}
       <ConfirmModal
