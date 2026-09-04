@@ -52,7 +52,7 @@ function App() {
       />
       <Route path="/login" element={<Navigate to="/" replace />} />
 
-      {/* Student Dashboard Route */}
+      {/* Student Protected Routes */}
       <Route
         path="/dashboard"
         element={
@@ -63,8 +63,6 @@ function App() {
           )
         }
       />
-      {/* Society-scoped dashboard, e.g. /dashboard/SocietyA — browsable by anyone, seat
-          selection restricted to the student's own assigned society (enforced in SeatMap) */}
       <Route
         path="/dashboard/:societySlug"
         element={
@@ -75,6 +73,37 @@ function App() {
           )
         }
       />
+      <Route
+        path="/seats"
+        element={
+          isAuthenticated && !isAdmin ? (
+            <StudentDashboard user={user} onLogout={handleLogout} />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+      <Route
+        path="/seats/:societyParam"
+        element={
+          isAuthenticated && !isAdmin ? (
+            <StudentDashboard user={user} onLogout={handleLogout} />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+      <Route
+        path="/pass"
+        element={
+          isAuthenticated && !isAdmin ? (
+            <StudentDashboard user={user} onLogout={handleLogout} />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+      <Route path="/ticket" element={<Navigate to="/pass" replace />} />
       <Route path="/student" element={<Navigate to="/dashboard" replace />} />
 
       {/* Admin Login Route */}

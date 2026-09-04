@@ -184,9 +184,9 @@ export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, on
 
   return (
     <div className="fixed inset-0 bg-[#3b1427]/60 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-      <div className="bg-[#f7e5ee] border border-rose-200 rounded-3xl p-5 sm:p-7 max-w-lg w-full max-h-[92vh] overflow-y-auto shadow-2xl space-y-5">
+      <div className="bg-[#f7e5ee] border border-rose-200 rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-rose-200/80 pb-3.5">
+        <div className="flex items-center justify-between border-b border-rose-200/80 px-5 sm:px-7 py-4 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
               <Edit3 size={18} />
@@ -203,14 +203,16 @@ export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, on
 
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-rose-200/50 rounded-xl transition-colors"
+            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-rose-200/50 rounded-xl transition-colors cursor-pointer"
           >
             <X size={20} />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Full Name */}
+        <form onSubmit={handleSubmit} className="flex-1 min-h-0 flex flex-col overflow-hidden">
+          {/* Scrollable Form Content */}
+          <div className="flex-1 overflow-y-auto px-5 sm:px-7 py-4 space-y-4">
+            {/* Full Name */}
           <div>
             <label className="block text-[#3b1427] font-semibold mb-1 text-xs sm:text-sm">
               Full Name
@@ -357,20 +359,21 @@ export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, on
               No seat confirmed yet for this attendee.
             </div>
           )}
+          </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3 pt-2">
+          {/* Action Buttons Pinned at Footer */}
+          <div className="flex items-center gap-3 px-5 sm:px-7 py-3.5 border-t border-rose-200/80 bg-[#f7e5ee] shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 px-4 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs sm:text-sm hover:bg-slate-50 active:scale-95 transition-all"
+              className="flex-1 py-2.5 px-4 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs sm:text-sm hover:bg-slate-50 active:scale-95 transition-all cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 text-white font-bold text-xs sm:text-sm hover:from-rose-500 hover:to-pink-500 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+              className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 text-white font-bold text-xs sm:text-sm hover:from-rose-500 hover:to-pink-500 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               <Save size={16} />
               <span>{saving ? 'Saving...' : 'Save Changes'}</span>

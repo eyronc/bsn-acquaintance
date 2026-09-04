@@ -470,7 +470,7 @@ export function AdminPanel({ onLogout }) {
   return (
     <div className="min-h-screen bg-[#f7e5ee] text-[#3b1427] pb-12">
       {/* Responsive Fixed Header */}
-      <header className="sticky top-0 z-50 bg-[#f7e5ee]/95 backdrop-blur-md border-b border-rose-200/60 shadow-sm py-3 px-3 sm:px-6 mb-6">
+      <header className="sticky top-0 z-50 bg-[#f7e5ee]/95 backdrop-blur-md border-b border-rose-200/60 shadow-sm py-2.5 sm:py-3 px-3 sm:px-6 mb-1 sm:mb-2">
         <div className="max-w-7xl mx-auto flex justify-between items-center gap-2 sm:gap-4">
           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
             <img
@@ -506,7 +506,7 @@ export function AdminPanel({ onLogout }) {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-6 sm:space-y-8">
+      <main className="max-w-7xl mx-auto px-3 sm:px-6 pt-1 pb-12 sm:pt-2 sm:pb-16 space-y-5 sm:space-y-7">
         {/* Registration Form Card */}
         <div className="neu-flat-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-rose-200/60">
           <h2 className="text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading mb-4 sm:mb-6 flex items-center gap-2.5">

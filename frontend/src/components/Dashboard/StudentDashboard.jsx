@@ -1,18 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { LogOut, Map } from 'lucide-react';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
+import { LogOut, Map, LayoutDashboard, Armchair, Ticket } from 'lucide-react';
+import { supabase } from '../../supabase/client';
 import { useSeats } from '../../hooks/useSeats';
-import { SeatMap } from './SeatMap';
+import { StudentOverview } from './StudentOverview';
+import { SeatSelectionView } from './SeatSelectionView';
+import { DigitalTicketView } from './DigitalTicketView';
 import { ConfirmModal } from './ConfirmModal';
 import { FloorPlanModal } from './FloorPlanModal';
 import { Toast } from '../UI/Toast';
 import { sendSeatConfirmationEmail } from '../../services/emailService';
 import { getSocietyTheme, normalizeSocietyName, societyToSlug } from '../../utils/societyTheme';
 
+function formatStudentClass(year, section) {
+  const numYear = year ? String(year).replace(/\D/g, '') : '4';
+  const sec = section ? String(section).replace(/^Section\s*/i, '').trim().toUpperCase() : 'B';
+  return `BSN - ${numYear}${sec}`;
+}
+
 export function StudentDashboard({ user, onLogout }) {
   const { seats, loading, error, getUserSeat, reserveSeat, confirmSeatWithAttendee, clearSeat } = useSeats();
+  const location = useLocation();
   const { societySlug } = useParams();
   const navigate = useNavigate();
+
+  const [profile, setProfile] = useState(user);
   const [userSeat, setUserSeat] = useState(null);
   const [selectedSeat, setSelectedSeat] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -20,17 +32,37 @@ export function StudentDashboard({ user, onLogout }) {
   const [toast, setToast] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
 
-  // The society this student is assigned to (drives seat-picking permission)
-  const effectiveUserSociety = normalizeSocietyName(user?.society);
+  // Determine current active tab from route pathname
+  const pathname = location.pathname;
+  let currentTab = 'dashboard';
+  if (pathname.startsWith('/seats') || societySlug) {
+    currentTab = 'seats';
+  } else if (pathname === '/pass' || pathname === '/ticket') {
+    currentTab = 'pass';
+  }
 
-  // The society currently being browsed on the floor plan — driven by the
-  // /dashboard/:societySlug URL segment so it's shareable/bookmarkable, and
-  // defaults to the student's own assigned society when no segment is present.
-  const browsingSociety = societySlug ? normalizeSocietyName(societySlug) : effectiveUserSociety;
-  const handleSocietyChange = (soc) => {
-    navigate(`/dashboard/${societyToSlug(soc)}`, { replace: true });
-  };
+  // Fetch fresh attendee data from Supabase to guarantee exact society from database
+  useEffect(() => {
+    if (!user?.id) return;
+    const fetchFreshProfile = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('attendees')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
+        if (data && !error) {
+          setProfile(data);
+          localStorage.setItem('bsn_user', JSON.stringify({ ...user, ...data, role: 'student' }));
+        }
+      } catch (e) {
+        console.warn('Could not refresh profile from DB:', e.message);
+      }
+    };
+    fetchFreshProfile();
+  }, [user?.id]);
 
+  const effectiveUserSociety = profile?.society || user?.society || 'Society A';
   const currentTheme = getSocietyTheme(effectiveUserSociety);
 
   // Fetch user's current seat on mount
@@ -51,8 +83,10 @@ export function StudentDashboard({ user, onLogout }) {
   // Synchronize dynamic society theme across HTML & body
   useEffect(() => {
     document.documentElement.setAttribute('data-society', effectiveUserSociety);
+    document.body.setAttribute('data-society', effectiveUserSociety);
     return () => {
       document.documentElement.removeAttribute('data-society');
+      document.body.removeAttribute('data-society');
     };
   }, [effectiveUserSociety]);
 
@@ -129,8 +163,12 @@ export function StudentDashboard({ user, onLogout }) {
           message: 'Your seat is confirmed! (Email: check console)',
           type: 'success',
         });
-        console.warn('Seat confirmation email:', emailResult.message);
       }
+
+      // Automatically navigate student to view their digital ticket
+      setTimeout(() => {
+        navigate('/pass');
+      }, 800);
     } catch (err) {
       console.error('Error confirming seat:', err);
       setToast({ message: 'Failed to confirm seat: ' + err.message, type: 'error' });
@@ -146,7 +184,7 @@ export function StudentDashboard({ user, onLogout }) {
       <div className={`min-h-screen ${currentTheme.pageBg} flex items-center justify-center`}>
         <div className="text-center neu-flat p-8 rounded-3xl">
           <div className="w-12 h-12 border-4 border-current border-t-transparent rounded-full animate-spin mx-auto mb-4" style={{ color: currentTheme.accentColor }}></div>
-          <p className={`${currentTheme.textDark} font-semibold`}>Loading seat map...</p>
+          <p className={`${currentTheme.textDark} font-semibold`}>Loading event portal...</p>
         </div>
       </div>
     );
@@ -154,21 +192,23 @@ export function StudentDashboard({ user, onLogout }) {
 
   return (
     <div data-society={effectiveUserSociety} className={`min-h-screen ${currentTheme.pageBg} ${currentTheme.textDark} transition-colors duration-300`}>
-      {/* Fixed Sticky Header - z-30 so FloorPlanModal at z-[9999] completely covers it */}
-      <header className={`sticky top-0 z-30 ${currentTheme.headerBg} backdrop-blur-md border-b ${currentTheme.border} shadow-sm mb-3 sm:mb-6 transition-colors`}>
+      {/* Fixed Sticky Header */}
+      <header className={`no-print sticky top-0 z-30 ${currentTheme.headerBg} backdrop-blur-md border-b ${currentTheme.border} shadow-sm mb-1 sm:mb-2 transition-colors`}>
         <div className="max-w-7xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3 flex justify-between items-center gap-3">
           {/* User Identity & Branding */}
           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
             <img 
               src="/uclmnursing.svg" 
               alt="UCLM Nursing Emblem" 
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full neu-avatar object-contain p-1 flex-shrink-0"
+              className="w-9 h-9 sm:w-11 sm:h-11 rounded-full neu-avatar object-contain p-1 flex-shrink-0 cursor-pointer"
+              onClick={() => navigate('/dashboard')}
+              title="Return to Dashboard"
             />
             <div className="min-w-0">
-              {/* Mobile View: High-contrast, clean student identity without long clipping text */}
+              {/* Mobile View */}
               <div className="sm:hidden min-w-0">
-                <p className={`text-sm font-extrabold ${currentTheme.textDark} font-heading truncate leading-tight`}>
-                  {user.fullname}
+                <p className={`text-xs sm:text-sm font-extrabold ${currentTheme.textDark} font-heading truncate leading-tight`}>
+                  {profile?.fullname || user?.fullname}
                 </p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span 
@@ -181,8 +221,8 @@ export function StudentDashboard({ user, onLogout }) {
                   >
                     {effectiveUserSociety}
                   </span>
-                  <span className="text-[10px] text-slate-500 font-semibold truncate">
-                    BSN 2026
+                  <span className="text-[10px] font-extrabold text-slate-700 truncate font-mono">
+                    {formatStudentClass(profile?.year_level || user?.year_level, profile?.section || user?.section)}
                   </span>
                 </div>
               </div>
@@ -193,7 +233,10 @@ export function StudentDashboard({ user, onLogout }) {
                   BSN 2026 <span className="font-extrabold text-sm md:text-base ml-1" style={{ color: currentTheme.accentColor }}>Acquaintance Party</span>
                 </h1>
                 <div className="flex items-center gap-2 text-slate-500 text-xs md:text-sm truncate font-medium mt-0.5">
-                  <span>Welcome, <strong>{user.fullname}</strong>!</span>
+                  <span>Welcome, <strong>{profile?.fullname || user?.fullname}</strong>!</span>
+                  <span className="font-extrabold text-slate-700 font-mono text-xs px-2 py-0.5 rounded-md bg-black/5 border border-black/5">
+                    {formatStudentClass(profile?.year_level || user?.year_level, profile?.section || user?.section)}
+                  </span>
                   <span 
                     className="px-2.5 py-0.5 font-extrabold text-[11px] rounded-full border shadow-xs transition-all"
                     style={{
@@ -208,6 +251,48 @@ export function StudentDashboard({ user, onLogout }) {
               </div>
             </div>
           </div>
+
+          {/* Navigation Tabs (Desktop & Tablet) */}
+          <nav className="hidden md:flex items-center gap-1.5 p-1 rounded-2xl neu-pressed border border-[var(--neu-border)]">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                currentTab === 'dashboard'
+                  ? 'neu-button text-[var(--neu-accent)] shadow-xs scale-[0.98]'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <LayoutDashboard size={14} />
+              <span>Dashboard</span>
+            </button>
+
+            <button
+              onClick={() => navigate('/seats')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                currentTab === 'seats'
+                  ? 'neu-button text-[var(--neu-accent)] shadow-xs scale-[0.98]'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Armchair size={14} />
+              <span>Seat Selection</span>
+            </button>
+
+            <button
+              onClick={() => navigate('/pass')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                currentTab === 'pass'
+                  ? 'neu-button text-[var(--neu-accent)] shadow-xs scale-[0.98]'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Ticket size={14} />
+              <span>My Ticket</span>
+              {isConfirmed && (
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              )}
+            </button>
+          </nav>
 
           {/* Action Buttons */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
@@ -235,74 +320,92 @@ export function StudentDashboard({ user, onLogout }) {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-2 sm:px-6 py-3 md:py-6">
+      {/* Main Content Area Based on Current Route */}
+      <main className="max-w-7xl mx-auto px-2 sm:px-6 pt-1 pb-20 md:pt-2 md:pb-8">
         {error && (
-          <div className="mb-6 p-4 neu-pressed rounded-2xl text-red-500 text-sm font-semibold text-center max-w-lg mx-auto">
+          <div className="mb-4 p-4 neu-pressed rounded-2xl text-red-500 text-sm font-semibold text-center max-w-lg mx-auto">
             Error: {error}
           </div>
         )}
 
-        {isConfirmed ? (
-          // Confirmed State - Fully Centered and Adapted to Society Theme
-          <div className="text-center space-y-6 sm:space-y-8 flex flex-col items-center justify-center">
-            <div className={`p-5 sm:p-8 w-full max-w-lg mx-auto neu-flat-lg rounded-3xl text-center ${currentTheme.cardBg} border ${currentTheme.border}`}>
-              <h2 className={`text-2xl md:text-3xl font-extrabold font-heading mb-3 sm:mb-4 ${currentTheme.textDark}`}>
-                Your Seat is Confirmed!
-              </h2>
-              <div className={`neu-pressed px-4 sm:px-6 py-3 sm:py-4 rounded-2xl mb-4 sm:mb-6 inline-block max-w-full border ${currentTheme.border}`}>
-                <p className="text-slate-500 text-xs sm:text-sm mb-1 font-medium">Your Reserved Seat &bull; {effectiveUserSociety}</p>
-                <p className={`text-xl sm:text-3xl font-extrabold font-heading ${currentTheme.textDark}`}>
-                  Table {userSeat.table_code || userSeat.table_number} • Seat {userSeat.seat_number}
-                </p>
-              </div>
-              <p className="text-slate-600 text-sm sm:text-base font-medium">
-                See you at the BSN Acquaintance Party 2026!
-              </p>
-            </div>
+        {currentTab === 'seats' && (
+          <SeatSelectionView
+            seats={seats}
+            selectedSeat={selectedSeat}
+            onSeatSelect={handleSeatSelect}
+            userSeat={userSeat}
+            currentUserId={user?.id}
+            effectiveUserSociety={effectiveUserSociety}
+            currentTheme={currentTheme}
+            onOpenConfirmModal={() => setShowConfirmModal(true)}
+          />
+        )}
 
-            {/* Show seat map in read-only mode */}
-            <div className="w-full">
-              <SeatMap
-                seats={seats}
-                selectedSeat={null}
-                onSeatSelect={() => {}}
-                userSeat={userSeat}
-                currentUserId={user?.id}
-                userSociety={effectiveUserSociety}
-                activeSociety={browsingSociety}
-                onSocietyChange={handleSocietyChange}
-              />
-            </div>
-          </div>
-        ) : (
-          // Seat Selection State
-          <div className="w-full">
-            <SeatMap
-              seats={seats}
-              selectedSeat={selectedSeat}
-              onSeatSelect={handleSeatSelect}
-              userSeat={userSeat}
-              currentUserId={user?.id}
-              userSociety={effectiveUserSociety}
-              activeSociety={browsingSociety}
-              onSocietyChange={handleSocietyChange}
-            />
-          </div>
+        {currentTab === 'pass' && (
+          <DigitalTicketView
+            user={user}
+            profile={profile}
+            userSeat={userSeat}
+            currentTheme={currentTheme}
+            effectiveUserSociety={effectiveUserSociety}
+            onOpenFloorPlan={() => setShowFloorPlanModal(true)}
+          />
+        )}
+
+        {currentTab === 'dashboard' && (
+          <StudentOverview
+            user={user}
+            profile={profile}
+            userSeat={userSeat}
+            seats={seats}
+            currentTheme={currentTheme}
+            effectiveUserSociety={effectiveUserSociety}
+            onOpenFloorPlan={() => setShowFloorPlanModal(true)}
+          />
         )}
       </main>
 
-      {/* Sticky "Choose this seat" action bar */}
-      {selectedSeat && !isConfirmed && (
-        <div className="fixed bottom-4 left-3 right-3 sm:left-auto sm:right-6 sm:bottom-6 z-40 max-w-md sm:w-auto flex justify-center mx-auto">
-          <button
-            onClick={() => setShowConfirmModal(true)}
-            className={`w-full sm:w-auto px-6 py-3.5 ${currentTheme.buttonPrimary} font-bold rounded-2xl text-sm md:text-base shadow-2xl flex items-center justify-center gap-2 active:scale-95 transition-transform`}
-          >
-            Choose This Seat (Table {selectedSeat.table_code || selectedSeat.table_number} • Seat {selectedSeat.seat_number})
-          </button>
-        </div>
-      )}
+      {/* Mobile Bottom Navigation Bar (Thumb friendly on phones - Hidden when printing) */}
+      <nav className="no-print md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[var(--neu-bg)]/95 backdrop-blur-md border-t border-[var(--neu-border)] px-4 py-2 flex items-center justify-around shadow-xl">
+        <button
+          onClick={() => navigate('/dashboard')}
+          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-[10px] font-extrabold transition-all cursor-pointer ${
+            currentTab === 'dashboard'
+              ? 'text-[var(--neu-accent)] scale-105'
+              : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <LayoutDashboard size={18} />
+          <span>Dashboard</span>
+        </button>
+
+        <button
+          onClick={() => navigate('/seats')}
+          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-[10px] font-extrabold transition-all cursor-pointer ${
+            currentTab === 'seats'
+              ? 'text-[var(--neu-accent)] scale-105'
+              : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <Armchair size={18} />
+          <span>Seats</span>
+        </button>
+
+        <button
+          onClick={() => navigate('/pass')}
+          className={`flex flex-col items-center gap-1 py-1 px-3 rounded-xl text-[10px] font-extrabold transition-all relative cursor-pointer ${
+            currentTab === 'pass'
+              ? 'text-[var(--neu-accent)] scale-105'
+              : 'text-slate-500 hover:text-slate-800'
+          }`}
+        >
+          <Ticket size={18} />
+          <span>My Ticket</span>
+          {isConfirmed && (
+            <span className="absolute top-0 right-2 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200" />
+          )}
+        </button>
+      </nav>
 
       {/* Floor Plan Modal */}
       <FloorPlanModal

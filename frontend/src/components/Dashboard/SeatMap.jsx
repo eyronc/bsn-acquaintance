@@ -66,12 +66,13 @@ export function SeatMap({
   userSeat,
   currentUserId,
   userSociety = 'Society A',
+  initialSociety,
   activeSociety: controlledActiveSociety,
   onSocietyChange,
 }) {
   const [showFloorPlanModal, setShowFloorPlanModal] = useState(false);
   const [internalActiveSociety, setInternalActiveSociety] = useState(
-    normalizeSocietyName(controlledActiveSociety || userSociety)
+    normalizeSocietyName(controlledActiveSociety || initialSociety || userSociety || 'Society A')
   );
   const [searchTable, setSearchTable] = useState('');
   const [page, setPage] = useState(1);
@@ -100,11 +101,16 @@ export function SeatMap({
   // Sync active tab whenever user's assigned society changes or loads
   // (only relevant in uncontrolled/standalone mode)
   useEffect(() => {
-    if (!controlledActiveSociety && userSociety) {
-      setInternalActiveSociety(normalizeSocietyName(userSociety));
-      setPage(1);
+    if (!controlledActiveSociety) {
+      if (initialSociety) {
+        setInternalActiveSociety(normalizeSocietyName(initialSociety));
+        setPage(1);
+      } else if (userSociety) {
+        setInternalActiveSociety(normalizeSocietyName(userSociety));
+        setPage(1);
+      }
     }
-  }, [userSociety, controlledActiveSociety]);
+  }, [userSociety, initialSociety, controlledActiveSociety]);
 
   // Group seats by table_code (e.g., "A-01", "B-02")
   const tableGroups = useMemo(() => {
@@ -131,7 +137,7 @@ export function SeatMap({
     return map;
   }, [seats]);
 
-  // List of tables belonging to active society
+  // List of tables filtered by active society and search
   const filteredTables = useMemo(() => {
     const list = Object.values(tableGroups).filter((t) => {
       const matchesSociety = normalizeSocietyName(t.society) === normalizeSocietyName(activeSociety);
@@ -139,8 +145,6 @@ export function SeatMap({
       if (!searchTable) return true;
       return t.code.toLowerCase().includes(searchTable.toLowerCase().trim());
     });
-
-    // Sort cleanly by table code
     list.sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true, sensitivity: 'base' }));
     return list;
   }, [tableGroups, activeSociety, searchTable]);
@@ -175,19 +179,7 @@ export function SeatMap({
   };
 
   return (
-    <div className="space-y-5 sm:space-y-6 py-2 md:py-4 max-w-7xl mx-auto px-2 sm:px-4">
-      {/* Visual Stage Area (Clean Architectural Bar - No Sparkles) */}
-      <div className="relative text-center my-2 sm:my-3 px-2">
-        <div className="w-full max-w-xs sm:max-w-sm mx-auto py-2.5 px-4 bg-slate-900 border-2 border-slate-700 rounded-2xl flex items-center justify-center shadow-md">
-          <span className="text-white font-black tracking-[0.25em] text-xs uppercase select-none">
-            MAIN EVENT STAGE
-          </span>
-        </div>
-        <p className="text-[10px] sm:text-[11px] text-[var(--neu-text)]/60 mt-1 font-semibold text-center">
-          Tables in Row A face directly toward the stage
-        </p>
-      </div>
-
+    <div className="space-y-4 sm:space-y-5 pt-0 pb-4 max-w-7xl mx-auto px-1 sm:px-4">
       {/* Society Selection Tabs */}
       <div className="space-y-2.5 text-center sm:text-left">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 px-1">
@@ -208,7 +200,7 @@ export function SeatMap({
         </div>
 
         {/* Society Navigation Pill Tabs with Dedicated Neumorphic Borders & Colors per Society */}
-        <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-2 px-1 scrollbar-thin max-w-full">
+        <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pt-2.5 pb-2.5 px-2 scrollbar-thin max-w-full">
           {STAGE_TABLE_CONFIG.map((conf) => {
             const isSelected = normalizeSocietyName(activeSociety) === normalizeSocietyName(conf.society);
             const isUserSoc = normalizeSocietyName(conf.society) === normalizedUserSociety;
@@ -221,11 +213,13 @@ export function SeatMap({
                 style={{
                   borderColor: isSelected ? confTheme.accentColor : confTheme.badge.border,
                   color: isSelected ? confTheme.accentColor : confTheme.textDark,
+                  borderWidth: isSelected ? '2.5px' : '1.5px',
+                  borderStyle: 'solid',
                 }}
                 className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
                   isSelected
-                    ? 'neu-pressed border-2 scale-[0.98]'
-                    : 'neu-button border hover:scale-[1.02]'
+                    ? 'neu-pressed'
+                    : 'neu-button hover:-translate-y-0.5'
                 }`}
               >
                 <span>{conf.society}</span>
@@ -304,11 +298,11 @@ export function SeatMap({
             Tables {filteredTables.length > 0 ? (page - 1) * TABLES_PER_PAGE + 1 : 0} -{' '}
             {Math.min(page * TABLES_PER_PAGE, filteredTables.length)} of {filteredTables.length}
           </span>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5 py-1">
             <button
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
               disabled={page <= 1}
-              className="p-1.5 neu-button rounded-lg text-[var(--neu-text)] border border-[var(--neu-border)] disabled:opacity-40 cursor-pointer"
+              className="p-1.5 neu-button rounded-xl text-[var(--neu-text)] border border-[var(--neu-border)] hover:border-[var(--neu-accent)] disabled:opacity-40 disabled:hover:border-[var(--neu-border)] cursor-pointer"
               title="Previous tables"
             >
               <ChevronLeft size={16} />
@@ -317,7 +311,7 @@ export function SeatMap({
             <button
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
               disabled={page >= totalPages}
-              className="p-1.5 neu-button rounded-lg text-[var(--neu-text)] border border-[var(--neu-border)] disabled:opacity-40 cursor-pointer"
+              className="p-1.5 neu-button rounded-xl text-[var(--neu-text)] border border-[var(--neu-border)] hover:border-[var(--neu-accent)] disabled:opacity-40 disabled:hover:border-[var(--neu-border)] cursor-pointer"
               title="Next tables"
             >
               <ChevronRight size={16} />

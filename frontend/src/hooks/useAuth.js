@@ -9,7 +9,24 @@ export function useAuth() {
   useEffect(() => {
     const storedUser = localStorage.getItem('bsn_user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const parsed = JSON.parse(storedUser);
+      setUser(parsed);
+      // If student user, re-sync from Supabase in background to guarantee latest society/seat data
+      if (parsed.id && parsed.role === 'student') {
+        supabase
+          .from('attendees')
+          .select('*')
+          .eq('id', parsed.id)
+          .maybeSingle()
+          .then(({ data }) => {
+            if (data) {
+              const updated = { ...parsed, ...data, role: 'student' };
+              setUser(updated);
+              localStorage.setItem('bsn_user', JSON.stringify(updated));
+            }
+          })
+          .catch(() => {});
+      }
     }
     setLoading(false);
   }, []);
@@ -20,8 +37,7 @@ export function useAuth() {
       console.log('🔐 Attempting login:', { email, code });
       
       const { data, error } = await supabase
-        .from('attendees')
-        .select('id, email, fullname, unique_code, society')
+        .select('*')
         .eq('email', email)
         .eq('unique_code', code)
         .maybeSingle();

@@ -111,7 +111,7 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[9999] flex items-center justify-center p-2.5 sm:p-6 animate-in fade-in duration-200"
+      className="no-print fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[9999] flex items-center justify-center p-2.5 sm:p-6 animate-in fade-in duration-200"
     >
       <div
         className={`rounded-3xl p-4 sm:p-6 max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden gap-3 sm:gap-4 border ${
@@ -122,16 +122,16 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
       >
         {/* Modal Header */}
         <div
-          className={`flex-shrink-0 flex items-center justify-between pb-3 border-b ${
-            isAdmin ? 'border-rose-200/80' : socTheme.border
+          className={`px-3 sm:px-6 py-2.5 sm:py-4 border-b flex items-center justify-between gap-2 sm:gap-3 shrink-0 ${
+            isAdmin ? 'border-rose-200/80 bg-rose-50/50' : 'border-black/10'
           }`}
         >
-          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 text-left">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <div
-              className={`w-9 h-9 sm:w-10 sm:h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border ${
+              className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl border flex items-center justify-center shrink-0 ${
                 isAdmin
                   ? 'bg-rose-100 border-rose-200 text-rose-600'
-                  : 'bg-white/80'
+                  : ''
               }`}
               style={
                 !isAdmin
@@ -143,44 +143,44 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
                   : undefined
               }
             >
-              <ImageIcon size={20} />
+              <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div className="min-w-0 text-left">
+            <div className="min-w-0 flex-1 text-left">
               <h3
-                className={`text-base sm:text-xl font-extrabold font-heading truncate text-left ${
+                className={`text-xs xs:text-sm sm:text-xl font-extrabold font-heading text-left leading-snug ${
                   isAdmin ? 'text-[#3b1427]' : socTheme.textDark
                 }`}
               >
                 Event Hall & Stage Floor Plan
               </h3>
               <p
-                className={`text-[11px] sm:text-xs font-semibold truncate text-left ${
+                className={`text-[9.5px] sm:text-xs font-semibold text-left leading-tight mt-0.5 ${
                   isAdmin ? 'text-rose-600' : socTheme.subtext
                 }`}
               >
-                Official layout map for BSN Acquaintance Party 2026
+                Mactan Expo Center &bull; BSN Acquaintance Party 2026
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={handleDownload}
-              className="px-3 sm:px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
               title="Download full floor plan image"
             >
-              <Download size={15} />
+              <Download size={14} className="sm:w-[15px] sm:h-[15px]" />
               <span className="hidden sm:inline">Download Map</span>
             </button>
 
             <button
               onClick={onClose}
-              className={`p-2 text-slate-400 hover:text-slate-700 rounded-xl transition-colors cursor-pointer ${
+              className={`p-1.5 sm:p-2 text-slate-400 hover:text-slate-700 rounded-xl transition-colors cursor-pointer ${
                 isAdmin ? 'hover:bg-rose-200/60' : 'hover:bg-black/5'
               }`}
-              aria-label="Close modal"
+              title="Close (Esc)"
             >
-              <X size={20} />
+              <X size={18} className="sm:w-5 sm:h-5" />
             </button>
           </div>
         </div>
