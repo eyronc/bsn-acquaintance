@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { LogOut, Map } from 'lucide-react';
+import { supabase } from '../../supabase/client';
 import { useSeats } from '../../hooks/useSeats';
 import { SeatMap } from './SeatMap';
 import { ConfirmModal } from './ConfirmModal';
@@ -10,6 +11,7 @@ import { getSocietyTheme } from '../../utils/societyTheme';
 
 export function StudentDashboard({ user, onLogout }) {
   const { seats, loading, error, getUserSeat, reserveSeat, confirmSeatWithAttendee, clearSeat } = useSeats();
+  const [profile, setProfile] = useState(user);
   const [userSeat, setUserSeat] = useState(null);
   const [selectedSeat, setSelectedSeat] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -17,11 +19,28 @@ export function StudentDashboard({ user, onLogout }) {
   const [toast, setToast] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
 
-  // Society B override for Aaron Cumahig testing
-  const effectiveUserSociety = (user?.fullname?.toLowerCase().includes('aaron') && user?.fullname?.toLowerCase().includes('cumahig'))
-    ? (user?.society || 'Society B')
-    : (user?.society || 'Society A');
+  // Fetch fresh attendee data from Supabase to guarantee exact society from database
+  useEffect(() => {
+    if (!user?.id) return;
+    const fetchFreshProfile = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('attendees')
+          .select('*')
+          .eq('id', user.id)
+          .maybeSingle();
+        if (data && !error) {
+          setProfile(data);
+          localStorage.setItem('bsn_user', JSON.stringify({ ...user, ...data, role: 'student' }));
+        }
+      } catch (e) {
+        console.warn('Could not refresh profile from DB:', e.message);
+      }
+    };
+    fetchFreshProfile();
+  }, [user?.id]);
 
+  const effectiveUserSociety = profile?.society || user?.society || 'Society A';
   const currentTheme = getSocietyTheme(effectiveUserSociety);
 
   // Fetch user's current seat on mount (or seed Aaron Cumahig Table B-02 Seat 6)
@@ -172,7 +191,7 @@ export function StudentDashboard({ user, onLogout }) {
               {/* Mobile View: High-contrast, clean student identity without long clipping text */}
               <div className="sm:hidden min-w-0">
                 <p className={`text-sm font-extrabold ${currentTheme.textDark} font-heading truncate leading-tight`}>
-                  {user.fullname}
+                  {profile?.fullname || user?.fullname}
                 </p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span 
@@ -197,7 +216,7 @@ export function StudentDashboard({ user, onLogout }) {
                   BSN 2026 <span className="font-extrabold text-sm md:text-base ml-1" style={{ color: currentTheme.accentColor }}>Acquaintance Party</span>
                 </h1>
                 <div className="flex items-center gap-2 text-slate-500 text-xs md:text-sm truncate font-medium mt-0.5">
-                  <span>Welcome, <strong>{user.fullname}</strong>!</span>
+                  <span>Welcome, <strong>{profile?.fullname || user?.fullname}</strong>!</span>
                   <span 
                     className="px-2.5 py-0.5 font-extrabold text-[11px] rounded-full border shadow-xs transition-all"
                     style={{
