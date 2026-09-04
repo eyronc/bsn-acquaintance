@@ -191,23 +191,30 @@ export const SOCIETY_THEMES = {
   },
 };
 
+// Normalizes any of "A", "Society A", "SocietyA", "society a" -> "Society A".
+// Falls back to "Society A" when empty, or returns the trimmed input unchanged
+// when it doesn't match the A-G society pattern (custom society names).
+export function normalizeSocietyName(soc) {
+  if (!soc) return 'Society A';
+  const trimmed = String(soc).trim();
+  const match = trimmed.match(/^(?:society\s*)?([A-G])$/i);
+  if (match) return `Society ${match[1].toUpperCase()}`;
+  return trimmed;
+}
+
+// URL-safe slug for routing, e.g. "Society A" -> "SocietyA"
+export function societyToSlug(soc) {
+  return normalizeSocietyName(soc).replace(/\s+/g, '');
+}
+
 export function getSocietyTheme(societyName) {
   if (!societyName) return SOCIETY_THEMES['Society A'];
-  const trimmed = String(societyName).trim();
-  if (SOCIETY_THEMES[trimmed]) return SOCIETY_THEMES[trimmed];
-  
-  // Match single letter e.g. "A" -> "Society A"
-  const letterMatch = trimmed.match(/^[A-G]$/i) || trimmed.match(/Society\s*([A-G])/i);
-  if (letterMatch) {
-    const letter = (letterMatch[1] || letterMatch[0]).toUpperCase();
-    if (SOCIETY_THEMES[`Society ${letter}`]) {
-      return SOCIETY_THEMES[`Society ${letter}`];
-    }
-  }
-  
+  const normalized = normalizeSocietyName(societyName);
+  if (SOCIETY_THEMES[normalized]) return SOCIETY_THEMES[normalized];
+
   // Default fallback for custom societies
   return {
-    name: trimmed,
+    name: normalized,
     row: 'Custom',
     pageBg: 'bg-[#f5f3ff]',
     headerBg: 'bg-[#f5f3ff]/95',

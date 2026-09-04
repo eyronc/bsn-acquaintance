@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, memo } from 'react';
 import { STAGE_TABLE_CONFIG } from '../../hooks/useSeats';
 import { FloorPlanModal } from './FloorPlanModal';
 import { Map, Lock, Search, ChevronLeft, ChevronRight, Layers, ArrowRight } from 'lucide-react';
-import { getSocietyTheme } from '../../utils/societyTheme';
+import { getSocietyTheme, normalizeSocietyName } from '../../utils/societyTheme';
 
 const SeatButton = memo(({ seat, index, status, isSelected, isRestricted, onSeatSelect, onRestrictedClick }) => {
   const angle = (index / 10) * Math.PI * 2 - Math.PI / 2; // Start from top
@@ -65,36 +65,51 @@ export function SeatMap({
   onSeatSelect,
   userSeat,
   currentUserId,
-  userSociety = 'Society A',
   initialSociety,
+  activeSociety: controlledActiveSociety,
+  onSocietyChange,
 }) {
   const [showFloorPlanModal, setShowFloorPlanModal] = useState(false);
-  const [activeSociety, setActiveSociety] = useState(initialSociety || userSociety || 'Society A');
+  const [internalActiveSociety, setInternalActiveSociety] = useState(
+    normalizeSocietyName(controlledActiveSociety || initialSociety || userSociety || 'Society A')
+  );
   const [searchTable, setSearchTable] = useState('');
   const [page, setPage] = useState(1);
   const [restrictionNotice, setRestrictionNotice] = useState(null);
   const TABLES_PER_PAGE = 6; // 6 tables per page prevents vertical overflow
 
-  // Normalize user society string for comparison (e.g. "Society A" vs "A")
-  const normalizeSociety = (soc) => {
-    if (!soc) return 'Society A';
-    const s = String(soc).trim();
-    if (/^[A-G]$/i.test(s)) return `Society ${s.toUpperCase()}`;
-    return s;
+  // Controlled by the parent (drives the /dashboard/:society URL) when provided,
+  // otherwise falls back to internal state for standalone usage.
+  const activeSociety = controlledActiveSociety
+    ? normalizeSocietyName(controlledActiveSociety)
+    : internalActiveSociety;
+
+  const changeActiveSociety = (soc) => {
+    const normalized = normalizeSocietyName(soc);
+    if (onSocietyChange) {
+      onSocietyChange(normalized);
+    } else {
+      setInternalActiveSociety(normalized);
+    }
+    setPage(1);
+    setSearchTable('');
   };
 
-  const normalizedUserSociety = normalizeSociety(userSociety);
+  const normalizedUserSociety = normalizeSocietyName(userSociety);
 
   // Sync active tab whenever user's assigned society changes or loads
+  // (only relevant in uncontrolled/standalone mode)
   useEffect(() => {
-    if (initialSociety) {
-      setActiveSociety(normalizeSociety(initialSociety));
-      setPage(1);
-    } else if (userSociety) {
-      setActiveSociety(normalizeSociety(userSociety));
-      setPage(1);
+    if (!controlledActiveSociety) {
+      if (initialSociety) {
+        setInternalActiveSociety(normalizeSocietyName(initialSociety));
+        setPage(1);
+      } else if (userSociety) {
+        setInternalActiveSociety(normalizeSocietyName(userSociety));
+        setPage(1);
+      }
     }
-  }, [initialSociety, userSociety]);
+  }, [userSociety, initialSociety, controlledActiveSociety]);
 
   // Group seats by table_code (e.g., "A-01", "B-02")
   const tableGroups = useMemo(() => {
@@ -124,7 +139,7 @@ export function SeatMap({
   // List of tables filtered by active society and search
   const filteredTables = useMemo(() => {
     const list = Object.values(tableGroups).filter((t) => {
-      const matchesSociety = normalizeSociety(t.society) === normalizeSociety(activeSociety);
+      const matchesSociety = normalizeSocietyName(t.society) === normalizeSocietyName(activeSociety);
       if (!matchesSociety) return false;
       if (!searchTable) return true;
       return t.code.toLowerCase().includes(searchTable.toLowerCase().trim());
@@ -151,7 +166,7 @@ export function SeatMap({
     return 'available';
   };
 
-  const isCurrentSocietyAllowed = normalizeSociety(activeSociety) === normalizedUserSociety;
+  const isCurrentSocietyAllowed = normalizeSocietyName(activeSociety) === normalizedUserSociety;
   const userSocTheme = getSocietyTheme(normalizedUserSociety);
   const activeSocTheme = getSocietyTheme(activeSociety);
 
@@ -186,18 +201,14 @@ export function SeatMap({
         {/* Society Navigation Pill Tabs with Dedicated Neumorphic Borders & Colors per Society */}
         <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pt-2.5 pb-2.5 px-2 scrollbar-thin max-w-full">
           {STAGE_TABLE_CONFIG.map((conf) => {
-            const isSelected = normalizeSociety(activeSociety) === normalizeSociety(conf.society);
-            const isUserSoc = normalizeSociety(conf.society) === normalizedUserSociety;
+            const isSelected = normalizeSocietyName(activeSociety) === normalizeSocietyName(conf.society);
+            const isUserSoc = normalizeSocietyName(conf.society) === normalizedUserSociety;
             const confTheme = getSocietyTheme(conf.society);
 
             return (
               <button
                 key={conf.row}
-                onClick={() => {
-                  setActiveSociety(conf.society);
-                  setPage(1);
-                  setSearchTable('');
-                }}
+                onClick={() => changeActiveSociety(conf.society)}
                 style={{
                   borderColor: isSelected ? confTheme.accentColor : confTheme.badge.border,
                   color: isSelected ? confTheme.accentColor : confTheme.textDark,
@@ -246,11 +257,7 @@ export function SeatMap({
             </div>
           </div>
           <button
-            onClick={() => {
-              setActiveSociety(normalizedUserSociety);
-              setPage(1);
-              setSearchTable('');
-            }}
+            onClick={() => changeActiveSociety(normalizedUserSociety)}
             className="neu-button px-3.5 py-1.5 rounded-xl font-bold text-xs text-[var(--neu-text)] hover:text-[var(--neu-accent)] flex items-center gap-1.5 shrink-0 active:scale-95 shadow-sm border border-[var(--neu-border)] cursor-pointer"
           >
             <span>Back to {normalizedUserSociety}</span>

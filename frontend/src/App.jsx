@@ -7,7 +7,7 @@ import { StudentDashboard } from './components/Dashboard/StudentDashboard';
 import { AdminPanel } from './components/Admin/AdminPanel';
 
 function App() {
-  const { user, isAuthenticated, isAdmin, studentLogin, adminLogin, logout } = useAuth();
+  const { user, loading, isAuthenticated, isAdmin, studentLogin, adminLogin, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleStudentLogin = async (email, code) => {
@@ -24,6 +24,18 @@ function App() {
     logout();
     navigate('/');
   };
+
+  // useAuth reads the session from localStorage asynchronously. Deciding routes
+  // before that resolves would see isAuthenticated as false on every fresh load
+  // (including a deep link like /dashboard/SocietyB), bounce to "/", and lose the
+  // URL — so hold off rendering any route until the real auth state is known.
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#f7e5ee] flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-rose-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <Routes>
@@ -43,6 +55,16 @@ function App() {
       {/* Student Protected Routes */}
       <Route
         path="/dashboard"
+        element={
+          isAuthenticated && !isAdmin ? (
+            <StudentDashboard user={user} onLogout={handleLogout} />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+      <Route
+        path="/dashboard/:societySlug"
         element={
           isAuthenticated && !isAdmin ? (
             <StudentDashboard user={user} onLogout={handleLogout} />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { LogOut, Map, LayoutDashboard, Armchair, Ticket } from 'lucide-react';
 import { supabase } from '../../supabase/client';
 import { useSeats } from '../../hooks/useSeats';
@@ -10,7 +10,7 @@ import { ConfirmModal } from './ConfirmModal';
 import { FloorPlanModal } from './FloorPlanModal';
 import { Toast } from '../UI/Toast';
 import { sendSeatConfirmationEmail } from '../../services/emailService';
-import { getSocietyTheme } from '../../utils/societyTheme';
+import { getSocietyTheme, normalizeSocietyName, societyToSlug } from '../../utils/societyTheme';
 
 function formatStudentClass(year, section) {
   const numYear = year ? String(year).replace(/\D/g, '') : '4';
@@ -21,6 +21,7 @@ function formatStudentClass(year, section) {
 export function StudentDashboard({ user, onLogout }) {
   const { seats, loading, error, getUserSeat, reserveSeat, confirmSeatWithAttendee, clearSeat } = useSeats();
   const location = useLocation();
+  const { societySlug } = useParams();
   const navigate = useNavigate();
 
   const [profile, setProfile] = useState(user);
@@ -34,7 +35,7 @@ export function StudentDashboard({ user, onLogout }) {
   // Determine current active tab from route pathname
   const pathname = location.pathname;
   let currentTab = 'dashboard';
-  if (pathname.startsWith('/seats')) {
+  if (pathname.startsWith('/seats') || societySlug) {
     currentTab = 'seats';
   } else if (pathname === '/pass' || pathname === '/ticket') {
     currentTab = 'pass';
@@ -64,32 +65,20 @@ export function StudentDashboard({ user, onLogout }) {
   const effectiveUserSociety = profile?.society || user?.society || 'Society A';
   const currentTheme = getSocietyTheme(effectiveUserSociety);
 
-  // Fetch user's current seat on mount (or seed Aaron Cumahig Table B-02 Seat 6)
+  // Fetch user's current seat on mount
   useEffect(() => {
     const fetchUserSeat = async () => {
       const userSeatData = await getUserSeat(user.id);
       if (userSeatData) {
         setUserSeat(userSeatData);
         setSelectedSeat(userSeatData);
-      } else if (user?.fullname?.toLowerCase().includes('aaron') && user?.fullname?.toLowerCase().includes('cumahig')) {
-        const aaronSeat = {
-          id: 'table-B-02-seat-06',
-          table_code: 'B-02',
-          table_number: 2,
-          seat_number: 6,
-          society: 'Society B',
-          status: 'confirmed',
-          attendee_id: user.id,
-        };
-        setUserSeat(aaronSeat);
-        setSelectedSeat(aaronSeat);
       }
     };
 
     if (user?.id) {
       fetchUserSeat();
     }
-  }, [user?.id, user?.fullname, getUserSeat]);
+  }, [user?.id, getUserSeat]);
 
   // Synchronize dynamic society theme across HTML & body
   useEffect(() => {
@@ -434,12 +423,13 @@ export function StudentDashboard({ user, onLogout }) {
         loading={confirmLoading}
       />
 
-      {/* Toast Notification */}
+      {/* Toast Notification — raised above the sticky "Choose this seat" bar so they don't overlap */}
       {toast && (
         <Toast
           message={toast.message}
           type={toast.type}
           onClose={() => setToast(null)}
+          raised={Boolean(selectedSeat && !isConfirmed)}
         />
       )}
     </div>

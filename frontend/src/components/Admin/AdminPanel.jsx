@@ -88,28 +88,15 @@ export function AdminPanel({ onLogout }) {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      
-      const list = (data || []).map((att) => {
-        if (att.fullname && att.fullname.toLowerCase().includes('aaron cumahig') && (att.society === 'Society A' || !att.society)) {
-          return { ...att, society: 'Society B' };
-        }
-        return att;
-      });
-      setAttendees(list);
+
+      setAttendees(data || []);
     } catch (error) {
       console.warn('Supabase attendees table query failed:', error.message);
       // Fallback mock attendees
       const local = localStorage.getItem('bsn_mock_attendees');
       if (local) {
         try {
-          const parsed = JSON.parse(local).map((att) => {
-            if (att.fullname && att.fullname.toLowerCase().includes('aaron cumahig') && (att.society === 'Society A' || !att.society)) {
-              return { ...att, society: 'Society B' };
-            }
-            return att;
-          });
-          setAttendees(parsed);
-          localStorage.setItem('bsn_mock_attendees', JSON.stringify(parsed));
+          setAttendees(JSON.parse(local));
         } catch (e) { }
       }
     } finally {
