@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { LogOut, Map } from 'lucide-react';
 import { useSeats } from '../../hooks/useSeats';
 import { SeatMap } from './SeatMap';
@@ -6,10 +7,12 @@ import { ConfirmModal } from './ConfirmModal';
 import { FloorPlanModal } from './FloorPlanModal';
 import { Toast } from '../UI/Toast';
 import { sendSeatConfirmationEmail } from '../../services/emailService';
-import { getSocietyTheme } from '../../utils/societyTheme';
+import { getSocietyTheme, normalizeSocietyName, societyToSlug } from '../../utils/societyTheme';
 
 export function StudentDashboard({ user, onLogout }) {
   const { seats, loading, error, getUserSeat, reserveSeat, confirmSeatWithAttendee, clearSeat } = useSeats();
+  const { societySlug } = useParams();
+  const navigate = useNavigate();
   const [userSeat, setUserSeat] = useState(null);
   const [selectedSeat, setSelectedSeat] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -17,40 +20,33 @@ export function StudentDashboard({ user, onLogout }) {
   const [toast, setToast] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
 
-  // Society B override for Aaron Cumahig testing
-  const effectiveUserSociety = (user?.fullname?.toLowerCase().includes('aaron') && user?.fullname?.toLowerCase().includes('cumahig'))
-    ? (user?.society || 'Society B')
-    : (user?.society || 'Society A');
+  // The society this student is assigned to (drives seat-picking permission)
+  const effectiveUserSociety = normalizeSocietyName(user?.society);
+
+  // The society currently being browsed on the floor plan — driven by the
+  // /dashboard/:societySlug URL segment so it's shareable/bookmarkable, and
+  // defaults to the student's own assigned society when no segment is present.
+  const browsingSociety = societySlug ? normalizeSocietyName(societySlug) : effectiveUserSociety;
+  const handleSocietyChange = (soc) => {
+    navigate(`/dashboard/${societyToSlug(soc)}`, { replace: true });
+  };
 
   const currentTheme = getSocietyTheme(effectiveUserSociety);
 
-  // Fetch user's current seat on mount (or seed Aaron Cumahig Table B-02 Seat 6)
+  // Fetch user's current seat on mount
   useEffect(() => {
     const fetchUserSeat = async () => {
       const userSeatData = await getUserSeat(user.id);
       if (userSeatData) {
         setUserSeat(userSeatData);
         setSelectedSeat(userSeatData);
-      } else if (user?.fullname?.toLowerCase().includes('aaron') && user?.fullname?.toLowerCase().includes('cumahig')) {
-        // Default reservation for Aaron Cumahig: Table B-02, Seat 6
-        const aaronSeat = {
-          id: 'table-B-02-seat-06',
-          table_code: 'B-02',
-          table_number: 2,
-          seat_number: 6,
-          society: 'Society B',
-          status: 'confirmed',
-          attendee_id: user.id,
-        };
-        setUserSeat(aaronSeat);
-        setSelectedSeat(aaronSeat);
       }
     };
 
     if (user?.id) {
       fetchUserSeat();
     }
-  }, [user?.id, user?.fullname, getUserSeat]);
+  }, [user?.id, getUserSeat]);
 
   // Synchronize dynamic society theme across HTML & body
   useEffect(() => {
@@ -274,6 +270,8 @@ export function StudentDashboard({ user, onLogout }) {
                 userSeat={userSeat}
                 currentUserId={user?.id}
                 userSociety={effectiveUserSociety}
+                activeSociety={browsingSociety}
+                onSocietyChange={handleSocietyChange}
               />
             </div>
           </div>
@@ -287,6 +285,8 @@ export function StudentDashboard({ user, onLogout }) {
               userSeat={userSeat}
               currentUserId={user?.id}
               userSociety={effectiveUserSociety}
+              activeSociety={browsingSociety}
+              onSocietyChange={handleSocietyChange}
             />
           </div>
         )}
@@ -320,12 +320,13 @@ export function StudentDashboard({ user, onLogout }) {
         loading={confirmLoading}
       />
 
-      {/* Toast Notification */}
+      {/* Toast Notification — raised above the sticky "Choose this seat" bar so they don't overlap */}
       {toast && (
         <Toast
           message={toast.message}
           type={toast.type}
           onClose={() => setToast(null)}
+          raised={Boolean(selectedSeat && !isConfirmed)}
         />
       )}
     </div>
