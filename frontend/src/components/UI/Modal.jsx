@@ -6,24 +6,24 @@ export function Modal({ isOpen, title, children, onClose, actions, sticky = fals
 
   return (
     <div className="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-50 backdrop-blur-sm transition-all duration-300 p-4">
-      <div className="neu-flat-lg rounded-3xl max-w-md w-full overflow-hidden transform transition-all duration-300 ease-out animate-modal-enter shadow-2xl">
+      <div className="neu-flat-lg rounded-3xl max-w-md w-full overflow-hidden transform transition-all duration-300 ease-out animate-modal-enter shadow-2xl border border-[var(--neu-border)]">
         {/* Header */}
-        <div className="neu-flat p-6 flex justify-between items-center border-b border-pink-200/40">
-          <h2 className="text-xl md:text-2xl font-extrabold text-[#3b1427] font-heading">{title}</h2>
+        <div className="neu-flat p-6 flex justify-between items-center border-b border-[var(--neu-border)]">
+          <h2 className="text-xl md:text-2xl font-extrabold text-[var(--neu-text)] font-heading">{title}</h2>
           <button
             onClick={onClose}
-            className="neu-button p-2 rounded-full text-[#3b1427] hover:text-pink-600 transition-colors"
+            className="neu-button p-2 rounded-full text-[var(--neu-text)] hover:text-[var(--neu-accent)] transition-colors"
           >
             <X size={20} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="max-h-[70vh] overflow-y-auto p-6 text-[#3b1427]">{children}</div>
+        <div className="max-h-[70vh] overflow-y-auto p-6 text-[var(--neu-text)]">{children}</div>
 
         {/* Actions */}
         {actions && (
-          <div className="flex gap-3 p-6 neu-flat border-t border-pink-200/40">
+          <div className="flex gap-3 p-6 neu-flat border-t border-[var(--neu-border)]">
             {actions.map((action, i) => (
               <button
                 key={i}
@@ -34,7 +34,7 @@ export function Modal({ isOpen, title, children, onClose, actions, sticky = fals
                     ? 'neu-button text-red-600'
                     : i === actions.length - 1
                     ? 'neu-button-primary text-white'
-                    : 'neu-button text-[#3b1427]'
+                    : 'neu-button text-[var(--neu-text)]'
                 }`}
               >
                 {action.label}

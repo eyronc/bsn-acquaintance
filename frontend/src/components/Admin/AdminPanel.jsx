@@ -73,8 +73,9 @@ export function AdminPanel({ onLogout }) {
     }
   };
 
-  // Fetch all attendees on mount
+  // Fetch all attendees on mount and ensure admin panel remains 100% pink
   useEffect(() => {
+    document.documentElement.removeAttribute('data-society');
     fetchAttendees();
   }, []);
 
@@ -686,7 +687,7 @@ export function AdminPanel({ onLogout }) {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search name, email, code, BSN - 4B, society..."
+                  placeholder="Search name, email, code, section, society..."
                   className="w-full pl-9 pr-3 py-2 bg-rose-50/50 border border-rose-200/80 rounded-xl text-xs sm:text-sm font-medium text-[#3b1427] focus:outline-none focus:ring-2 focus:ring-rose-400"
                 />
               </div>
@@ -1004,10 +1005,11 @@ export function AdminPanel({ onLogout }) {
         />
       )}
 
-      {/* View Floor Plan Modal */}
+      {/* View Floor Plan Modal - Always Pink in Admin */}
       <FloorPlanModal
         isOpen={showFloorPlanModal}
         onClose={() => setShowFloorPlanModal(false)}
+        society="admin"
       />
 
       {/* Custom Soft Pink Glassmorphic Delete Confirmation Modal (NO EMOJIS) */}
