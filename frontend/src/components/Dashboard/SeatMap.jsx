@@ -1,9 +1,10 @@
-import React, { useState, useMemo, memo } from 'react';
+import React, { useState, useEffect, useMemo, memo } from 'react';
 import { STAGE_TABLE_CONFIG } from '../../hooks/useSeats';
 import { FloorPlanModal } from './FloorPlanModal';
-import { Map, Lock, Check, Search, Download, Sparkles, ChevronLeft, ChevronRight, Layers } from 'lucide-react';
+import { Map, Lock, Check, Search, Download, Sparkles, ChevronLeft, ChevronRight, Layers, ArrowRight } from 'lucide-react';
+import { getSocietyTheme } from '../../utils/societyTheme';
 
-const SeatButton = memo(({ seat, index, status, isSelected, isRestricted, onSeatSelect }) => {
+const SeatButton = memo(({ seat, index, status, isSelected, isRestricted, onSeatSelect, onRestrictedClick }) => {
   const angle = (index / 10) * Math.PI * 2 - Math.PI / 2; // Start from top
   const radiusPct = 37.5;
   const xPct = Math.cos(angle) * radiusPct;
@@ -14,7 +15,7 @@ const SeatButton = memo(({ seat, index, status, isSelected, isRestricted, onSeat
   let classes = 'neu-seat-available font-extrabold cursor-pointer';
 
   if (isRestricted && status === 'available') {
-    classes = 'neu-pressed text-slate-400 cursor-not-allowed opacity-50 border border-slate-300/40';
+    classes = 'neu-pressed text-slate-400 opacity-60 border border-slate-300/60 cursor-not-allowed';
   } else if (isSelected || status === 'selected') {
     classes = 'bg-emerald-500 text-white font-extrabold ring-4 ring-emerald-300 scale-125 z-20 shadow-xl shadow-emerald-500/30';
   } else if (status === 'confirmed') {
@@ -26,6 +27,10 @@ const SeatButton = memo(({ seat, index, status, isSelected, isRestricted, onSeat
   return (
     <button
       onClick={() => {
+        if (isRestricted) {
+          if (onRestrictedClick) onRestrictedClick(seat);
+          return;
+        }
         if (!isClickable && !isSelected) return;
         if (isSelected) {
           onSeatSelect(null);
@@ -40,7 +45,7 @@ const SeatButton = memo(({ seat, index, status, isSelected, isRestricted, onSeat
         transform: 'translate(-50%, -50%)',
       }}
       className={`w-7 xs:w-8 sm:w-9 md:w-10 h-7 xs:h-8 sm:h-9 md:h-10 rounded-full text-[10px] sm:text-xs flex items-center justify-center active:scale-95 transition-all ${classes}`}
-      disabled={!isClickable && !isSelected}
+      disabled={!isClickable && !isSelected && !isRestricted}
       title={
         isRestricted
           ? `Table ${seat.table_code} • Seat ${seat.seat_number} (Restricted to ${seat.society})`
@@ -59,6 +64,7 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
   const [activeSociety, setActiveSociety] = useState(userSociety || 'Society A');
   const [searchTable, setSearchTable] = useState('');
   const [page, setPage] = useState(1);
+  const [restrictionNotice, setRestrictionNotice] = useState(null);
   const TABLES_PER_PAGE = 6; // 6 tables per page prevents vertical overflow
 
   // Normalize user society string for comparison (e.g. "Society A" vs "A")
@@ -70,6 +76,14 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
   };
 
   const normalizedUserSociety = normalizeSociety(userSociety);
+
+  // Sync active tab whenever user's assigned society changes or loads
+  useEffect(() => {
+    if (userSociety) {
+      setActiveSociety(normalizeSociety(userSociety));
+      setPage(1);
+    }
+  }, [userSociety]);
 
   // Group seats by table_code (e.g., "A-01", "B-02")
   const tableGroups = useMemo(() => {
@@ -129,6 +143,15 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
   };
 
   const isCurrentSocietyAllowed = normalizeSociety(activeSociety) === normalizedUserSociety;
+  const userSocTheme = getSocietyTheme(normalizedUserSociety);
+  const activeSocTheme = getSocietyTheme(activeSociety);
+
+  const handleRestrictedSeatClick = (seat) => {
+    setRestrictionNotice(
+      `Table ${seat.table_code} belongs to ${seat.society}. Since you are in ${normalizedUserSociety}, you can only select and reserve seats within ${normalizedUserSociety}.`
+    );
+    setTimeout(() => setRestrictionNotice(null), 5000);
+  };
 
   return (
     <div className="space-y-6 md:space-y-8 py-2 md:py-4">
@@ -145,7 +168,7 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
             Hall Seat Selection
           </h2>
           <p className="text-slate-600 text-xs sm:text-sm font-medium">
-            Browse by Society, inspect round tables, and pick your banquet seat
+            Browse tables by Society zone and select your reservation seat
           </p>
         </div>
 
@@ -175,21 +198,22 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
 
       {/* Society Selection Tabs */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between px-1">
+        <div className="flex flex-wrap items-center justify-between gap-2 px-1">
           <div className="flex items-center gap-2">
             <Layers size={16} className="text-rose-600" />
             <span className="text-xs sm:text-sm font-bold text-[#3b1427]">Select Society / Hall Zone:</span>
           </div>
-          <div className="text-xs font-semibold text-rose-700 bg-rose-100/70 px-2.5 py-1 rounded-full">
-            Your Society: <strong className="font-extrabold">{normalizedUserSociety}</strong>
+          <div className={`text-xs font-semibold px-3 py-1 rounded-full border shadow-sm ${userSocTheme.bgLight} ${userSocTheme.text} ${userSocTheme.border}`}>
+            Your Assigned Society: <strong className="font-extrabold">{normalizedUserSociety}</strong>
           </div>
         </div>
 
-        {/* Society Navigation Pill Tabs */}
+        {/* Society Navigation Pill Tabs with Dedicated Light Pastel Themes */}
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin">
           {STAGE_TABLE_CONFIG.map((conf) => {
             const isSelected = normalizeSociety(activeSociety) === normalizeSociety(conf.society);
             const isUserSoc = normalizeSociety(conf.society) === normalizedUserSociety;
+            const confTheme = getSocietyTheme(conf.society);
 
             return (
               <button
@@ -199,14 +223,14 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
                   setPage(1);
                   setSearchTable('');
                 }}
-                className={`px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 active:scale-95 ${
+                className={`px-3.5 py-2 rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex items-center gap-1.5 shrink-0 active:scale-95 cursor-pointer ${
                   isSelected
-                    ? 'neu-button-primary text-white shadow-md'
-                    : 'neu-button text-[#3b1427] hover:text-rose-600'
+                    ? confTheme.tabActive
+                    : confTheme.tabInactive
                 }`}
               >
                 <span>{conf.society}</span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-white/20 text-white' : 'bg-rose-100 text-rose-700'}`}>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-white/25 text-white' : 'bg-white/70 text-slate-700'}`}>
                   Row {conf.row}
                 </span>
                 {isUserSoc && (
@@ -220,26 +244,47 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
 
       {/* Society Access Notification Banner */}
       {!isCurrentSocietyAllowed ? (
-        <div className="neu-pressed p-3.5 sm:p-4 rounded-2xl border border-amber-300 bg-amber-50/70 text-amber-900 text-xs sm:text-sm flex items-start gap-3">
-          <Lock size={18} className="text-amber-600 shrink-0 mt-0.5" />
-          <div>
-            <p className="font-extrabold">Viewing {activeSociety} (Restricted)</p>
-            <p className="text-amber-800 text-xs mt-0.5">
-              You are assigned to <strong>{normalizedUserSociety}</strong>. You may browse these tables for reference, but you can only select and reserve seats within <strong>{normalizedUserSociety}</strong>.
-            </p>
+        <div className="neu-pressed p-3.5 sm:p-4 rounded-2xl border border-amber-300 bg-amber-50/80 text-amber-900 text-xs sm:text-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+          <div className="flex items-start gap-2.5">
+            <Lock size={18} className="text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-extrabold">Viewing {activeSociety} (Browse Only)</p>
+              <p className="text-amber-800 text-xs mt-0.5">
+                You belong to <strong>{normalizedUserSociety}</strong>. You can only pick and reserve seats within <strong>{normalizedUserSociety}</strong> tables.
+              </p>
+            </div>
           </div>
+          <button
+            onClick={() => {
+              setActiveSociety(normalizedUserSociety);
+              setPage(1);
+              setSearchTable('');
+            }}
+            className="neu-button px-3.5 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 text-[#3b1427] hover:text-rose-600 active:scale-95 shrink-0 cursor-pointer shadow-sm border border-amber-300/80"
+          >
+            <span>Jump to {normalizedUserSociety}</span>
+            <ArrowRight size={14} />
+          </button>
         </div>
       ) : (
-        <div className="p-3 sm:p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-300 text-emerald-900 text-xs sm:text-sm flex items-center justify-between gap-2 shadow-sm">
+        <div className={`p-3 sm:p-3.5 rounded-2xl border ${activeSocTheme.bgLight} ${activeSocTheme.border} ${activeSocTheme.text} text-xs sm:text-sm flex items-center justify-between gap-2 shadow-sm`}>
           <div className="flex items-center gap-2">
             <Check size={18} className="text-emerald-600 shrink-0" />
             <span>
-              You are in <strong>{normalizedUserSociety}</strong>. All open seats below are eligible for your reservation!
+              You are in <strong>{normalizedUserSociety}</strong>. All available seats below are open for your reservation!
             </span>
           </div>
-          <span className="text-[11px] font-mono font-extrabold bg-emerald-200/80 text-emerald-900 px-2 py-0.5 rounded">
+          <span className="text-[11px] font-mono font-extrabold bg-white/80 px-2.5 py-0.5 rounded-full border border-emerald-300 text-emerald-800">
             ELIGIBLE
           </span>
+        </div>
+      )}
+
+      {/* Click Restriction Toast Banner */}
+      {restrictionNotice && (
+        <div className="p-3 bg-amber-100/90 border border-amber-300 text-amber-900 text-xs sm:text-sm rounded-xl flex items-center gap-2 animate-in fade-in shadow-md">
+          <Lock size={16} className="text-amber-700 shrink-0" />
+          <span className="font-semibold">{restrictionNotice}</span>
         </div>
       )}
 
@@ -319,22 +364,23 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
           {paginatedTables.map((table) => {
             const confirmedCount = table.seats.filter((s) => s.status === 'confirmed' || s.attendee_id).length;
             const isTableRestricted = !isCurrentSocietyAllowed;
+            const tableTheme = getSocietyTheme(table.society);
 
             return (
               <div key={table.code} className="flex flex-col items-center">
                 {/* Table Round Neumorphic Container */}
-                <div className="relative w-[270px] xs:w-[300px] sm:w-[320px] md:w-[340px] h-[270px] xs:h-[300px] sm:h-[320px] md:h-[340px] flex items-center justify-center">
+                <div className={`relative w-[270px] xs:w-[300px] sm:w-[320px] md:w-[340px] h-[270px] xs:h-[300px] sm:h-[320px] md:h-[340px] flex items-center justify-center rounded-full transition-all`}>
                   
-                  {/* Center Table Deck */}
-                  <div className="absolute w-[50%] h-[50%] neu-circle rounded-full flex items-center justify-center z-10 select-none">
+                  {/* Center Table Deck with Light Society Theme */}
+                  <div className={`absolute w-[50%] h-[50%] neu-circle rounded-full flex items-center justify-center z-10 select-none border-2 shadow-inner ${tableTheme.border} ${tableTheme.bgLight}`}>
                     <div className="text-center p-2">
-                      <p className="text-[#3b1427] font-extrabold text-base sm:text-xl font-heading leading-tight">
+                      <p className={`font-extrabold text-base sm:text-xl font-heading leading-tight ${tableTheme.textDark}`}>
                         Table {table.code}
                       </p>
-                      <p className="text-rose-600 font-bold text-[10px] sm:text-xs mt-0.5 truncate max-w-[100px] mx-auto">
+                      <p className={`font-extrabold text-[10px] sm:text-xs mt-0.5 truncate max-w-[100px] mx-auto ${tableTheme.text}`}>
                         {table.society}
                       </p>
-                      <span className="inline-block mt-1 text-[9px] font-bold text-slate-500 bg-rose-100/60 px-2 py-0.5 rounded-full">
+                      <span className="inline-block mt-1 text-[9px] font-bold text-slate-600 bg-white/70 px-2 py-0.5 rounded-full border border-rose-200/50">
                         {confirmedCount}/10 Taken
                       </span>
                     </div>
@@ -354,6 +400,7 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
                         isSelected={isSelected}
                         isRestricted={isTableRestricted}
                         onSeatSelect={onSeatSelect}
+                        onRestrictedClick={handleRestrictedSeatClick}
                       />
                     );
                   })}
@@ -361,7 +408,7 @@ export function SeatMap({ seats, selectedSeat, onSeatSelect, userSeat, currentUs
 
                 {/* Table Footer Status */}
                 <div className="mt-2 text-center">
-                  <span className="neu-pressed px-3.5 py-1 rounded-full text-[11px] text-[#3b1427] font-bold">
+                  <span className={`px-3.5 py-1 rounded-full text-[11px] font-bold border ${tableTheme.bgLight} ${tableTheme.textDark} ${tableTheme.borderLight} shadow-sm`}>
                     Table {table.code} &bull; {10 - confirmedCount} Seats Available
                   </span>
                 </div>

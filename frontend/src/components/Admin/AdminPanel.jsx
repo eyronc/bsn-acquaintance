@@ -6,6 +6,7 @@ import { Toast } from '../UI/Toast';
 import { sendAccessCodeEmail } from '../../services/emailService';
 import { EditAttendeeModal, PRESET_SOCIETIES } from './EditAttendeeModal';
 import { FloorPlanModal } from '../Dashboard/FloorPlanModal';
+import { getSocietyTheme } from '../../utils/societyTheme';
 
 // Year levels and their corresponding valid sections
 const YEAR_OPTIONS = ['1st Year', '2nd Year', '3rd Year', '4th Year'];
@@ -86,14 +87,28 @@ export function AdminPanel({ onLogout }) {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setAttendees(data || []);
+      
+      const list = (data || []).map((att) => {
+        if (att.fullname && att.fullname.toLowerCase().includes('aaron cumahig') && (att.society === 'Society A' || !att.society)) {
+          return { ...att, society: 'Society B' };
+        }
+        return att;
+      });
+      setAttendees(list);
     } catch (error) {
       console.warn('Supabase attendees table query failed:', error.message);
       // Fallback mock attendees
       const local = localStorage.getItem('bsn_mock_attendees');
       if (local) {
         try {
-          setAttendees(JSON.parse(local));
+          const parsed = JSON.parse(local).map((att) => {
+            if (att.fullname && att.fullname.toLowerCase().includes('aaron cumahig') && (att.society === 'Society A' || !att.society)) {
+              return { ...att, society: 'Society B' };
+            }
+            return att;
+          });
+          setAttendees(parsed);
+          localStorage.setItem('bsn_mock_attendees', JSON.stringify(parsed));
         } catch (e) { }
       }
     } finally {
@@ -118,7 +133,7 @@ export function AdminPanel({ onLogout }) {
           section,
           society: finalSociety,
           unique_code: uniqueCode,
-          payment_amount: 650
+          payment_amount: 950
         }])
         .select();
 
@@ -161,7 +176,7 @@ export function AdminPanel({ onLogout }) {
         section,
         society: finalSociety,
         unique_code: uniqueCode,
-        payment_amount: 650,
+        payment_amount: 950,
         created_at: new Date().toISOString(),
       };
       const updated = [newAttendee, ...attendees];
@@ -306,9 +321,14 @@ export function AdminPanel({ onLogout }) {
         if (sortBy === 'name') return a.fullname.localeCompare(b.fullname);
         if (sortBy === 'oldest') return new Date(a.created_at) - new Date(b.created_at);
         if (sortBy === 'class') {
-          const classA = formatClassBadge(a.year, a.section);
-          const classB = formatClassBadge(b.year, b.section);
-          return classA.localeCompare(classB);
+          const yearOrder = { '1st Year': 1, '2nd Year': 2, '3rd Year': 3, '4th Year': 4 };
+          const yA = yearOrder[a.year] || 99;
+          const yB = yearOrder[b.year] || 99;
+          if (yA !== yB) return yA - yB;
+          const secA = (a.section || '').toUpperCase();
+          const secB = (b.section || '').toUpperCase();
+          if (secA !== secB) return secA.localeCompare(secB);
+          return (a.fullname || '').localeCompare(b.fullname || '');
         }
         return new Date(b.created_at) - new Date(a.created_at); // default 'newest'
       });
@@ -362,7 +382,7 @@ export function AdminPanel({ onLogout }) {
 
       const statusText = att.seat_confirmed ? 'Confirmed' : 'Pending';
       const formattedDate = att.created_at ? new Date(att.created_at).toLocaleString() : '';
-      const feeText = `₱${att.payment_amount || 650}`;
+      const feeText = `₱${att.payment_amount || 950}`;
 
       return [
         index + 1,
@@ -406,10 +426,10 @@ export function AdminPanel({ onLogout }) {
     // ==========================================
     // SHEET 2: "Liquidation Summary"
     // ==========================================
-    const totalAmount = sortedExportData.reduce((sum, att) => sum + (Number(att.payment_amount) || 650), 0);
+    const totalAmount = sortedExportData.reduce((sum, att) => sum + (Number(att.payment_amount) || 950), 0);
     const confirmedCount = sortedExportData.filter(att => att.seat_confirmed).length;
     const pendingCount = sortedExportData.length - confirmedCount;
-    const confirmedAmount = sortedExportData.filter(att => att.seat_confirmed).reduce((sum, att) => sum + (Number(att.payment_amount) || 650), 0);
+    const confirmedAmount = sortedExportData.filter(att => att.seat_confirmed).reduce((sum, att) => sum + (Number(att.payment_amount) || 950), 0);
     const pendingAmount = totalAmount - confirmedAmount;
 
     const ws2Data = [
@@ -420,7 +440,7 @@ export function AdminPanel({ onLogout }) {
       ['Total Registered Attendees', sortedExportData.length],
       ['Total Confirmed Seats', confirmedCount],
       ['Pending Registrations', pendingCount],
-      ['Standard Ticket Fee', '₱650.00'],
+      ['Standard Ticket Fee', '₱950.00'],
       ['Total Expected Revenue', `₱${totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`],
       ['Total Confirmed Revenue Collected', `₱${confirmedAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`],
       ['Pending Unconfirmed Revenue', `₱${pendingAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`]
@@ -602,13 +622,19 @@ export function AdminPanel({ onLogout }) {
 
             {/* Selected Preview Badges */}
             <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-rose-100/60 rounded-xl text-xs text-rose-800 font-bold">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-rose-100/60 rounded-xl text-xs text-rose-800 font-bold border border-rose-200/80">
                 <School size={14} className="text-rose-600" />
                 <span>Class: <code className="font-mono">{formatClassBadge(year, section)}</code></span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-100/60 rounded-xl text-xs text-purple-800 font-bold">
-                <span>Society: <code className="font-mono">{isCustomSociety ? (customSociety || 'Custom') : society}</code></span>
-              </div>
+              {(() => {
+                const currentSoc = isCustomSociety ? (customSociety || 'Custom') : society;
+                const socTheme = getSocietyTheme(currentSoc);
+                return (
+                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold border ${socTheme.bgLight} ${socTheme.text} ${socTheme.border}`}>
+                    <span>Society: <code className="font-mono">{currentSoc}</code></span>
+                  </div>
+                );
+              })()}
             </div>
 
             <button
@@ -717,7 +743,7 @@ export function AdminPanel({ onLogout }) {
                   <option value="newest">Sort: Newest First</option>
                   <option value="oldest">Sort: Oldest First</option>
                   <option value="name">Sort: Name (A-Z)</option>
-                  <option value="class">Sort: Class (BSN - 1A)</option>
+                  <option value="class">Sort: Class (Year & Section)</option>
                 </select>
               </div>
             </div>
@@ -769,9 +795,14 @@ export function AdminPanel({ onLogout }) {
 
                         {/* Society */}
                         <td className="py-3 px-2 text-center">
-                          <span className="font-mono font-bold text-[11px] px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200/80 rounded-md inline-block whitespace-nowrap">
-                            {attendee.society || 'Society A'}
-                          </span>
+                          {(() => {
+                            const socTheme = getSocietyTheme(attendee.society);
+                            return (
+                              <span className={`font-mono font-bold text-[11px] px-2.5 py-0.5 rounded-md border inline-block whitespace-nowrap ${socTheme.bgLight} ${socTheme.text} ${socTheme.border}`}>
+                                {attendee.society || 'Society A'}
+                              </span>
+                            );
+                          })()}
                         </td>
 
                         {/* Email */}
@@ -796,7 +827,7 @@ export function AdminPanel({ onLogout }) {
                         {/* Payment */}
                         <td className="py-3 px-2 text-center">
                           <span className="inline-flex items-center justify-center px-2 py-0.5 bg-emerald-100/90 text-emerald-800 border border-emerald-300/60 rounded-full font-extrabold text-[11px] whitespace-nowrap">
-                            ₱{attendee.payment_amount || 650}
+                            ₱{attendee.payment_amount || 950}
                           </span>
                         </td>
 
@@ -870,9 +901,14 @@ export function AdminPanel({ onLogout }) {
                           <span className="font-mono text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold">
                             {formatClassBadge(attendee.year, attendee.section)}
                           </span>
-                          <span className="font-mono text-purple-700 bg-purple-100 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold">
-                            {attendee.society || 'Society A'}
-                          </span>
+                          {(() => {
+                            const socTheme = getSocietyTheme(attendee.society);
+                            return (
+                              <span className={`font-mono px-2 py-0.5 rounded text-[10px] uppercase font-bold border ${socTheme.bgLight} ${socTheme.text} ${socTheme.border}`}>
+                                {attendee.society || 'Society A'}
+                              </span>
+                            );
+                          })()}
                         </div>
                         <h3 className="text-base font-extrabold text-[#3b1427] truncate leading-snug">
                           {attendee.fullname}
@@ -897,7 +933,7 @@ export function AdminPanel({ onLogout }) {
                       </div>
                       <div>
                         <span className="text-slate-400 block text-[10px]">Payment Fee</span>
-                        <span className="text-emerald-700 font-extrabold block">₱{attendee.payment_amount || 650}</span>
+                        <span className="text-emerald-700 font-extrabold block">₱{attendee.payment_amount || 950}</span>
                       </div>
                       <div className="col-span-2">
                         <span className="text-slate-400 block text-[10px]">Seat Reserved</span>
@@ -954,6 +990,7 @@ export function AdminPanel({ onLogout }) {
       {/* Edit Attendee Modal */}
       {attendeeToEdit && (
         <EditAttendeeModal
+          isOpen={Boolean(attendeeToEdit)}
           attendee={attendeeToEdit}
           onClose={() => setAttendeeToEdit(null)}
           onSave={(updated) => {
@@ -963,6 +1000,7 @@ export function AdminPanel({ onLogout }) {
               type: 'success',
             });
           }}
+          setToast={setToast}
         />
       )}
 

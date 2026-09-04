@@ -6,6 +6,7 @@ import { ConfirmModal } from './ConfirmModal';
 import { FloorPlanModal } from './FloorPlanModal';
 import { Toast } from '../UI/Toast';
 import { sendSeatConfirmationEmail } from '../../services/emailService';
+import { getSocietyTheme } from '../../utils/societyTheme';
 
 export function StudentDashboard({ user, onLogout }) {
   const { seats, loading, error, getUserSeat, reserveSeat, confirmSeatWithAttendee, clearSeat } = useSeats();
@@ -15,6 +16,11 @@ export function StudentDashboard({ user, onLogout }) {
   const [showFloorPlanModal, setShowFloorPlanModal] = useState(false);
   const [toast, setToast] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
+
+  // Society B override for Aaron Cumahig testing if needed
+  const effectiveUserSociety = (user?.fullname?.toLowerCase().includes('aaron') && user?.fullname?.toLowerCase().includes('cumahig'))
+    ? (user?.society || 'Society B')
+    : (user?.society || 'Society A');
 
   // Fetch user's current seat on mount
   useEffect(() => {
@@ -145,9 +151,21 @@ export function StudentDashboard({ user, onLogout }) {
               </h1>
               <div className="flex items-center gap-2 text-slate-500 text-[11px] sm:text-sm truncate font-medium">
                 <span>Welcome, {user.fullname}!</span>
-                <span className="px-2 py-0.5 bg-rose-100/80 text-rose-800 font-extrabold text-[10px] rounded-full">
-                  {user.society || 'Society A'}
-                </span>
+                {(() => {
+                  const theme = getSocietyTheme(effectiveUserSociety);
+                  return (
+                    <span 
+                      className="px-2.5 py-0.5 font-extrabold text-[11px] rounded-full border shadow-sm transition-all"
+                      style={{
+                        backgroundColor: theme.badge.bg,
+                        color: theme.badge.text,
+                        borderColor: theme.border
+                      }}
+                    >
+                      {effectiveUserSociety}
+                    </span>
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -190,7 +208,7 @@ export function StudentDashboard({ user, onLogout }) {
                 Your Seat is Confirmed!
               </h2>
               <div className="neu-pressed px-6 py-4 rounded-2xl mb-6 inline-block">
-                <p className="text-slate-500 text-sm mb-1 font-medium">Your Reserved Seat &bull; {user.society || 'Society A'}</p>
+                <p className="text-slate-500 text-sm mb-1 font-medium">Your Reserved Seat &bull; {effectiveUserSociety}</p>
                 <p className="text-2xl md:text-3xl font-extrabold text-rose-600 font-heading">
                   Table {userSeat.table_code || userSeat.table_number} • Seat {userSeat.seat_number}
                 </p>
@@ -207,7 +225,7 @@ export function StudentDashboard({ user, onLogout }) {
               onSeatSelect={() => {}}
               userSeat={userSeat}
               currentUserId={user?.id}
-              userSociety={user.society || 'Society A'}
+              userSociety={effectiveUserSociety}
             />
           </div>
         ) : (
@@ -219,7 +237,7 @@ export function StudentDashboard({ user, onLogout }) {
               onSeatSelect={handleSeatSelect}
               userSeat={userSeat}
               currentUserId={user?.id}
-              userSociety={user.society || 'Society A'}
+              userSociety={effectiveUserSociety}
             />
           </>
         )}
