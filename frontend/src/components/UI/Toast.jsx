@@ -15,6 +15,7 @@ export function Toast({ message, type = 'success', onClose, duration = 3500, rai
     info: <Info className="text-rose-600 shrink-0 mt-0.5" size={18} />,
   };
 
+  return (
     <div
       className={`no-print fixed left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50 flex items-start gap-3 p-3.5 bg-white/95 backdrop-blur-md neu-flat-lg rounded-2xl border border-[var(--neu-border)] shadow-2xl animate-toast-enter text-[var(--neu-text)] ${
         raised ? 'bottom-24 sm:bottom-24' : 'bottom-4 sm:bottom-6'

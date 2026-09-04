@@ -65,6 +65,7 @@ export function SeatMap({
   onSeatSelect,
   userSeat,
   currentUserId,
+  userSociety = 'Society A',
   initialSociety,
   activeSociety: controlledActiveSociety,
   onSocietyChange,
