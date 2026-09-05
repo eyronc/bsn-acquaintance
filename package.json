@@ -11,6 +11,7 @@
     "preview": "npm --prefix frontend run preview"
   },
   "dependencies": {
-    "nodemailer": "^6.9.16"
+    "nodemailer": "^6.9.16",
+    "resend": "^6.26.0"
   }
 }

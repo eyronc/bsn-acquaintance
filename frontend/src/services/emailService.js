@@ -37,6 +37,9 @@ export async function sendAccessCodeEmail(attendee) {
         email: attendee.email,
         fullname: attendee.fullname,
         unique_code: attendee.unique_code,
+        society: attendee.society || 'Society A',
+        year_level: attendee.year || attendee.year_level,
+        section: attendee.section,
         eventUrl: eventUrl,
       }),
     });
@@ -86,6 +89,10 @@ export async function sendSeatConfirmationEmail(attendee, tableNumber, seatNumbe
         fullname: attendee.fullname,
         table_number: tableNumber,
         seat_number: seatNumber,
+        society: attendee.society || 'Society A',
+        unique_code: attendee.unique_code,
+        year_level: attendee.year || attendee.year_level,
+        section: attendee.section,
         eventUrl: url,
       }),
     });

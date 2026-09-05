@@ -10,7 +10,7 @@
 - **Venue**: **Mactan Expo Center**
 - **Date**: **September 26, 2026 (Saturday)**
 - **Time**: **5:00 PM – 10:00 PM**
-- **Theme**: **Celestial Garden: A night of Wonder and Grace**
+- **Theme**: **Celestial Garden: A Night of Wonder and Grace**
 
 ---
 
