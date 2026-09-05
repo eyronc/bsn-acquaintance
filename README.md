@@ -66,9 +66,9 @@ Built with **React 18**, **Vite**, **Tailwind CSS**, and **Supabase (PostgreSQL)
 ### 6. Automated Email Notification Engine
 - **Dual-Environment Architecture**:
   - **Local Development**: Node.js & Express server running on port `3001` with Nodemailer.
-  - **Production (Vercel)**: Serverless API handlers (`api/send-access-code.js` and `api/send-seat-confirmation.js`).
-- **Automated Access Code Email**: Dispatches unique access code and login instructions upon registration.
-- **Seat Confirmation Email**: Sends official admission confirmation with assigned table code and seat number.
+  - **Production (Vercel)**: Serverless API handler (`api/send-access-code.js`).
+- **Automated Access Code Email**: Dispatches unique access code and login instructions upon registration with multi-tier failover (Resend → Brevo → Gmail).
+- **Direct Digital Ticket Pass**: Seat confirmation instantly generates a downloadable & printable admission pass on-site, preserving 100% of email quota.
 
 ---
 
@@ -107,7 +107,7 @@ Based on the official Mactan Expo Center Stage configuration (`/STAGE.png`):
 uclm-bsn-acquaintance/
 ├── api/                                # Vercel Serverless Functions
 │   ├── send-access-code.js             # Access code email handler
-│   └── send-seat-confirmation.js       # Seat confirmation email handler
+│   └── society-email-theme.js          # Dynamic color palettes per society
 ├── backend/                            # Local Node/Express Email Service
 │   ├── server.js                       # Express email server (Port 3001)
 │   └── package.json
