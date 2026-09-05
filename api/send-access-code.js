@@ -186,7 +186,7 @@ export default async function handler(req, res) {
         const resendResponse = await resend.emails.send({
           from: 'UCLM NSBO <access-code@bsn-acquaintance.online>',
           to: [email],
-          reply_to: 'nsbouclm@gmail.com',
+          replyTo: 'nsbouclm@gmail.com',
           subject: subject,
           html: emailHtml,
         });

@@ -9,7 +9,6 @@ import { DigitalTicketView } from './DigitalTicketView';
 import { ConfirmModal } from './ConfirmModal';
 import { FloorPlanModal } from './FloorPlanModal';
 import { Toast } from '../UI/Toast';
-import { sendSeatConfirmationEmail } from '../../services/emailService';
 import { getSocietyTheme, normalizeSocietyName, societyToSlug } from '../../utils/societyTheme';
 
 function formatStudentClass(year, section) {
@@ -146,29 +145,15 @@ export function StudentDashboard({ user, onLogout }) {
       setUserSeat({ ...selectedSeat, status: 'confirmed' });
       setShowConfirmModal(false);
 
-      // Send confirmation email
-      const emailResult = await sendSeatConfirmationEmail(
-        user,
-        selectedSeat.table_number,
-        selectedSeat.seat_number
-      );
+      setToast({
+        message: 'Your seat is confirmed! Generating your digital pass...',
+        type: 'success',
+      });
 
-      if (emailResult.success) {
-        setToast({
-          message: 'Your seat is confirmed! Confirmation email sent.',
-          type: 'success',
-        });
-      } else {
-        setToast({
-          message: 'Your seat is confirmed! (Email: check console)',
-          type: 'success',
-        });
-      }
-
-      // Automatically navigate student to view their digital ticket
+      // Automatically navigate student to view their digital ticket pass
       setTimeout(() => {
         navigate('/pass');
-      }, 800);
+      }, 600);
     } catch (err) {
       console.error('Error confirming seat:', err);
       setToast({ message: 'Failed to confirm seat: ' + err.message, type: 'error' });
