@@ -26,16 +26,31 @@ export function SeatSelectionView({
     <div className="space-y-3 sm:space-y-4 pb-24 sm:pb-12 page-transition">
       {/* Confirmed Reservation Ribbon */}
       {isConfirmed && (
-        <div className="neu-pressed px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl border border-emerald-300/80 bg-emerald-50/70 max-w-xl mx-auto flex items-center justify-between gap-2.5 shadow-xs">
+        <div 
+          className="neu-pressed px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl border max-w-xl mx-auto flex items-center justify-between gap-2.5 shadow-xs"
+          style={{
+            borderColor: currentTheme.badge.border,
+          }}
+        >
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-7 h-7 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-700 shrink-0">
+            <div 
+              className="w-7 h-7 rounded-full border flex items-center justify-center shrink-0 shadow-xs"
+              style={{
+                backgroundColor: currentTheme.badge.bg,
+                borderColor: currentTheme.badge.border,
+                color: currentTheme.accentColor,
+              }}
+            >
               <CheckCircle2 size={15} />
             </div>
             <div className="min-w-0 text-left">
-              <p className="text-[9.5px] uppercase font-extrabold text-emerald-700 leading-none">
+              <p 
+                className="text-[9.5px] uppercase font-extrabold leading-none"
+                style={{ color: currentTheme.accentColor }}
+              >
                 Confirmed Reservation
               </p>
-              <p className="text-xs sm:text-sm font-black text-emerald-950 truncate mt-0.5 font-heading">
+              <p className={`text-xs sm:text-sm font-black truncate mt-0.5 font-heading ${currentTheme.textDark}`}>
                 Table {userSeat.table_code || userSeat.table_number} &bull; Seat {userSeat.seat_number}
               </p>
             </div>
@@ -43,7 +58,8 @@ export function SeatSelectionView({
 
           <button
             onClick={() => navigate('/pass')}
-            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-extrabold rounded-xl text-xs flex items-center gap-1.5 shrink-0 shadow-xs cursor-pointer transition-all"
+            style={{ backgroundColor: currentTheme.accentColor }}
+            className="px-3 py-1.5 hover:opacity-90 active:scale-95 text-white font-extrabold rounded-xl text-xs flex items-center gap-1.5 shrink-0 shadow-xs cursor-pointer transition-all"
           >
             <Ticket size={13} />
             <span>View Ticket</span>

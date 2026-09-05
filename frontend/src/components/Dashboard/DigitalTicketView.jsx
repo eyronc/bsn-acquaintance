@@ -143,7 +143,7 @@ export function DigitalTicketView({
         {/* Ticket Body with Clean Key-Value Structure */}
         <div className="p-5 sm:p-7 space-y-6">
           {/* Attendee Name & Access Code */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-black/10 pb-4">
+          <div className="ticket-attendee-row flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-black/10 pb-4">
             <div>
               <p className="text-[11px] uppercase font-bold text-slate-500">Attendee Name</p>
               <h3 className={`text-lg sm:text-2xl font-black font-heading ${currentTheme.textDark}`}>
@@ -163,8 +163,13 @@ export function DigitalTicketView({
           </div>
 
           {/* Reserved Seat Highlight */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <div className="p-3.5 neu-pressed rounded-2xl border border-[var(--neu-border)] text-center">
+          <div className="ticket-seats-grid grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div 
+              className="p-3.5 neu-pressed rounded-2xl border text-center"
+              style={{
+                borderColor: currentTheme.badge.border,
+              }}
+            >
               <p className="text-[10px] uppercase font-bold text-slate-500">Society Zone</p>
               <p
                 className="text-lg sm:text-2xl font-black font-heading truncate"
@@ -174,16 +179,38 @@ export function DigitalTicketView({
               </p>
             </div>
 
-            <div className="p-3.5 neu-pressed rounded-2xl border border-emerald-300 bg-emerald-50/50 text-center">
-              <p className="text-[10px] uppercase font-bold text-emerald-800">Table Number</p>
-              <p className="text-lg sm:text-2xl font-black text-emerald-950 font-heading">
+            <div 
+              className="p-3.5 neu-pressed rounded-2xl border text-center"
+              style={{
+                borderColor: currentTheme.badge.border,
+                backgroundColor: currentTheme.badge.bg,
+              }}
+            >
+              <p 
+                className="text-[10px] uppercase font-bold"
+                style={{ color: currentTheme.accentColor }}
+              >
+                Table Number
+              </p>
+              <p className={`text-lg sm:text-2xl font-black font-heading ${currentTheme.textDark}`}>
                 {userSeat?.table_code || userSeat?.table_number}
               </p>
             </div>
 
-            <div className="p-3.5 neu-pressed rounded-2xl border border-emerald-300 bg-emerald-50/50 text-center col-span-2 sm:col-span-1">
-              <p className="text-[10px] uppercase font-bold text-emerald-800">Seat Number</p>
-              <p className="text-lg sm:text-2xl font-black text-emerald-950 font-heading">
+            <div 
+              className="p-3.5 neu-pressed rounded-2xl border text-center col-span-2 sm:col-span-1"
+              style={{
+                borderColor: currentTheme.badge.border,
+                backgroundColor: currentTheme.badge.bg,
+              }}
+            >
+              <p 
+                className="text-[10px] uppercase font-bold"
+                style={{ color: currentTheme.accentColor }}
+              >
+                Seat Number
+              </p>
+              <p className={`text-lg sm:text-2xl font-black font-heading ${currentTheme.textDark}`}>
                 Seat {userSeat?.seat_number}
               </p>
             </div>
@@ -191,7 +218,7 @@ export function DigitalTicketView({
 
           {/* Updated Official Event Details */}
           <div className="p-4 rounded-2xl bg-black/5 border border-black/10 space-y-2 text-xs text-slate-700">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div className="ticket-details-grid grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div className="flex items-center gap-2">
                 <MapPin size={15} style={{ color: currentTheme.accentColor }} className="shrink-0" />
                 <span className="font-bold">Venue: Mactan Expo Center</span>
@@ -204,8 +231,11 @@ export function DigitalTicketView({
                 <Clock size={15} style={{ color: currentTheme.accentColor }} className="shrink-0" />
                 <span className="font-semibold">Time: 5:00 PM – 10:00 PM</span>
               </div>
-              <div className="flex items-center gap-1.5 text-emerald-800 font-bold">
-                <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
+              <div 
+                className="flex items-center gap-1.5 font-bold"
+                style={{ color: currentTheme.accentColor }}
+              >
+                <CheckCircle2 size={15} style={{ color: currentTheme.accentColor }} className="shrink-0" />
                 <span>Admission Status: Confirmed &amp; Valid</span>
               </div>
             </div>
@@ -220,7 +250,8 @@ export function DigitalTicketView({
       <div className="no-print flex flex-col sm:flex-row items-center gap-3">
         <button
           onClick={handlePrint}
-          className="w-full sm:flex-1 py-3 px-5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all cursor-pointer"
+          style={{ backgroundColor: currentTheme.accentColor }}
+          className="w-full sm:flex-1 py-3 px-5 hover:opacity-90 text-white font-bold rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all cursor-pointer"
         >
           <Printer size={16} />
           <span>Print / Save Ticket</span>

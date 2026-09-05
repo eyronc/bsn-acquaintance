@@ -71,7 +71,8 @@ export function StudentOverview({
             {isConfirmed ? (
               <button
                 onClick={() => navigate('/pass')}
-                className="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all cursor-pointer"
+                style={{ backgroundColor: currentTheme.accentColor }}
+                className="w-full sm:w-auto px-4 py-2.5 hover:opacity-90 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all cursor-pointer"
               >
                 <Ticket size={16} />
                 <span>View My Ticket</span>
@@ -93,19 +94,34 @@ export function StudentOverview({
 
       {/* Main Reservation Status Card */}
       {isConfirmed ? (
-        <div className={`p-4 sm:p-6 neu-pressed rounded-3xl border border-emerald-300/80 bg-emerald-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4`}>
+        <div 
+          className="p-4 sm:p-6 neu-pressed rounded-3xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4"
+          style={{
+            borderColor: currentTheme.badge.border,
+          }}
+        >
           <div className="flex items-center gap-3.5 text-left w-full sm:w-auto">
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-600 shrink-0">
+            <div 
+              className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl border flex items-center justify-center shrink-0 shadow-xs"
+              style={{
+                backgroundColor: currentTheme.badge.bg,
+                borderColor: currentTheme.badge.border,
+                color: currentTheme.accentColor,
+              }}
+            >
               <CheckCircle2 size={22} className="sm:w-6 sm:h-6" />
             </div>
             <div className="min-w-0 flex-1 text-left">
-              <p className="text-[10px] sm:text-xs font-extrabold text-emerald-800 uppercase tracking-wider">
+              <p 
+                className="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider"
+                style={{ color: currentTheme.accentColor }}
+              >
                 Seat Confirmed &bull; Ready for the Party
               </p>
-              <h3 className="text-lg sm:text-2xl font-black text-emerald-950 font-heading leading-tight mt-0.5">
+              <h3 className={`text-lg sm:text-2xl font-black font-heading leading-tight mt-0.5 ${currentTheme.textDark}`}>
                 Table {userSeat?.table_code || userSeat?.table_number} &bull; Seat {userSeat?.seat_number}
               </h3>
-              <p className="text-[11px] sm:text-xs text-emerald-700 font-medium mt-1 leading-snug">
+              <p className={`text-[11px] sm:text-xs font-medium mt-1 leading-snug opacity-80 ${currentTheme.textDark}`}>
                 Your reservation is locked in {effectiveUserSociety}. You can print or download your pass anytime.
               </p>
             </div>
@@ -114,14 +130,19 @@ export function StudentOverview({
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
               onClick={() => navigate('/pass')}
-              className="flex-1 sm:flex-initial px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
+              style={{ backgroundColor: currentTheme.accentColor }}
+              className="flex-1 sm:flex-initial px-4 py-2.5 hover:opacity-90 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
             >
               <Ticket size={14} />
               <span>Digital Pass</span>
             </button>
             <button
               onClick={() => navigate('/seats')}
-              className="flex-1 sm:flex-initial px-4 py-2.5 neu-button border border-emerald-300 text-emerald-900 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+              style={{
+                borderColor: currentTheme.badge.border,
+                color: currentTheme.accentColor,
+              }}
+              className="flex-1 sm:flex-initial px-4 py-2.5 neu-button border font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
             >
               <Armchair size={14} />
               <span>Browse Tables</span>
@@ -202,7 +223,8 @@ export function StudentOverview({
 
             <button
               onClick={() => navigate('/seats')}
-              className="text-xs font-bold text-[var(--neu-accent)] hover:underline flex items-center gap-1 cursor-pointer"
+              style={{ color: currentTheme.accentColor }}
+              className="text-xs font-bold hover:underline flex items-center gap-1 cursor-pointer"
             >
               <span>View Tables</span>
               <ArrowRight size={12} />
