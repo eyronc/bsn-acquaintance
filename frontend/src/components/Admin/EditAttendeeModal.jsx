@@ -183,19 +183,19 @@ export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, on
   };
 
   return (
-    <div className="fixed inset-0 bg-[#3b1427]/60 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-      <div className="bg-[#f7e5ee] border border-rose-200 rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+    <div data-theme="celestial" className="fixed inset-0 bg-[#050f1f]/70 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+      <div className="bg-[#0F2A44] border border-[#E7C15A]/25 rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-rose-200/80 px-5 sm:px-7 py-4 shrink-0">
+        <div className="flex items-center justify-between border-b border-[#E7C15A]/20 px-5 sm:px-7 py-4 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
+            <div className="w-10 h-10 rounded-2xl bg-[#E7C15A]/15 border border-[#E7C15A]/25 flex items-center justify-center text-[#E7C15A] shrink-0">
               <Edit3 size={18} />
             </div>
             <div>
-              <h3 className="text-lg sm:text-xl font-extrabold text-[#3b1427] font-heading">
+              <h3 className="text-lg sm:text-xl font-extrabold text-[#F3ECDF] font-heading">
                 Update Attendee Record
               </h3>
-              <p className="text-xs text-rose-600 font-semibold font-mono">
+              <p className="text-xs text-[#E7C15A] font-semibold font-mono">
                 Access Code: {attendee.unique_code}
               </p>
             </div>
@@ -203,7 +203,7 @@ export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, on
 
           <button
             onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-rose-200/50 rounded-xl transition-colors cursor-pointer"
+            className="p-1.5 text-[#9DB4C7]/60 hover:text-[#F3ECDF] hover:bg-white/5 rounded-xl transition-colors cursor-pointer"
           >
             <X size={20} />
           </button>
@@ -214,34 +214,34 @@ export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, on
           <div className="flex-1 overflow-y-auto px-5 sm:px-7 py-4 space-y-4">
             {/* Full Name */}
           <div>
-            <label className="block text-[#3b1427] font-semibold mb-1 text-xs sm:text-sm">
+            <label className="block text-[#F3ECDF] font-semibold mb-1 text-xs sm:text-sm">
               Full Name
             </label>
             <div className="relative">
-              <User size={15} className="absolute left-3.5 top-3.5 text-rose-400" />
+              <User size={15} className="absolute left-3.5 top-3.5 text-[#E7C15A]/60" />
               <input
                 type="text"
                 value={fullname}
                 onChange={(e) => setFullname(e.target.value)}
                 required
-                className="neu-input w-full pl-9 pr-3 py-2.5 rounded-xl text-sm font-semibold text-[#3b1427]"
+                className="neu-input w-full pl-9 pr-3 py-2.5 rounded-xl text-sm font-semibold text-[#F3ECDF]"
               />
             </div>
           </div>
 
           {/* Email */}
           <div>
-            <label className="block text-[#3b1427] font-semibold mb-1 text-xs sm:text-sm">
+            <label className="block text-[#F3ECDF] font-semibold mb-1 text-xs sm:text-sm">
               Email Address
             </label>
             <div className="relative">
-              <Mail size={15} className="absolute left-3.5 top-3.5 text-rose-400" />
+              <Mail size={15} className="absolute left-3.5 top-3.5 text-[#E7C15A]/60" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="neu-input w-full pl-9 pr-3 py-2.5 rounded-xl text-sm font-medium text-[#3b1427]"
+                className="neu-input w-full pl-9 pr-3 py-2.5 rounded-xl text-sm font-medium text-[#F3ECDF]"
               />
             </div>
           </div>
@@ -249,13 +249,13 @@ export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, on
           {/* Year & Section */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[#3b1427] font-semibold mb-1 text-xs sm:text-sm">
+              <label className="block text-[#F3ECDF] font-semibold mb-1 text-xs sm:text-sm">
                 Year Level
               </label>
               <select
                 value={year}
                 onChange={(e) => handleYearChange(e.target.value)}
-                className="neu-input w-full px-3 py-2.5 rounded-xl text-sm font-semibold text-[#3b1427]"
+                className="neu-input w-full px-3 py-2.5 rounded-xl text-sm font-semibold text-[#F3ECDF]"
               >
                 {YEAR_OPTIONS.map((y) => (
                   <option key={y} value={y}>{y}</option>
@@ -264,13 +264,13 @@ export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, on
             </div>
 
             <div>
-              <label className="block text-[#3b1427] font-semibold mb-1 text-xs sm:text-sm">
+              <label className="block text-[#F3ECDF] font-semibold mb-1 text-xs sm:text-sm">
                 Section
               </label>
               <select
                 value={section}
                 onChange={(e) => setSection(e.target.value)}
-                className="neu-input w-full px-3 py-2.5 rounded-xl text-sm font-semibold text-[#3b1427]"
+                className="neu-input w-full px-3 py-2.5 rounded-xl text-sm font-semibold text-[#F3ECDF]"
               >
                 {currentSections.map((sec) => (
                   <option key={sec} value={sec}>Section {sec}</option>
@@ -281,15 +281,15 @@ export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, on
 
           {/* Society Selection */}
           <div>
-            <label className="block text-[#3b1427] font-semibold mb-1 text-xs sm:text-sm flex items-center justify-between">
+            <label className="block text-[#F3ECDF] font-semibold mb-1 text-xs sm:text-sm flex items-center justify-between">
               <span>Assigned Society / Table Range</span>
-              <span className="text-[10px] text-rose-600 font-bold">STAGE.png Mapping</span>
+              <span className="text-[10px] text-[#E7C15A] font-bold">STAGE.png Mapping</span>
             </label>
             <div className="space-y-2">
               <select
                 value={society}
                 onChange={(e) => handleSocietyChange(e.target.value)}
-                className="neu-input w-full px-3 py-2.5 rounded-xl text-sm font-semibold text-[#3b1427]"
+                className="neu-input w-full px-3 py-2.5 rounded-xl text-sm font-semibold text-[#F3ECDF]"
               >
                 {PRESET_SOCIETIES.map((soc) => (
                   <option key={soc} value={soc}>{soc}</option>
@@ -304,76 +304,76 @@ export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, on
                   onChange={(e) => setCustomSociety(e.target.value)}
                   placeholder="Enter custom society name (e.g. Nightingale Society)"
                   required
-                  className="neu-input w-full px-3 py-2 rounded-xl text-xs font-semibold text-[#3b1427]"
+                  className="neu-input w-full px-3 py-2 rounded-xl text-xs font-semibold text-[#F3ECDF]"
                 />
               )}
             </div>
-            <p className="text-[11px] text-slate-500 mt-1">
+            <p className="text-[11px] text-[#9DB4C7]/80 mt-1">
               * Attendees assigned to this society can only reserve tables designated for this society.
             </p>
           </div>
 
           {/* Payment Amount */}
           <div>
-            <label className="block text-[#3b1427] font-semibold mb-1 text-xs sm:text-sm">
+            <label className="block text-[#F3ECDF] font-semibold mb-1 text-xs sm:text-sm">
               Payment Ticket Amount (₱)
             </label>
             <div className="relative">
-              <span className="absolute left-3.5 top-2.5 text-rose-500 font-extrabold text-sm select-none">₱</span>
+              <span className="absolute left-3.5 top-2.5 text-[#E7C15A]/80 font-extrabold text-sm select-none">₱</span>
               <input
                 type="number"
                 value={paymentAmount}
                 onChange={(e) => setPaymentAmount(e.target.value)}
                 min="0"
                 step="50"
-                className="neu-input w-full pl-9 pr-3 py-2.5 rounded-xl text-sm font-bold text-[#3b1427]"
+                className="neu-input w-full pl-9 pr-3 py-2.5 rounded-xl text-sm font-bold text-[#F3ECDF]"
               />
             </div>
           </div>
 
           {/* Seat Status & Release Option */}
           {attendee.seat_confirmed ? (
-            <div className="p-3.5 bg-rose-100/60 rounded-2xl border border-rose-200/80 space-y-2">
+            <div className="p-3.5 bg-[#E7C15A]/12 rounded-2xl border border-[#E7C15A]/20 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-[#3b1427] font-bold flex items-center gap-1.5">
-                  <Armchair size={15} className="text-rose-600" />
+                <span className="text-xs text-[#F3ECDF] font-bold flex items-center gap-1.5">
+                  <Armchair size={15} className="text-[#E7C15A]" />
                   <span>Current Seat: Table {attendee.table_code || attendee.table_number} &bull; Seat {attendee.seat_number}</span>
                 </span>
-                <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full">
+                <span className="text-[10px] bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 font-extrabold px-2 py-0.5 rounded-full">
                   Confirmed
                 </span>
               </div>
 
-              <label className="flex items-center gap-2 cursor-pointer pt-1 text-xs text-rose-800 font-bold select-none">
+              <label className="flex items-center gap-2 cursor-pointer pt-1 text-xs text-[#F5DE9B] font-bold select-none">
                 <input
                   type="checkbox"
                   checked={clearSeatChecked}
                   onChange={(e) => setClearSeatChecked(e.target.checked)}
-                  className="w-4 h-4 rounded accent-rose-600 cursor-pointer"
+                  className="w-4 h-4 rounded accent-[#E7C15A] cursor-pointer"
                 />
                 <span>Release / Free this seat (allow student to re-select)</span>
               </label>
             </div>
           ) : (
-            <div className="text-xs text-slate-500 bg-rose-50/50 p-2.5 rounded-xl border border-rose-100">
+            <div className="text-xs text-[#9DB4C7]/80 bg-white/[0.04] p-2.5 rounded-xl border border-white/10">
               No seat confirmed yet for this attendee.
             </div>
           )}
           </div>
 
           {/* Action Buttons Pinned at Footer */}
-          <div className="flex items-center gap-3 px-5 sm:px-7 py-3.5 border-t border-rose-200/80 bg-[#f7e5ee] shrink-0">
+          <div className="flex items-center gap-3 px-5 sm:px-7 py-3.5 border-t border-[#E7C15A]/20 bg-[#0F2A44] shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2.5 px-4 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs sm:text-sm hover:bg-slate-50 active:scale-95 transition-all cursor-pointer"
+              className="flex-1 py-2.5 px-4 rounded-xl border border-white/15 text-[#F3ECDF]/90 font-bold text-xs sm:text-sm hover:bg-white/5 active:scale-95 transition-all cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 text-white font-bold text-xs sm:text-sm hover:from-rose-500 hover:to-pink-500 active:scale-95 transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+              className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#F5DE9B] to-[#C99A3C] text-[#0A1A33] font-bold text-xs sm:text-sm hover:from-[#F5DE9B] hover:to-[#E7C15A] active:scale-95 transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               <Save size={16} />
               <span>{saving ? 'Saving...' : 'Save Changes'}</span>

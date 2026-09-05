@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+// NOTE: styling below uses the celestial dark palette (see [data-theme="celestial"] in index.css)
 import { LogOut, Plus, Copy, Check, User, Mail, Key, Armchair, Calendar, Trash2, Search, Filter, ArrowUpDown, GraduationCap, School, AlertTriangle, X, Download, Edit3, Map } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import { supabase } from '../../supabase/client';
@@ -73,10 +74,16 @@ export function AdminPanel({ onLogout }) {
     }
   };
 
-  // Fetch all attendees on mount and ensure admin panel remains 100% pink
+  // Fetch attendees on mount and put the whole document into the celestial dark theme
   useEffect(() => {
     document.documentElement.removeAttribute('data-society');
+    document.documentElement.setAttribute('data-theme', 'celestial');
+    document.body.setAttribute('data-theme', 'celestial');
     fetchAttendees();
+    return () => {
+      document.documentElement.removeAttribute('data-theme');
+      document.body.removeAttribute('data-theme');
+    };
   }, []);
 
   const fetchAttendees = async () => {
@@ -468,9 +475,13 @@ export function AdminPanel({ onLogout }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7e5ee] text-[#3b1427] pb-12">
+    <div
+      data-theme="celestial"
+      className="min-h-screen text-[#F3ECDF] pb-12"
+      style={{ background: 'linear-gradient(135deg, #0A1A33 0%, #10314A 55%, #0C2036 100%)' }}
+    >
       {/* Responsive Fixed Header */}
-      <header className="sticky top-0 z-50 bg-[#f7e5ee]/95 backdrop-blur-md border-b border-rose-200/60 shadow-sm py-2.5 sm:py-3 px-3 sm:px-6 mb-1 sm:mb-2">
+      <header className="sticky top-0 z-50 bg-[#0A1A33]/90 backdrop-blur-md border-b border-[#E7C15A]/25 shadow-sm py-2.5 sm:py-3 px-3 sm:px-6 mb-1 sm:mb-2">
         <div className="max-w-7xl mx-auto flex justify-between items-center gap-2 sm:gap-4">
           <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
             <img
@@ -479,27 +490,27 @@ export function AdminPanel({ onLogout }) {
               className="w-9 h-9 sm:w-12 sm:h-12 rounded-full neu-avatar object-contain p-1 flex-shrink-0"
             />
             <div className="min-w-0">
-              <h1 className="text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading truncate leading-tight">Admin Panel</h1>
-              <p className="text-rose-600 font-bold text-[11px] sm:text-sm truncate">BSN Party 2026</p>
+              <h1 className="text-base sm:text-2xl font-extrabold text-[#F3ECDF] font-heading truncate leading-tight">Admin Panel</h1>
+              <p className="text-[#E7C15A] font-bold text-[11px] sm:text-sm truncate">BSN Party 2026</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowFloorPlanModal(true)}
-              className="neu-button px-3 sm:px-4 py-2 text-rose-700 hover:text-rose-900 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shrink-0 border border-rose-300/40 active:scale-95 transition-transform cursor-pointer shadow-sm"
+              className="neu-button px-3 sm:px-4 py-2 text-[#E7C15A] hover:text-[#F5DE9B] font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shrink-0 border border-[#E7C15A]/30 active:scale-95 transition-transform cursor-pointer shadow-sm"
               title="View Stage & Floor Plan"
             >
-              <Map size={16} className="text-rose-600" />
+              <Map size={16} className="text-[#E7C15A]" />
               <span className="font-bold hidden sm:inline">Floor Plan</span>
             </button>
 
             <button
               onClick={onLogout}
-              className="neu-button px-3 sm:px-5 py-2 text-rose-700 hover:text-rose-900 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 shrink-0 border border-rose-300/40 active:scale-95 transition-transform"
+              className="neu-button px-3 sm:px-5 py-2 text-[#E7C15A] hover:text-[#F5DE9B] font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 shrink-0 border border-[#E7C15A]/30 active:scale-95 transition-transform"
               aria-label="Logout"
             >
-              <LogOut size={16} className="text-rose-600" />
+              <LogOut size={16} className="text-[#E7C15A]" />
               <span className="font-bold">Logout</span>
             </button>
           </div>
@@ -508,9 +519,9 @@ export function AdminPanel({ onLogout }) {
 
       <main className="max-w-7xl mx-auto px-3 sm:px-6 pt-1 pb-12 sm:pt-2 sm:pb-16 space-y-5 sm:space-y-7">
         {/* Registration Form Card */}
-        <div className="neu-flat-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-rose-200/60">
-          <h2 className="text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading mb-4 sm:mb-6 flex items-center gap-2.5">
-            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-rose-600 text-white flex items-center justify-center font-bold text-xs sm:text-sm shadow-sm">
+        <div className="neu-flat-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-[#E7C15A]/20">
+          <h2 className="text-base sm:text-2xl font-extrabold text-[#F3ECDF] font-heading mb-4 sm:mb-6 flex items-center gap-2.5">
+            <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-[#F5DE9B] to-[#C99A3C] text-[#0A1A33] flex items-center justify-center font-bold text-xs sm:text-sm shadow-sm">
               <Plus size={18} />
             </div>
             Add New Attendee
@@ -520,25 +531,25 @@ export function AdminPanel({ onLogout }) {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
               {/* Full Name */}
               <div>
-                <label className="block text-[#3b1427] font-semibold mb-1.5 text-xs sm:text-sm">Full Name</label>
+                <label className="block text-[#F3ECDF] font-semibold mb-1.5 text-xs sm:text-sm">Full Name</label>
                 <input
                   type="text"
                   value={fullname}
                   onChange={(e) => setFullname(e.target.value)}
                   placeholder="John Doe"
                   required
-                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#3b1427] text-sm font-medium"
+                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#F3ECDF] text-sm font-medium"
                 />
               </div>
 
               {/* Year Level */}
               <div>
-                <label className="block text-[#3b1427] font-semibold mb-1.5 text-xs sm:text-sm">Year Level</label>
+                <label className="block text-[#F3ECDF] font-semibold mb-1.5 text-xs sm:text-sm">Year Level</label>
                 <select
                   value={year}
                   onChange={(e) => handleYearChange(e.target.value)}
                   required
-                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#3b1427] text-sm font-semibold"
+                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#F3ECDF] text-sm font-semibold"
                 >
                   {YEAR_OPTIONS.map((y) => (
                     <option key={y} value={y}>{y}</option>
@@ -548,12 +559,12 @@ export function AdminPanel({ onLogout }) {
 
               {/* Section */}
               <div>
-                <label className="block text-[#3b1427] font-semibold mb-1.5 text-xs sm:text-sm">Section</label>
+                <label className="block text-[#F3ECDF] font-semibold mb-1.5 text-xs sm:text-sm">Section</label>
                 <select
                   value={section}
                   onChange={(e) => setSection(e.target.value)}
                   required
-                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#3b1427] text-sm font-semibold"
+                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#F3ECDF] text-sm font-semibold"
                 >
                   {currentSections.map((sec) => (
                     <option key={sec} value={sec}>Section {sec}</option>
@@ -563,7 +574,7 @@ export function AdminPanel({ onLogout }) {
 
               {/* Society Selection */}
               <div>
-                <label className="block text-[#3b1427] font-semibold mb-1.5 text-xs sm:text-sm">Society</label>
+                <label className="block text-[#F3ECDF] font-semibold mb-1.5 text-xs sm:text-sm">Society</label>
                 <select
                   value={isCustomSociety ? '__CUSTOM__' : society}
                   onChange={(e) => {
@@ -575,7 +586,7 @@ export function AdminPanel({ onLogout }) {
                     }
                   }}
                   required
-                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#3b1427] text-sm font-semibold"
+                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#F3ECDF] text-sm font-semibold"
                 >
                   {PRESET_SOCIETIES.map((s) => (
                     <option key={s} value={s}>{s}</option>
@@ -589,29 +600,29 @@ export function AdminPanel({ onLogout }) {
                     onChange={(e) => setCustomSociety(e.target.value)}
                     placeholder="Enter custom society"
                     required
-                    className="neu-input w-full mt-2 px-3 py-1.5 rounded-xl text-xs text-[#3b1427] font-medium"
+                    className="neu-input w-full mt-2 px-3 py-1.5 rounded-xl text-xs text-[#F3ECDF] font-medium"
                   />
                 )}
               </div>
 
               {/* Email Address */}
               <div>
-                <label className="block text-[#3b1427] font-semibold mb-1.5 text-xs sm:text-sm">Email Address</label>
+                <label className="block text-[#F3ECDF] font-semibold mb-1.5 text-xs sm:text-sm">Email Address</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="john@example.com"
                   required
-                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#3b1427] text-sm font-medium"
+                  className="neu-input w-full px-3.5 py-2.5 sm:py-3 rounded-xl text-[#F3ECDF] text-sm font-medium"
                 />
               </div>
             </div>
 
             {/* Selected Preview Badges */}
             <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-rose-100/60 rounded-xl text-xs text-rose-800 font-bold border border-rose-200/80">
-                <School size={14} className="text-rose-600" />
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-[#E7C15A]/12 rounded-xl text-xs text-[#F5DE9B] font-bold border border-[#E7C15A]/25">
+                <School size={14} className="text-[#E7C15A]" />
                 <span>Class: <code className="font-mono">{formatClassBadge(year, section)}</code></span>
               </div>
               {(() => {
@@ -637,13 +648,13 @@ export function AdminPanel({ onLogout }) {
         </div>
 
         {/* Registered Attendees Card */}
-        <div className="neu-flat-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-rose-200/60 space-y-4">
+        <div className="neu-flat-lg rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-[#E7C15A]/20 space-y-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
             <div>
-              <h2 className="text-base sm:text-2xl font-extrabold text-[#3b1427] font-heading">
+              <h2 className="text-base sm:text-2xl font-extrabold text-[#F3ECDF] font-heading">
                 Registered Attendees
               </h2>
-              <p className="text-slate-600 text-xs sm:text-sm font-medium">
+              <p className="text-[#9DB4C7] text-xs sm:text-sm font-medium">
                 Showing {filteredAttendees.length} of {attendees.length} total registered guests
               </p>
             </div>
@@ -658,24 +669,24 @@ export function AdminPanel({ onLogout }) {
                 <span className="text-white font-extrabold tracking-wide">Export Excel</span>
               </button>
 
-              <span className="px-3.5 py-1.5 bg-rose-100 text-rose-800 font-extrabold text-xs sm:text-sm rounded-full neu-flat shrink-0">
+              <span className="px-3.5 py-1.5 bg-[#E7C15A]/15 text-[#F5DE9B] font-extrabold text-xs sm:text-sm rounded-full neu-flat shrink-0">
                 {filteredAttendees.length} Shown
               </span>
             </div>
           </div>
 
           {/* Search, Filter & Sort Control Bar */}
-          <div className="bg-white/80 backdrop-blur-sm p-3.5 rounded-2xl border border-rose-200/70 space-y-3">
+          <div className="bg-white/5 backdrop-blur-sm p-3.5 rounded-2xl border border-[#E7C15A]/25 space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2.5">
               {/* Search Bar */}
               <div className="sm:col-span-2 relative">
-                <Search size={16} className="absolute left-3 top-3 text-rose-400" />
+                <Search size={16} className="absolute left-3 top-3 text-[#E7C15A]/60" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search name, email, code, section, society..."
-                  className="w-full pl-9 pr-3 py-2 bg-rose-50/50 border border-rose-200/80 rounded-xl text-xs sm:text-sm font-medium text-[#3b1427] focus:outline-none focus:ring-2 focus:ring-rose-400"
+                  className="w-full pl-9 pr-3 py-2 bg-white/[0.04] border border-[#E7C15A]/25 rounded-xl text-xs sm:text-sm font-medium text-[#F3ECDF] focus:outline-none focus:ring-2 focus:ring-[#E7C15A]/50"
                 />
               </div>
 
@@ -684,7 +695,7 @@ export function AdminPanel({ onLogout }) {
                 <select
                   value={societyFilter}
                   onChange={(e) => setSocietyFilter(e.target.value)}
-                  className="w-full px-3 py-2 bg-rose-50/50 border border-rose-200/80 rounded-xl text-xs sm:text-sm font-semibold text-[#3b1427]"
+                  className="w-full px-3 py-2 bg-white/[0.04] border border-[#E7C15A]/25 rounded-xl text-xs sm:text-sm font-semibold text-[#F3ECDF]"
                 >
                   <option value="All">All Societies</option>
                   {PRESET_SOCIETIES.map((s) => (
@@ -698,7 +709,7 @@ export function AdminPanel({ onLogout }) {
                 <select
                   value={yearFilter}
                   onChange={(e) => setYearFilter(e.target.value)}
-                  className="w-full px-3 py-2 bg-rose-50/50 border border-rose-200/80 rounded-xl text-xs sm:text-sm font-semibold text-[#3b1427]"
+                  className="w-full px-3 py-2 bg-white/[0.04] border border-[#E7C15A]/25 rounded-xl text-xs sm:text-sm font-semibold text-[#F3ECDF]"
                 >
                   <option value="All">All Years</option>
                   {YEAR_OPTIONS.map((y) => (
@@ -712,7 +723,7 @@ export function AdminPanel({ onLogout }) {
                 <select
                   value={sectionFilter}
                   onChange={(e) => setSectionFilter(e.target.value)}
-                  className="w-full px-3 py-2 bg-rose-50/50 border border-rose-200/80 rounded-xl text-xs sm:text-sm font-semibold text-[#3b1427]"
+                  className="w-full px-3 py-2 bg-white/[0.04] border border-[#E7C15A]/25 rounded-xl text-xs sm:text-sm font-semibold text-[#F3ECDF]"
                 >
                   <option value="All">All Sections</option>
                   {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M'].map((sec) => (
@@ -726,7 +737,7 @@ export function AdminPanel({ onLogout }) {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-3 py-2 bg-rose-50/50 border border-rose-200/80 rounded-xl text-xs sm:text-sm font-semibold text-[#3b1427]"
+                  className="w-full px-3 py-2 bg-white/[0.04] border border-[#E7C15A]/25 rounded-xl text-xs sm:text-sm font-semibold text-[#F3ECDF]"
                 >
                   <option value="newest">Sort: Newest First</option>
                   <option value="oldest">Sort: Oldest First</option>
@@ -739,44 +750,44 @@ export function AdminPanel({ onLogout }) {
 
           {fetchLoading ? (
             <div className="text-center py-8">
-              <div className="w-8 h-8 border-4 border-rose-600 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
-              <p className="text-[#3b1427] font-medium text-sm">Loading attendees...</p>
+              <div className="w-8 h-8 border-4 border-[#E7C15A]/50 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+              <p className="text-[#F3ECDF] font-medium text-sm">Loading attendees...</p>
             </div>
           ) : filteredAttendees.length === 0 ? (
-            <div className="text-center py-8 bg-rose-50/50 rounded-2xl border border-rose-100">
-              <User size={32} className="mx-auto text-rose-300 mb-2" />
-              <p className="text-slate-600 font-medium text-sm">No matching attendees found</p>
+            <div className="text-center py-8 bg-white/[0.04] rounded-2xl border border-white/10">
+              <User size={32} className="mx-auto text-[#E7C15A]/45 mb-2" />
+              <p className="text-[#9DB4C7] font-medium text-sm">No matching attendees found</p>
             </div>
           ) : (
             <>
               {/* Desktop Table View (md and up) - Clean & Balanced Spacing */}
-              <div className="hidden md:block w-full overflow-hidden rounded-2xl border border-rose-200/80">
+              <div className="hidden md:block w-full overflow-hidden rounded-2xl border border-[#E7C15A]/25">
                 <table className="w-full text-xs lg:text-sm table-fixed border-collapse">
                   <thead>
-                    <tr className="border-b border-rose-200/80 bg-rose-50/50">
-                      <th className="w-[14%] text-left py-3.5 px-4 font-extrabold text-[#3b1427]">Name</th>
-                      <th className="w-[8%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Class</th>
-                      <th className="w-[10%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Society</th>
-                      <th className="w-[17%] text-left py-3.5 px-3 font-extrabold text-[#3b1427]">Email</th>
-                      <th className="w-[10%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Code</th>
-                      <th className="w-[8%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Payment</th>
-                      <th className="w-[8%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Status</th>
-                      <th className="w-[11%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Seat</th>
-                      <th className="w-[7%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Registered</th>
-                      <th className="w-[7%] text-center py-3.5 px-2 font-extrabold text-[#3b1427]">Actions</th>
+                    <tr className="border-b border-[#E7C15A]/25 bg-white/[0.04]">
+                      <th className="w-[14%] text-left py-3.5 px-4 font-extrabold text-[#F3ECDF]">Name</th>
+                      <th className="w-[8%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Class</th>
+                      <th className="w-[10%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Society</th>
+                      <th className="w-[17%] text-left py-3.5 px-3 font-extrabold text-[#F3ECDF]">Email</th>
+                      <th className="w-[10%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Code</th>
+                      <th className="w-[8%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Payment</th>
+                      <th className="w-[11%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Seat</th>
+                      <th className="w-[8%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Status</th>
+                      <th className="w-[7%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Registered</th>
+                      <th className="w-[7%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-rose-100/60 bg-white/60">
+                  <tbody className="divide-y divide-white/10 bg-white/[0.02]">
                     {filteredAttendees.map((attendee) => (
-                      <tr key={attendee.id} className="hover:bg-rose-50/50 transition-colors">
+                      <tr key={attendee.id} className="hover:bg-white/[0.04] transition-colors">
                         {/* Name */}
-                        <td className="py-3 px-4 text-left text-[#3b1427] font-semibold truncate" title={attendee.fullname}>
+                        <td className="py-3 px-4 text-left text-[#F3ECDF] font-semibold truncate" title={attendee.fullname}>
                           {attendee.fullname}
                         </td>
 
                         {/* Class / Section */}
                         <td className="py-3 px-2 text-center">
-                          <span className="font-mono font-bold text-[11px] px-2 py-0.5 bg-rose-100 text-rose-800 rounded-md border border-rose-200 inline-block whitespace-nowrap">
+                          <span className="font-mono font-bold text-[11px] px-2 py-0.5 bg-[#E7C15A]/15 text-[#F5DE9B] rounded-md border border-[#E7C15A]/25 inline-block whitespace-nowrap">
                             {formatClassBadge(attendee.year, attendee.section)}
                           </span>
                         </td>
@@ -794,7 +805,7 @@ export function AdminPanel({ onLogout }) {
                         </td>
 
                         {/* Email */}
-                        <td className="py-3 px-3 text-left text-slate-600 text-xs truncate" title={attendee.email}>
+                        <td className="py-3 px-3 text-left text-[#9DB4C7] text-xs truncate" title={attendee.email}>
                           {attendee.email}
                         </td>
 
@@ -803,8 +814,8 @@ export function AdminPanel({ onLogout }) {
                           <code
                             onClick={() => copyToClipboard(attendee.unique_code)}
                             className={`neu-pressed px-2 py-1 rounded-md font-mono font-bold text-[11px] inline-flex items-center justify-center whitespace-nowrap cursor-pointer transition-all select-none w-[95px] ${copiedCode === attendee.unique_code
-                              ? 'bg-emerald-100 text-emerald-600 border border-emerald-300'
-                              : 'bg-rose-100 text-rose-600 hover:bg-rose-200 border border-rose-200'
+                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+                              : 'bg-[#E7C15A]/15 text-[#E7C15A] hover:bg-[#E7C15A]/25 border border-[#E7C15A]/25'
                               }`}
                             title="Click to copy code"
                           >
@@ -814,37 +825,37 @@ export function AdminPanel({ onLogout }) {
 
                         {/* Payment */}
                         <td className="py-3 px-2 text-center">
-                          <span className="inline-flex items-center justify-center px-2 py-0.5 bg-emerald-100/90 text-emerald-800 border border-emerald-300/60 rounded-full font-extrabold text-[11px] whitespace-nowrap">
+                          <span className="inline-flex items-center justify-center px-2 py-0.5 bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 rounded-full font-extrabold text-[11px] whitespace-nowrap">
                             ₱{attendee.payment_amount || 950}
                           </span>
-                        </td>
-
-                        {/* Status */}
-                        <td className="py-3 px-2 text-center">
-                          {attendee.seat_confirmed ? (
-                            <span className="inline-flex items-center justify-center px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300/50 rounded-full font-bold text-[11px] whitespace-nowrap">
-                              Confirmed
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center justify-center px-2 py-0.5 bg-amber-100 text-amber-800 border border-amber-300/50 rounded-full font-bold text-[11px] whitespace-nowrap">
-                              Pending
-                            </span>
-                          )}
                         </td>
 
                         {/* Seat */}
                         <td className="py-3 px-2 text-center">
                           {attendee.seat_confirmed && (attendee.table_code || attendee.table_number) ? (
-                            <span className="inline-block font-mono font-bold text-[#3b1427] text-[11px] px-2 py-0.5 bg-rose-100/70 border border-rose-200/80 rounded-md shadow-sm whitespace-nowrap">
+                            <span className="inline-block font-mono font-bold text-[#F3ECDF] text-[11px] px-2 py-0.5 bg-[#E7C15A]/15 border border-[#E7C15A]/25 rounded-md shadow-sm whitespace-nowrap">
                               {attendee.table_code || `T${attendee.table_number}`} • S{attendee.seat_number}
                             </span>
                           ) : (
-                            <span className="text-slate-400 text-xs">—</span>
+                            <span className="text-[#9DB4C7]/60 text-xs">—</span>
+                          )}
+                        </td>
+
+                        {/* Status */}
+                        <td className="py-3 px-2 text-center">
+                          {attendee.seat_confirmed ? (
+                            <span className="inline-flex items-center justify-center px-2 py-0.5 bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 rounded-full font-bold text-[11px] whitespace-nowrap">
+                              Confirmed
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center justify-center px-2 py-0.5 bg-amber-500/15 text-amber-300 border border-amber-400/30 rounded-full font-bold text-[11px] whitespace-nowrap">
+                              Pending
+                            </span>
                           )}
                         </td>
 
                         {/* Registered */}
-                        <td className="py-3 px-2 text-center text-slate-500 text-[11px] font-medium whitespace-nowrap">
+                        <td className="py-3 px-2 text-center text-[#9DB4C7]/80 text-[11px] font-medium whitespace-nowrap">
                           {new Date(attendee.created_at).toLocaleDateString()}
                         </td>
 
@@ -853,7 +864,7 @@ export function AdminPanel({ onLogout }) {
                           <div className="flex items-center justify-center gap-1.5">
                             <button
                               onClick={() => setAttendeeToEdit(attendee)}
-                              className="p-1.5 bg-purple-100 hover:bg-purple-600 text-purple-700 hover:text-white rounded-md font-semibold text-xs inline-flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+                              className="p-1.5 bg-violet-500/15 hover:bg-violet-500 text-violet-300 hover:text-white rounded-md font-semibold text-xs inline-flex items-center justify-center transition-colors shrink-0 cursor-pointer"
                               title="Edit Attendee"
                             >
                               <Edit3 size={13} className="shrink-0" />
@@ -861,7 +872,7 @@ export function AdminPanel({ onLogout }) {
                             <button
                               onClick={() => setAttendeeToDelete(attendee)}
                               disabled={deleteLoading === attendee.id}
-                              className="p-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-md font-semibold text-xs inline-flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+                              className="p-1.5 bg-rose-500/15 hover:bg-rose-500 text-rose-300 hover:text-white rounded-md font-semibold text-xs inline-flex items-center justify-center transition-colors shrink-0 cursor-pointer"
                               title="Delete Attendee & Release Seat"
                             >
                               <Trash2 size={13} className="shrink-0" />
@@ -879,14 +890,14 @@ export function AdminPanel({ onLogout }) {
                 {filteredAttendees.map((attendee) => (
                   <div
                     key={attendee.id}
-                    className="bg-white/90 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-rose-200/70 space-y-3 transition-all"
+                    className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 shadow-sm border border-[#E7C15A]/25 space-y-3 transition-all"
                   >
                     {/* Top Row: Full Name + Class Badge + Society + Status */}
-                    <div className="flex justify-between items-start gap-2 border-b border-rose-100 pb-2.5">
+                    <div className="flex justify-between items-start gap-2 border-b border-white/10 pb-2.5">
                       <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-1.5 text-rose-600 font-bold text-[10px] uppercase tracking-wider mb-0.5">
+                        <div className="flex flex-wrap items-center gap-1.5 text-[#E7C15A] font-bold text-[10px] uppercase tracking-wider mb-0.5">
                           <User size={12} />
-                          <span className="font-mono text-rose-700 bg-rose-100 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold">
+                          <span className="font-mono text-[#E7C15A] bg-[#E7C15A]/15 px-1.5 py-0.5 rounded text-[10px] uppercase font-bold">
                             {formatClassBadge(attendee.year, attendee.section)}
                           </span>
                           {(() => {
@@ -898,16 +909,16 @@ export function AdminPanel({ onLogout }) {
                             );
                           })()}
                         </div>
-                        <h3 className="text-base font-extrabold text-[#3b1427] truncate leading-snug">
+                        <h3 className="text-base font-extrabold text-[#F3ECDF] truncate leading-snug">
                           {attendee.fullname}
                         </h3>
                       </div>
                       {attendee.seat_confirmed ? (
-                        <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full font-extrabold text-[11px] shrink-0">
+                        <span className="px-2.5 py-1 bg-emerald-500/15 text-emerald-300 border border-emerald-400/30 rounded-full font-extrabold text-[11px] shrink-0">
                           Confirmed
                         </span>
                       ) : (
-                        <span className="px-2.5 py-1 bg-amber-100 text-amber-800 border border-amber-200 rounded-full font-extrabold text-[11px] shrink-0">
+                        <span className="px-2.5 py-1 bg-amber-500/15 text-amber-300 border border-amber-400/30 rounded-full font-extrabold text-[11px] shrink-0">
                           Pending
                         </span>
                       )}
@@ -916,16 +927,16 @@ export function AdminPanel({ onLogout }) {
                     {/* Middle Info Row */}
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div>
-                        <span className="text-slate-400 block text-[10px]">Email Address</span>
-                        <span className="text-slate-700 font-medium truncate block">{attendee.email}</span>
+                        <span className="text-[#9DB4C7]/60 block text-[10px]">Email Address</span>
+                        <span className="text-[#F3ECDF]/90 font-medium truncate block">{attendee.email}</span>
                       </div>
                       <div>
-                        <span className="text-slate-400 block text-[10px]">Payment Fee</span>
-                        <span className="text-emerald-700 font-extrabold block">₱{attendee.payment_amount || 950}</span>
+                        <span className="text-[#9DB4C7]/60 block text-[10px]">Payment Fee</span>
+                        <span className="text-emerald-300 font-extrabold block">₱{attendee.payment_amount || 950}</span>
                       </div>
                       <div className="col-span-2">
-                        <span className="text-slate-400 block text-[10px]">Seat Reserved</span>
-                        <span className="text-slate-700 font-semibold block">
+                        <span className="text-[#9DB4C7]/60 block text-[10px]">Seat Reserved</span>
+                        <span className="text-[#F3ECDF]/90 font-semibold block">
                           {attendee.seat_confirmed && (attendee.table_code || attendee.table_number)
                             ? `Table ${attendee.table_code || attendee.table_number} • Seat ${attendee.seat_number}`
                             : 'Not reserved'}
@@ -934,14 +945,14 @@ export function AdminPanel({ onLogout }) {
                     </div>
 
                     {/* Bottom Actions Row */}
-                    <div className="flex justify-between items-center pt-2 border-t border-rose-100/60">
+                    <div className="flex justify-between items-center pt-2 border-t border-white/10">
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-slate-400">Code:</span>
+                        <span className="text-[10px] text-[#9DB4C7]/60">Code:</span>
                         <code
                           onClick={() => copyToClipboard(attendee.unique_code)}
                           className={`neu-pressed px-2 py-0.5 rounded font-mono font-bold text-xs cursor-pointer transition-all select-none ${copiedCode === attendee.unique_code
-                            ? 'bg-emerald-100 text-emerald-600 border border-emerald-300'
-                            : 'bg-rose-100 text-rose-600'
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40'
+                            : 'bg-[#E7C15A]/15 text-[#E7C15A]'
                             }`}
                           title="Click to copy code"
                         >
@@ -952,7 +963,7 @@ export function AdminPanel({ onLogout }) {
                       <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => setAttendeeToEdit(attendee)}
-                          className="p-1.5 bg-purple-100 hover:bg-purple-600 text-purple-700 hover:text-white rounded-xl transition-colors cursor-pointer"
+                          className="p-1.5 bg-violet-500/15 hover:bg-violet-500 text-violet-300 hover:text-white rounded-xl transition-colors cursor-pointer"
                           title="Edit Attendee"
                         >
                           <Edit3 size={15} />
@@ -960,7 +971,7 @@ export function AdminPanel({ onLogout }) {
                         <button
                           onClick={() => setAttendeeToDelete(attendee)}
                           disabled={deleteLoading === attendee.id}
-                          className="p-1.5 bg-rose-100 hover:bg-rose-600 text-rose-700 hover:text-white rounded-xl transition-colors cursor-pointer"
+                          className="p-1.5 bg-rose-500/15 hover:bg-rose-500 text-rose-300 hover:text-white rounded-xl transition-colors cursor-pointer"
                           title="Delete Attendee"
                         >
                           <Trash2 size={15} />
@@ -1001,31 +1012,31 @@ export function AdminPanel({ onLogout }) {
 
       {/* Custom Soft Pink Glassmorphic Delete Confirmation Modal (NO EMOJIS) */}
       {attendeeToDelete && (
-        <div className="fixed inset-0 bg-[#3b1427]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white/95 backdrop-blur-xl border border-rose-200/90 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-5 transform scale-100 transition-all">
+        <div className="fixed inset-0 bg-[#050f1f]/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-[#0F2A44]/95 backdrop-blur-xl border border-[#E7C15A]/30 rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-5 transform scale-100 transition-all">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-600 shrink-0">
+                <div className="w-10 h-10 rounded-2xl bg-[#E7C15A]/15 border border-[#E7C15A]/25 flex items-center justify-center text-[#E7C15A] shrink-0">
                   <Trash2 size={18} />
                 </div>
                 <div>
-                  <h3 className="text-lg font-extrabold text-[#3b1427] font-heading">Delete Attendee</h3>
-                  <p className="text-xs text-rose-500 font-semibold uppercase tracking-wider">Confirm Removal</p>
+                  <h3 className="text-lg font-extrabold text-[#F3ECDF] font-heading">Delete Attendee</h3>
+                  <p className="text-xs text-[#E7C15A]/80 font-semibold uppercase tracking-wider">Confirm Removal</p>
                 </div>
               </div>
               <button
                 onClick={() => setAttendeeToDelete(null)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-xl hover:bg-rose-50 transition-colors"
+                className="text-[#9DB4C7]/60 hover:text-[#9DB4C7] p-1 rounded-xl hover:bg-white/5 transition-colors"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className="bg-rose-50/80 border border-rose-200/80 rounded-2xl p-4 text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
+            <div className="bg-white/5 border border-[#E7C15A]/25 rounded-2xl p-4 text-xs sm:text-sm text-[#F3ECDF]/90 leading-relaxed space-y-2">
               <p>
-                Are you sure you want to delete <strong className="text-[#3b1427] font-bold">{attendeeToDelete.fullname}</strong> (<span className="font-mono text-rose-700 font-semibold">{attendeeToDelete.email}</span>)?
+                Are you sure you want to delete <strong className="text-[#F3ECDF] font-bold">{attendeeToDelete.fullname}</strong> (<span className="font-mono text-[#E7C15A] font-semibold">{attendeeToDelete.email}</span>)?
               </p>
-              <div className="flex items-center gap-2 pt-1 border-t border-rose-100/80 text-xs text-rose-600 font-semibold">
+              <div className="flex items-center gap-2 pt-1 border-t border-white/10 text-xs text-[#E7C15A] font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
                 <span>Their reserved seat will be automatically freed and available for other guests.</span>
               </div>
@@ -1035,7 +1046,7 @@ export function AdminPanel({ onLogout }) {
               <button
                 onClick={() => setAttendeeToDelete(null)}
                 disabled={deleteLoading === attendeeToDelete.id}
-                className="flex-1 py-2.5 px-4 rounded-xl border border-slate-200 text-slate-700 font-bold text-xs sm:text-sm hover:bg-slate-50 active:scale-[0.98] transition-all"
+                className="flex-1 py-2.5 px-4 rounded-xl border border-white/15 text-[#F3ECDF]/90 font-bold text-xs sm:text-sm hover:bg-white/5 active:scale-[0.98] transition-all"
               >
                 Cancel
               </button>

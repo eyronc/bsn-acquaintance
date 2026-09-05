@@ -116,21 +116,21 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
       <div
         className={`rounded-3xl p-4 sm:p-6 max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden gap-3 sm:gap-4 border ${
           isAdmin
-            ? 'bg-[#fdf8fa] border-rose-200'
+            ? 'bg-[#0F2A44] border-[#E7C15A]/25'
             : `${socTheme.cardBg} ${socTheme.border}`
         }`}
       >
         {/* Modal Header */}
         <div
           className={`px-3 sm:px-6 py-2.5 sm:py-4 border-b flex items-center justify-between gap-2 sm:gap-3 shrink-0 ${
-            isAdmin ? 'border-rose-200/80 bg-rose-50/50' : 'border-black/10'
+            isAdmin ? 'border-[#E7C15A]/20 bg-white/[0.04]' : 'border-black/10'
           }`}
         >
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
             <div
               className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl border flex items-center justify-center shrink-0 ${
                 isAdmin
-                  ? 'bg-rose-100 border-rose-200 text-rose-600'
+                  ? 'bg-[#E7C15A]/15 border-[#E7C15A]/25 text-[#E7C15A]'
                   : ''
               }`}
               style={
@@ -148,14 +148,14 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
             <div className="min-w-0 flex-1 text-left">
               <h3
                 className={`text-xs xs:text-sm sm:text-xl font-extrabold font-heading text-left leading-snug ${
-                  isAdmin ? 'text-[#3b1427]' : socTheme.textDark
+                  isAdmin ? 'text-[#F3ECDF]' : socTheme.textDark
                 }`}
               >
                 Event Hall & Stage Floor Plan
               </h3>
               <p
                 className={`text-[9.5px] sm:text-xs font-semibold text-left leading-tight mt-0.5 ${
-                  isAdmin ? 'text-rose-600' : socTheme.subtext
+                  isAdmin ? 'text-[#E7C15A]' : socTheme.subtext
                 }`}
               >
                 Mactan Expo Center &bull; BSN Acquaintance Party 2026
@@ -176,7 +176,7 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
             <button
               onClick={onClose}
               className={`p-1.5 sm:p-2 text-slate-400 hover:text-slate-700 rounded-xl transition-colors cursor-pointer ${
-                isAdmin ? 'hover:bg-rose-200/60' : 'hover:bg-black/5'
+                isAdmin ? 'hover:bg-white/10' : 'hover:bg-black/5'
               }`}
               title="Close (Esc)"
             >
@@ -192,7 +192,7 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
               Zoom:{' '}
               <strong
                 className={`font-bold ${
-                  isAdmin ? 'text-rose-700' : socTheme.textDark
+                  isAdmin ? 'text-[#E7C15A]' : socTheme.textDark
                 }`}
               >
                 {Math.round(zoom * 100)}%
@@ -201,7 +201,7 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
             <span
               className={`hidden sm:inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full font-bold border ${
                 isAdmin
-                  ? 'bg-rose-100/70 text-rose-700 border-rose-200/50'
+                  ? 'bg-[#E7C15A]/12 text-[#E7C15A] border-[#E7C15A]/20'
                   : ''
               }`}
               style={
@@ -223,7 +223,7 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
             <button
               onClick={handleZoomOut}
               className={`p-1.5 neu-button rounded-lg text-slate-700 active:scale-95 cursor-pointer ${
-                isAdmin ? 'hover:text-rose-600' : ''
+                isAdmin ? 'hover:text-[#E7C15A]' : ''
               }`}
               title="Zoom out"
             >
@@ -232,7 +232,7 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
             <button
               onClick={handleReset}
               className={`px-2.5 py-1.5 neu-button rounded-lg text-slate-700 text-xs active:scale-95 flex items-center gap-1 cursor-pointer ${
-                isAdmin ? 'hover:text-rose-600' : ''
+                isAdmin ? 'hover:text-[#E7C15A]' : ''
               }`}
               title="Reset position and zoom"
             >
@@ -242,7 +242,7 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
             <button
               onClick={handleZoomIn}
               className={`p-1.5 neu-button rounded-lg text-slate-700 active:scale-95 cursor-pointer ${
-                isAdmin ? 'hover:text-rose-600' : ''
+                isAdmin ? 'hover:text-[#E7C15A]' : ''
               }`}
               title="Zoom in"
             >
@@ -263,7 +263,7 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
           onTouchEnd={handleTouchEnd}
           className={`flex-1 min-h-0 w-full overflow-hidden rounded-2xl neu-pressed relative select-none border ${
             isAdmin
-              ? 'bg-[#eef4f8] border-rose-200/70'
+              ? 'bg-white/[0.03] border-[#E7C15A]/20'
               : `bg-white/60 ${socTheme.border}`
           } ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
           title="Click and drag anywhere to pan the map"
@@ -282,7 +282,7 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
               alt="Official Event Stage Floor Plan"
               draggable={false}
               className={`rounded-xl shadow-xl max-w-[95%] max-h-[90%] object-contain select-none block pointer-events-none border ${
-                isAdmin ? 'border-rose-200/50' : socTheme.border
+                isAdmin ? 'border-[#E7C15A]/20' : socTheme.border
               }`}
             />
           </div>
@@ -291,7 +291,7 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
         {/* Footer Note */}
         <div
           className={`flex-shrink-0 pt-1 flex flex-col sm:flex-row justify-between items-center text-[11px] sm:text-xs text-slate-500 gap-1 px-1 border-t ${
-            isAdmin ? 'border-rose-200/60' : socTheme.border
+            isAdmin ? 'border-[#E7C15A]/20' : socTheme.border
           }`}
         >
           <span className="truncate text-left">
@@ -299,7 +299,7 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
           </span>
           <span
             className={`font-semibold shrink-0 ${
-              isAdmin ? 'text-rose-600' : socTheme.subtext
+              isAdmin ? 'text-[#E7C15A]' : socTheme.subtext
             }`}
           >
             Click "Download Map" to save the high-res image.
