@@ -54,7 +54,12 @@ export function useAuth() {
       }
 
       console.log('✅ Login successful:', data);
-      const userData = { ...data, role: 'student' };
+      const userData = { 
+        ...data, 
+        year: data.year || data.year_level,
+        year_level: data.year || data.year_level,
+        role: 'student' 
+      };
       setUser(userData);
       localStorage.setItem('bsn_user', JSON.stringify(userData));
       return userData;
@@ -68,7 +73,7 @@ export function useAuth() {
   const adminLogin = async (password) => {
     try {
       setError(null);
-      const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'admin123';
+      const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'celestial2026';
       
       if (password !== ADMIN_PASSWORD) {
         throw new Error('Invalid admin password');

@@ -35,7 +35,7 @@ function formatStudentClass(year, section) {
 // Access Code endpoint with 3-tier failover
 app.post('/api/send-access-code', async (req, res) => {
   try {
-    const { email, fullname, unique_code, society, year_level, section, eventUrl: providedUrl } = req.body;
+    const { email, fullname, unique_code, society, year_level, year, section, eventUrl: providedUrl } = req.body;
 
     if (!email || !fullname || !unique_code) {
       return res.status(400).json({
@@ -46,7 +46,7 @@ app.post('/api/send-access-code', async (req, res) => {
 
     const eventUrl = providedUrl || process.env.EVENT_URL || 'https://bsn-acquaintance.online';
     const socTheme = getSocietyEmailTheme(society);
-    const classBadge = formatStudentClass(year_level, section);
+    const classBadge = formatStudentClass(year || year_level, section);
     const subject = `Your Access Code - BSN Acquaintance Party 2026 (${socTheme.name})`;
 
     const emailHtml = `

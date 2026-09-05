@@ -12,8 +12,8 @@ import { Toast } from '../UI/Toast';
 import { getSocietyTheme, normalizeSocietyName, societyToSlug } from '../../utils/societyTheme';
 
 function formatStudentClass(year, section) {
-  const numYear = year ? String(year).replace(/\D/g, '') : '4';
-  const sec = section ? String(section).replace(/^Section\s*/i, '').trim().toUpperCase() : 'B';
+  const numYear = year ? String(year).replace(/\D/g, '') : '';
+  const sec = section ? String(section).replace(/^Section\s*/i, '').trim().toUpperCase() : '';
   return `BSN - ${numYear}${sec}`;
 }
 
@@ -207,7 +207,7 @@ export function StudentDashboard({ user, onLogout }) {
                     {effectiveUserSociety}
                   </span>
                   <span className="text-[10px] font-extrabold text-slate-700 truncate font-mono">
-                    {formatStudentClass(profile?.year_level || user?.year_level, profile?.section || user?.section)}
+                    {formatStudentClass(profile?.year || profile?.year_level || user?.year || user?.year_level, profile?.section || user?.section)}
                   </span>
                 </div>
               </div>
@@ -217,10 +217,10 @@ export function StudentDashboard({ user, onLogout }) {
                 <h1 className={`text-xl md:text-2xl font-extrabold ${currentTheme.textDark} font-heading truncate leading-tight`}>
                   BSN 2026 <span className="font-extrabold text-sm md:text-base ml-1" style={{ color: currentTheme.accentColor }}>Acquaintance Party</span>
                 </h1>
-                <div className="flex items-center gap-2 text-slate-500 text-xs md:text-sm truncate font-medium mt-0.5">
-                  <span>Welcome, <strong>{profile?.fullname || user?.fullname}</strong>!</span>
+                <div className="flex items-center gap-2 text-slate-600 text-xs md:text-sm truncate font-medium mt-0.5">
+                  <strong className="font-bold text-slate-800">{profile?.fullname || user?.fullname}</strong>
                   <span className="font-extrabold text-slate-700 font-mono text-xs px-2 py-0.5 rounded-md bg-black/5 border border-black/5">
-                    {formatStudentClass(profile?.year_level || user?.year_level, profile?.section || user?.section)}
+                    {formatStudentClass(profile?.year || profile?.year_level || user?.year || user?.year_level, profile?.section || user?.section)}
                   </span>
                   <span 
                     className="px-2.5 py-0.5 font-extrabold text-[11px] rounded-full border shadow-xs transition-all"

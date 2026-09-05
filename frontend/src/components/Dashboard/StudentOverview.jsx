@@ -4,8 +4,8 @@ import { Armchair, CheckCircle2, AlertCircle, ArrowRight, Map, Calendar, MapPin,
 import { STAGE_TABLE_CONFIG } from '../../hooks/useSeats';
 
 function formatStudentClass(year, section) {
-  const numYear = year ? String(year).replace(/\D/g, '') : '4';
-  const sec = section ? String(section).replace(/^Section\s*/i, '').trim().toUpperCase() : 'B';
+  const numYear = year ? String(year).replace(/\D/g, '') : '';
+  const sec = section ? String(section).replace(/^Section\s*/i, '').trim().toUpperCase() : '';
   return `BSN - ${numYear}${sec}`;
 }
 
@@ -52,7 +52,7 @@ export function StudentOverview({
                 {effectiveUserSociety}
               </span>
               <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-lg bg-black/5 text-slate-700 font-mono border border-black/5">
-                {formatStudentClass(profile?.year_level || user?.year_level, profile?.section || user?.section)}
+                {formatStudentClass(profile?.year || profile?.year_level || user?.year || user?.year_level, profile?.section || user?.section)}
               </span>
               <span className="text-xs font-semibold text-slate-500 font-mono">
                 Code: {profile?.unique_code || user?.unique_code}
@@ -79,7 +79,8 @@ export function StudentOverview({
             ) : (
               <button
                 onClick={() => navigate('/seats')}
-                className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all cursor-pointer"
+                style={{ backgroundColor: currentTheme.accentColor }}
+                className="w-full sm:w-auto px-5 py-2.5 hover:opacity-90 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all cursor-pointer"
               >
                 <Armchair size={16} />
                 <span>Select Your Seat</span>

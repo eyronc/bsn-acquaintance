@@ -33,7 +33,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { email, fullname, unique_code, society, year_level, section, eventUrl: providedUrl } = req.body;
+    const { email, fullname, unique_code, society, year_level, year, section, eventUrl: providedUrl } = req.body;
 
     if (!email || !fullname || !unique_code) {
       return res.status(400).json({
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
 
     const eventUrl = providedUrl || process.env.EVENT_URL || 'https://bsn-acquaintance.online';
     const socTheme = getSocietyEmailTheme(society);
-    const classBadge = formatStudentClass(year_level, section);
+    const classBadge = formatStudentClass(year || year_level, section);
     const subject = `Your Access Code - BSN Acquaintance Party 2026 (${socTheme.name})`;
 
     // Society-themed luxury email HTML

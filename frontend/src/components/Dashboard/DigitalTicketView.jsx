@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Printer, Map, Armchair, CheckCircle2, AlertCircle, ArrowRight, ShieldCheck, Sparkles, Calendar, Clock, MapPin } from 'lucide-react';
 
 function formatStudentClass(year, section) {
-  const numYear = year ? String(year).replace(/\D/g, '') : '4';
-  const sec = section ? String(section).replace(/^Section\s*/i, '').trim().toUpperCase() : 'B';
+  const numYear = year ? String(year).replace(/\D/g, '') : '';
+  const sec = section ? String(section).replace(/^Section\s*/i, '').trim().toUpperCase() : '';
   return `BSN - ${numYear}${sec}`;
 }
 
@@ -150,7 +150,7 @@ export function DigitalTicketView({
                 {profile?.fullname || user?.fullname}
               </h3>
               <p className="text-sm font-extrabold text-slate-700 mt-0.5 font-mono">
-                {formatStudentClass(profile?.year_level || user?.year_level, profile?.section || user?.section)}
+                {formatStudentClass(profile?.year || profile?.year_level || user?.year || user?.year_level, profile?.section || user?.section)}
               </p>
             </div>
 
