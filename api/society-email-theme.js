@@ -1,112 +1,48 @@
-// Color system strictly matching the Digital Ticket design in the app & STAGE.png
-export const SOCIETY_EMAIL_PALETTES = {
-  'Society A': {
-    name: 'Society A',
-    row: 'A',
-    headerBg: '#10b981', // Emerald green
-    accentColor: '#10b981',
-    cardBg: '#e7f5ec',
-    bodyBg: '#e8f5ed',
-    border: '#a7f3d0',
-    borderDark: '#10b981',
-    textDark: '#064e3b',
-    subtext: '#047857',
-    badgeBg: 'rgba(255, 255, 255, 0.2)',
-    badgeText: '#ffffff',
-  },
-  'Society B': {
-    name: 'Society B',
-    row: 'B',
-    headerBg: '#0ea5e9', // Sky blue
-    accentColor: '#0ea5e9',
-    cardBg: '#e4f1fb',
-    bodyBg: '#f0f7fc',
-    border: '#bae6fd',
-    borderDark: '#0ea5e9',
-    textDark: '#0c4a6e',
-    subtext: '#0369a1',
-    badgeBg: 'rgba(255, 255, 255, 0.2)',
-    badgeText: '#ffffff',
-  },
-  'Society C': {
-    name: 'Society C',
-    row: 'C',
-    headerBg: '#8b5cf6', // Lavender / Purple
-    accentColor: '#8b5cf6',
-    cardBg: '#f1eafd',
-    bodyBg: '#f8f5fd',
-    border: '#ddd6fe',
-    borderDark: '#8b5cf6',
-    textDark: '#4c1d95',
-    subtext: '#6d28d9',
-    badgeBg: 'rgba(255, 255, 255, 0.2)',
-    badgeText: '#ffffff',
-  },
-  'Society D': {
-    name: 'Society D',
-    row: 'D',
-    headerBg: '#d97706', // Warm Amber
-    accentColor: '#d97706',
-    cardBg: '#f8f4e6',
-    bodyBg: '#fdfbf4',
-    border: '#fde68a',
-    borderDark: '#d97706',
-    textDark: '#78350f',
-    subtext: '#b45309',
-    badgeBg: 'rgba(255, 255, 255, 0.2)',
-    badgeText: '#ffffff',
-  },
-  'Society E': {
-    name: 'Society E',
-    row: 'E',
-    headerBg: '#e11d48', // Rose / Pink
-    accentColor: '#e11d48',
-    cardBg: '#fbe6ef',
-    bodyBg: '#fdf2f6',
-    border: '#fecdd3',
-    borderDark: '#e11d48',
-    textDark: '#881337',
-    subtext: '#be123c',
-    badgeBg: 'rgba(255, 255, 255, 0.2)',
-    badgeText: '#ffffff',
-  },
-  'Society F': {
-    name: 'Society F',
-    row: 'F',
-    headerBg: '#0d9488', // Teal / Aqua
-    accentColor: '#0d9488',
-    cardBg: '#e1faf4',
-    bodyBg: '#f0fdfa',
-    border: '#99f6e4',
-    borderDark: '#0d9488',
-    textDark: '#134e4a',
-    subtext: '#0f766e',
-    badgeBg: 'rgba(255, 255, 255, 0.2)',
-    badgeText: '#ffffff',
-  },
-  'Society G': {
-    name: 'Society G',
-    row: 'G',
-    headerBg: '#ea580c', // Tangerine / Orange
-    accentColor: '#ea580c',
-    cardBg: '#fdede0',
-    bodyBg: '#fff8f2',
-    border: '#fed7aa',
-    borderDark: '#ea580c',
-    textDark: '#7c2d12',
-    subtext: '#c2410c',
-    badgeBg: 'rgba(255, 255, 255, 0.2)',
-    badgeText: '#ffffff',
-  },
+// Celestial Garden email palette — one theme for every society, matching the
+// app's landing / login / admin "Celestial Garden" look. Kept email-client safe:
+// the card body stays light so the template's dark body text stays readable;
+// the header, ticket panel and CTA carry the color.
+const CELESTIAL_EMAIL = {
+  // Page background behind the card (warm cream)
+  bodyBg: '#faf5e9',
+  // Hero header — navy fading through teal, more depth than a flat navy block
+  headerBg: 'linear-gradient(135deg, #0A1A33 0%, #123a52 42%, #1c5566 70%, #0f2f4a 100%)',
+  // Hairline borders around cards / inputs on the light card
+  cardBorder: '#e3d3a6',
+  // Ring around the circular NSBO logo
+  logoBorder: '#E7C15A',
+  // "OFFICIAL EVENT PASS" pill on the dark header
+  badgeBg: 'rgba(245,222,155,0.16)',
+  badgeBorder: 'rgba(245,222,155,0.55)',
+  badgeText: '#F5DE9B',
+  // Muted gold line under the H1 on the dark header
+  subtext: '#e6d4a6',
+  // Fill for the CTA button + step-number circles — solid warm gold (navy text).
+  // Kept solid (not a gradient) so Outlook and other clients that drop CSS
+  // gradients still render a visible button.
+  accentColor: '#E7C15A',
+  // Deep gold for small labels + the portal link + the access code on the light card
+  accentDark: '#8a6d1f',
+  // Near-navy for headings on the cream / white card
+  highlightText: '#12324a',
+  // Warm gold "ticket stub" area holding the access code
+  ticketCardBg: 'linear-gradient(135deg, #fdf8ea 0%, #f5e8c9 100%)',
+  ticketBorder: '#E7C15A',
+  // Warm gold glow under the CTA / circles
+  accentShadow: 'rgba(231,193,90,0.38)',
 };
 
-export function getSocietyEmailTheme(soc) {
-  if (!soc) return SOCIETY_EMAIL_PALETTES['Society A'];
+function normalizeSocietyName(soc) {
+  if (!soc) return 'Society A';
   const trimmed = String(soc).trim();
   const match = trimmed.match(/^(?:society\s*)?([A-G])$/i);
-  if (match) {
-    const letter = match[1].toUpperCase();
-    return SOCIETY_EMAIL_PALETTES[`Society ${letter}`] || SOCIETY_EMAIL_PALETTES['Society A'];
-  }
-  return SOCIETY_EMAIL_PALETTES[soc] || SOCIETY_EMAIL_PALETTES['Society A'];
+  if (match) return `Society ${match[1].toUpperCase()}`;
+  return trimmed;
+}
+
+export function getSocietyEmailTheme(soc) {
+  const name = normalizeSocietyName(soc);
+  const rowMatch = name.match(/([A-G])\s*$/i);
+  const row = rowMatch ? rowMatch[1].toUpperCase() : 'A';
+  return { ...CELESTIAL_EMAIL, name, row };
 }
