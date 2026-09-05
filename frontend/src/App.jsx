@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth';
+import { LandingPage } from './components/Landing/LandingPage';
 import { StudentLogin } from './components/Auth/StudentLogin';
 import { AdminLogin } from './components/Auth/AdminLogin';
 import { StudentDashboard } from './components/Dashboard/StudentDashboard';
@@ -39,9 +40,15 @@ function App() {
 
   return (
     <Routes>
-      {/* Student Login Route */}
+      {/* Public Landing Page (default URL) */}
       <Route
         path="/"
+        element={<LandingPage isAuthenticated={isAuthenticated} isAdmin={isAdmin} />}
+      />
+
+      {/* Student Login Route */}
+      <Route
+        path="/login"
         element={
           isAuthenticated ? (
             isAdmin ? <Navigate to="/admin/panel" replace /> : <Navigate to="/dashboard" replace />
@@ -50,7 +57,6 @@ function App() {
           )
         }
       />
-      <Route path="/login" element={<Navigate to="/" replace />} />
 
       {/* Student Protected Routes */}
       <Route
@@ -59,7 +65,7 @@ function App() {
           isAuthenticated && !isAdmin ? (
             <StudentDashboard user={user} onLogout={handleLogout} />
           ) : (
-            <Navigate to="/" replace />
+            <Navigate to="/login" replace />
           )
         }
       />
@@ -69,7 +75,7 @@ function App() {
           isAuthenticated && !isAdmin ? (
             <StudentDashboard user={user} onLogout={handleLogout} />
           ) : (
-            <Navigate to="/" replace />
+            <Navigate to="/login" replace />
           )
         }
       />
@@ -79,7 +85,7 @@ function App() {
           isAuthenticated && !isAdmin ? (
             <StudentDashboard user={user} onLogout={handleLogout} />
           ) : (
-            <Navigate to="/" replace />
+            <Navigate to="/login" replace />
           )
         }
       />
@@ -89,7 +95,7 @@ function App() {
           isAuthenticated && !isAdmin ? (
             <StudentDashboard user={user} onLogout={handleLogout} />
           ) : (
-            <Navigate to="/" replace />
+            <Navigate to="/login" replace />
           )
         }
       />
@@ -99,7 +105,7 @@ function App() {
           isAuthenticated && !isAdmin ? (
             <StudentDashboard user={user} onLogout={handleLogout} />
           ) : (
-            <Navigate to="/" replace />
+            <Navigate to="/login" replace />
           )
         }
       />
@@ -115,7 +121,7 @@ function App() {
           ) : (
             <AdminLogin
               onLogin={handleAdminLogin}
-              onBackToStudent={() => navigate('/')}
+              onBackToStudent={() => navigate('/login')}
             />
           )
         }

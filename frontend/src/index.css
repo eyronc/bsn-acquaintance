@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,6 +6,22 @@
 
 * {
   font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Celestial Garden landing page — elegant serif display face (beats the universal * rule) */
+.font-celestial {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif !important;
+}
+
+@keyframes celestial-twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 0.9; transform: scale(1.25); }
+}
+.animate-celestial-twinkle {
+  animation: celestial-twinkle 3s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-celestial-twinkle { animation: none; opacity: 0.5; }
 }
 
 /* ==========================================================================
@@ -90,6 +106,30 @@
   --neu-accent: #ea580c;
   --neu-accent-hover: #c2410c;
   --neu-border: #fed7aa;
+}
+
+/* Celestial Garden dark theme — used by the admin panel. Redefines the neu
+   primitives so every .neu-* surface flips to the midnight/gold palette.
+   Declared after the society blocks so it wins when both attributes are set. */
+[data-theme="celestial"] {
+  --neu-bg: #0F2A44;
+  --neu-shadow-dark: #071829;
+  --neu-shadow-light: rgba(231, 193, 90, 0.06);
+  --neu-text: #F3ECDF;
+  --neu-accent: #E7C15A;
+  --neu-accent-hover: #F5DE9B;
+  --neu-border: rgba(231, 193, 90, 0.28);
+}
+[data-theme="celestial"] .neu-button-primary,
+[data-theme="celestial"].neu-button-primary {
+  color: #0A1A33;
+}
+[data-theme="celestial"] select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23E7C15A'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+}
+[data-theme="celestial"] select option {
+  background-color: #0F2A44;
+  color: #F3ECDF;
 }
 
 html {
