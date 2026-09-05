@@ -274,7 +274,10 @@ export function StudentDashboard({ user, onLogout }) {
               <Ticket size={14} />
               <span>My Ticket</span>
               {isConfirmed && (
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span 
+                  className="w-2 h-2 rounded-full animate-pulse" 
+                  style={{ backgroundColor: currentTheme.accentColor }}
+                />
               )}
             </button>
           </nav>
@@ -387,7 +390,13 @@ export function StudentDashboard({ user, onLogout }) {
           <Ticket size={18} />
           <span>My Ticket</span>
           {isConfirmed && (
-            <span className="absolute top-0 right-2 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200" />
+            <span 
+              className="absolute top-0 right-2 w-2 h-2 rounded-full ring-2" 
+              style={{
+                backgroundColor: currentTheme.accentColor,
+                borderColor: currentTheme.badge.border,
+              }}
+            />
           )}
         </button>
       </nav>
