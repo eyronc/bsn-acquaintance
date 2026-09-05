@@ -81,7 +81,7 @@ export default async function handler(req, res) {
                       BSN Acquaintance Party 2026
                     </h1>
                     <p style="margin: 6px 0 0 0; color: #ffffff; font-size: 11px; font-weight: 600; opacity: 0.95; font-style: italic;">
-                      Theme: Celestial Garden: A night of Wonder and Grace
+                      Theme: Celestial Garden: A Night of Wonder and Grace
                     </p>
                   </td>
                 </tr>

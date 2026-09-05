@@ -62,7 +62,7 @@ export function StudentOverview({
               Welcome, {profile?.fullname || user?.fullname}!
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 font-medium">
-              BSN Acquaintance Party 2026 &bull; <span className="font-semibold italic">Celestial Garden: A night of Wonder and Grace</span>
+              BSN Acquaintance Party 2026 &bull; <span className="font-semibold italic">Celestial Garden: A Night of Wonder and Grace</span>
             </p>
           </div>
 
@@ -92,19 +92,19 @@ export function StudentOverview({
 
       {/* Main Reservation Status Card */}
       {isConfirmed ? (
-        <div className={`p-5 sm:p-6 neu-pressed rounded-3xl border border-emerald-300/80 bg-emerald-50/50 flex flex-col sm:flex-row items-center justify-between gap-4`}>
-          <div className="flex items-center gap-3.5 text-center sm:text-left">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-600 shrink-0 mx-auto sm:mx-0">
-              <CheckCircle2 size={24} />
+        <div className={`p-4 sm:p-6 neu-pressed rounded-3xl border border-emerald-300/80 bg-emerald-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4`}>
+          <div className="flex items-center gap-3.5 text-left w-full sm:w-auto">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-600 shrink-0">
+              <CheckCircle2 size={22} className="sm:w-6 sm:h-6" />
             </div>
-            <div>
-              <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">
+            <div className="min-w-0 flex-1 text-left">
+              <p className="text-[10px] sm:text-xs font-extrabold text-emerald-800 uppercase tracking-wider">
                 Seat Confirmed &bull; Ready for the Party
               </p>
-              <h3 className="text-xl sm:text-2xl font-black text-emerald-950 font-heading">
+              <h3 className="text-lg sm:text-2xl font-black text-emerald-950 font-heading leading-tight mt-0.5">
                 Table {userSeat?.table_code || userSeat?.table_number} &bull; Seat {userSeat?.seat_number}
               </h3>
-              <p className="text-xs text-emerald-700 font-medium mt-0.5">
+              <p className="text-[11px] sm:text-xs text-emerald-700 font-medium mt-1 leading-snug">
                 Your reservation is locked in {effectiveUserSociety}. You can print or download your pass anytime.
               </p>
             </div>
@@ -113,14 +113,14 @@ export function StudentOverview({
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
               onClick={() => navigate('/pass')}
-              className="flex-1 sm:flex-initial px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
+              className="flex-1 sm:flex-initial px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all cursor-pointer"
             >
               <Ticket size={14} />
               <span>Digital Pass</span>
             </button>
             <button
               onClick={() => navigate('/seats')}
-              className="flex-1 sm:flex-initial px-4 py-2 neu-button border border-emerald-300 text-emerald-900 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
+              className="flex-1 sm:flex-initial px-4 py-2.5 neu-button border border-emerald-300 text-emerald-900 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all cursor-pointer"
             >
               <Armchair size={14} />
               <span>Browse Tables</span>
@@ -128,19 +128,34 @@ export function StudentOverview({
           </div>
         </div>
       ) : (
-        <div className={`p-5 sm:p-6 neu-pressed rounded-3xl border border-amber-300/80 bg-amber-50/60 flex flex-col sm:flex-row items-center justify-between gap-4`}>
-          <div className="flex items-center gap-3.5 text-center sm:text-left">
-            <div className="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700 shrink-0 mx-auto sm:mx-0">
-              <AlertCircle size={24} />
+        <div 
+          className="p-4 sm:p-6 neu-pressed rounded-3xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 sm:gap-4"
+          style={{
+            borderColor: currentTheme.badge.border,
+          }}
+        >
+          <div className="flex items-center gap-3.5 text-left w-full sm:w-auto">
+            <div 
+              className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl border flex items-center justify-center shrink-0 shadow-xs"
+              style={{
+                backgroundColor: currentTheme.badge.bg,
+                borderColor: currentTheme.badge.border,
+                color: currentTheme.accentColor,
+              }}
+            >
+              <AlertCircle size={22} className="sm:w-6 sm:h-6" />
             </div>
-            <div>
-              <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">
+            <div className="min-w-0 flex-1 text-left">
+              <p 
+                className="text-[10px] sm:text-xs font-extrabold uppercase tracking-wider"
+                style={{ color: currentTheme.accentColor }}
+              >
                 Seat Not Reserved Yet
               </p>
-              <h3 className="text-lg sm:text-xl font-black text-amber-950 font-heading">
+              <h3 className={`text-base sm:text-xl font-black font-heading leading-tight mt-0.5 ${currentTheme.textDark}`}>
                 Please reserve a seat in {effectiveUserSociety}
               </h3>
-              <p className="text-xs text-amber-800/90 font-medium mt-0.5">
+              <p className={`text-[11px] sm:text-xs font-medium mt-1 leading-snug opacity-80 ${currentTheme.textDark}`}>
                 Tables fill up quickly. Choose your preferred table and seat with your classmates.
               </p>
             </div>
@@ -148,7 +163,8 @@ export function StudentOverview({
 
           <button
             onClick={() => navigate('/seats')}
-            className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all cursor-pointer shrink-0"
+            style={{ backgroundColor: currentTheme.accentColor }}
+            className="w-full sm:w-auto px-5 py-2.5 hover:opacity-90 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md active:scale-95 transition-all cursor-pointer shrink-0"
           >
             <Armchair size={16} />
             <span>Go to Seat Selector</span>
@@ -218,8 +234,15 @@ export function StudentOverview({
         {/* Updated Event Quick Info Widget */}
         <div className={`p-5 neu-flat rounded-3xl border ${currentTheme.border} space-y-3`}>
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-600">
+            <div className="flex items-center gap-2.5">
+              <div
+                className="w-8 h-8 rounded-xl border flex items-center justify-center shadow-xs"
+                style={{
+                  backgroundColor: currentTheme.badge.bg,
+                  borderColor: currentTheme.badge.border,
+                  color: currentTheme.accentColor,
+                }}
+              >
                 <Calendar size={16} />
               </div>
               <div>
@@ -229,32 +252,24 @@ export function StudentOverview({
                 <p className="text-[11px] text-slate-500 font-medium">BSN Acquaintance Party 2026</p>
               </div>
             </div>
-
-            <button
-              onClick={onOpenFloorPlan}
-              className="text-xs font-bold text-rose-600 hover:underline flex items-center gap-1 cursor-pointer"
-            >
-              <Map size={12} />
-              <span>Floor Map</span>
-            </button>
           </div>
 
-          <div className="space-y-2 pt-1 text-xs">
+          <div className="space-y-2.5 pt-1 text-xs">
             <div className="flex items-center gap-2.5 text-slate-700 font-semibold">
-              <MapPin size={14} className="text-rose-600 shrink-0" />
+              <MapPin size={15} style={{ color: currentTheme.accentColor }} className="shrink-0" />
               <span>Venue: <strong>Mactan Expo Center</strong></span>
             </div>
             <div className="flex items-center gap-2.5 text-slate-700 font-semibold">
-              <Calendar size={14} className="text-rose-600 shrink-0" />
+              <Calendar size={15} style={{ color: currentTheme.accentColor }} className="shrink-0" />
               <span>Date: <strong>September 26, 2026 (Saturday)</strong></span>
             </div>
             <div className="flex items-center gap-2.5 text-slate-700 font-semibold">
-              <Clock size={14} className="text-rose-600 shrink-0" />
+              <Clock size={15} style={{ color: currentTheme.accentColor }} className="shrink-0" />
               <span>Time: <strong>5:00 PM – 10:00 PM</strong></span>
             </div>
             <div className="flex items-center gap-2.5 text-slate-700 font-semibold">
-              <Sparkles size={14} className="text-amber-600 shrink-0" />
-              <span>Theme: <em>Celestial Garden: A night of Wonder and Grace</em></span>
+              <Sparkles size={15} style={{ color: currentTheme.accentColor }} className="shrink-0" />
+              <span>Theme: <em>Celestial Garden: A Night of Wonder and Grace</em></span>
             </div>
           </div>
         </div>

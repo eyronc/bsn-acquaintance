@@ -155,7 +155,7 @@ export default async function handler(req, res) {
                         Venue: Mactan Expo Center &bull; Date: September 26, 2026 (Saturday)
                       </p>
                       <p style="margin: 0; color: #64748b; font-size: 11.5px; font-weight: 500;">
-                        Time: 5:00 PM – 10:00 PM &bull; Theme: Celestial Garden: A night of Wonder and Grace
+                        Time: 5:00 PM – 10:00 PM &bull; Theme: Celestial Garden: A Night of Wonder and Grace
                       </p>
                     </div>
 

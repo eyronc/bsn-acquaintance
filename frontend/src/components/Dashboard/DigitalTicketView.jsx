@@ -18,16 +18,77 @@ export function DigitalTicketView({
 }) {
   const navigate = useNavigate();
   const isConfirmed = userSeat?.status === 'confirmed';
+  const studentName = (
+    profile?.fullname ||
+    user?.fullname ||
+    profile?.name ||
+    user?.name ||
+    'Student'
+  ).trim();
+  const ticketFileName = `${studentName} - BSN Acquaintance Party Ticket`;
 
   const handlePrint = () => {
+    const currentName = (
+      profile?.fullname ||
+      user?.fullname ||
+      profile?.name ||
+      user?.name ||
+      'Student'
+    ).trim();
+    document.title = `${currentName} - BSN Acquaintance Party Ticket`;
     window.print();
   };
+
+  // Set document.title so Save as PDF automatically defaults to "[Name] - BSN Acquaintance Party Ticket"
+  React.useEffect(() => {
+    const originalTitle = document.title;
+    if (studentName && studentName !== 'Student') {
+      document.title = ticketFileName;
+    }
+    return () => {
+      document.title = originalTitle;
+    };
+  }, [studentName, ticketFileName]);
+
+  // Automatically trigger download/print dialog when student lands here after confirming
+  React.useEffect(() => {
+    if (isConfirmed) {
+      const autoPrintTimer = setTimeout(() => {
+        const hasAutoPrompted = sessionStorage.getItem('has_auto_prompted_pass');
+        if (!hasAutoPrompted) {
+          sessionStorage.setItem('has_auto_prompted_pass', 'true');
+          const currentName = (
+            profile?.fullname ||
+            user?.fullname ||
+            profile?.name ||
+            user?.name ||
+            'Student'
+          ).trim();
+          document.title = `${currentName} - BSN Acquaintance Party Ticket`;
+          window.print();
+        }
+      }, 700);
+      return () => clearTimeout(autoPrintTimer);
+    }
+  }, [isConfirmed, profile, user]);
 
   if (!isConfirmed) {
     return (
       <div className="max-w-xl mx-auto px-2 py-8 text-center space-y-5 page-transition">
-        <div className={`p-8 neu-flat rounded-3xl border ${currentTheme.border} space-y-4`}>
-          <div className="w-16 h-16 rounded-3xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700 mx-auto shadow-sm">
+        <div 
+          className="p-8 neu-flat rounded-3xl border space-y-4 shadow-sm"
+          style={{
+            borderColor: currentTheme.badge.border,
+          }}
+        >
+          <div 
+            className="w-16 h-16 rounded-3xl border flex items-center justify-center mx-auto shadow-xs"
+            style={{
+              backgroundColor: currentTheme.badge.bg,
+              borderColor: currentTheme.badge.border,
+              color: currentTheme.accentColor,
+            }}
+          >
             <AlertCircle size={32} />
           </div>
           <div className="space-y-1">
@@ -41,7 +102,8 @@ export function DigitalTicketView({
 
           <button
             onClick={() => navigate('/seats')}
-            className="px-6 py-3 bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 text-white font-bold rounded-2xl text-sm flex items-center justify-center gap-2 shadow-lg mx-auto active:scale-95 transition-all cursor-pointer"
+            style={{ backgroundColor: currentTheme.accentColor }}
+            className="px-6 py-3 hover:opacity-90 text-white font-bold rounded-2xl text-sm flex items-center justify-center gap-2 shadow-md mx-auto active:scale-95 transition-all cursor-pointer"
           >
             <Armchair size={18} />
             <span>Select Your Seat Now</span>
@@ -73,7 +135,7 @@ export function DigitalTicketView({
               BSN Acquaintance Party 2026
             </h2>
             <p className="text-xs sm:text-sm font-semibold opacity-95 italic">
-              Theme: Celestial Garden: A night of Wonder and Grace
+              Theme: Celestial Garden: A Night of Wonder and Grace
             </p>
           </div>
         </div>
@@ -105,7 +167,7 @@ export function DigitalTicketView({
             <div className="p-3.5 neu-pressed rounded-2xl border border-[var(--neu-border)] text-center">
               <p className="text-[10px] uppercase font-bold text-slate-500">Society Zone</p>
               <p
-                className="text-sm sm:text-base font-black truncate"
+                className="text-lg sm:text-2xl font-black font-heading truncate"
                 style={{ color: currentTheme.accentColor }}
               >
                 {effectiveUserSociety}
@@ -131,15 +193,15 @@ export function DigitalTicketView({
           <div className="p-4 rounded-2xl bg-black/5 border border-black/10 space-y-2 text-xs text-slate-700">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div className="flex items-center gap-2">
-                <MapPin size={15} className="text-rose-600 shrink-0" />
+                <MapPin size={15} style={{ color: currentTheme.accentColor }} className="shrink-0" />
                 <span className="font-bold">Venue: Mactan Expo Center</span>
               </div>
               <div className="flex items-center gap-2">
-                <Calendar size={15} className="text-rose-600 shrink-0" />
+                <Calendar size={15} style={{ color: currentTheme.accentColor }} className="shrink-0" />
                 <span className="font-semibold">September 26, 2026 (Saturday)</span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock size={15} className="text-rose-600 shrink-0" />
+                <Clock size={15} style={{ color: currentTheme.accentColor }} className="shrink-0" />
                 <span className="font-semibold">Time: 5:00 PM – 10:00 PM</span>
               </div>
               <div className="flex items-center gap-1.5 text-emerald-800 font-bold">
@@ -162,14 +224,6 @@ export function DigitalTicketView({
         >
           <Printer size={16} />
           <span>Print / Save Ticket</span>
-        </button>
-
-        <button
-          onClick={onOpenFloorPlan}
-          className="w-full sm:flex-1 py-3 px-5 neu-button border border-[var(--neu-border)] text-[var(--neu-text)] font-bold rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2 active:scale-95 transition-all cursor-pointer shadow-sm"
-        >
-          <Map size={16} />
-          <span>View Floor Plan</span>
         </button>
 
         <button

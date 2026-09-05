@@ -170,6 +170,10 @@ export function SeatMap({
   const isCurrentSocietyAllowed = normalizeSocietyName(activeSociety) === normalizedUserSociety;
   const userSocTheme = getSocietyTheme(normalizedUserSociety);
   const activeSocTheme = getSocietyTheme(activeSociety);
+  const activeConfig = STAGE_TABLE_CONFIG.find(
+    (c) => normalizeSocietyName(c.society) === normalizeSocietyName(activeSociety)
+  );
+  const activeRowLetter = activeConfig?.row || activeSociety.replace(/^Society\s*/i, '').trim() || 'A';
 
   const handleRestrictedSeatClick = (seat) => {
     setRestrictionNotice(
@@ -180,27 +184,141 @@ export function SeatMap({
 
   return (
     <div className="space-y-4 sm:space-y-5 pt-0 pb-4 max-w-7xl mx-auto px-1 sm:px-4">
-      {/* Society Selection Tabs */}
-      <div className="space-y-2.5 text-center sm:text-left">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 px-1">
-          <div className="flex items-center justify-center gap-2">
-            <Layers size={16} className="text-[var(--neu-accent)] shrink-0" />
-            <span className="text-xs sm:text-sm font-bold text-[var(--neu-text)]">Select Society / Hall Zone:</span>
+      {/* Top Header: Hall Zone & User Assigned Society */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-2 px-1">
+        <div className="flex items-center justify-center gap-2">
+          <Layers size={16} className="text-[var(--neu-accent)] shrink-0" />
+          <span className="text-xs sm:text-sm font-bold text-[var(--neu-text)]">Select Society / Hall Zone:</span>
+        </div>
+        <div
+          className="text-xs font-semibold px-3 py-1 rounded-full border shadow-sm mx-auto sm:mx-0"
+          style={{
+            backgroundColor: userSocTheme.badge.bg,
+            color: userSocTheme.badge.text,
+            borderColor: userSocTheme.badge.border,
+          }}
+        >
+          Your Assigned Society: <strong className="font-extrabold">{normalizedUserSociety}</strong>
+        </div>
+      </div>
+
+      {/* Society Access Notification Banner - Positioned AT THE TOP of Society Options (A-G) */}
+      {!isCurrentSocietyAllowed && (
+        <div 
+          className="neu-flat p-3.5 sm:p-4 rounded-2xl border max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left shadow-sm transition-all duration-500 ease-out animate-in fade-in slide-in-from-top-3"
+          style={{
+            borderColor: userSocTheme.badge.border,
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <div 
+              className="w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 shadow-xs transition-transform duration-300 hover:scale-105"
+              style={{
+                backgroundColor: userSocTheme.badge.bg,
+                borderColor: userSocTheme.badge.border,
+                color: userSocTheme.accentColor,
+              }}
+            >
+              <Lock size={16} />
+            </div>
+            <div>
+              <p className="text-xs sm:text-sm font-extrabold text-[var(--neu-text)]">
+                Viewing {activeSociety} <span className="font-bold" style={{ color: userSocTheme.accentColor }}>(Browse Only)</span>
+              </p>
+              <p className="text-[11px] text-[var(--neu-text)]/75 font-medium mt-0.5">
+                You belong to <strong style={{ color: userSocTheme.accentColor }}>{normalizedUserSociety}</strong>. You can only pick seats in your assigned tables.
+              </p>
+            </div>
           </div>
-          <div
-            className="text-xs font-semibold px-3 py-1 rounded-full border shadow-sm mx-auto sm:mx-0"
+          <button
+            onClick={() => changeActiveSociety(normalizedUserSociety)}
             style={{
-              backgroundColor: userSocTheme.badge.bg,
-              color: userSocTheme.badge.text,
               borderColor: userSocTheme.badge.border,
+              color: userSocTheme.accentColor,
             }}
+            className="neu-button px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5 shrink-0 transition-all duration-300 ease-out hover:scale-105 active:scale-95 shadow-xs border cursor-pointer"
           >
-            Your Assigned Society: <strong className="font-extrabold">{normalizedUserSociety}</strong>
+            <span>Back to {normalizedUserSociety}</span>
+            <ArrowRight size={13} />
+          </button>
+        </div>
+      )}
+
+      {/* Society Navigation: Color-Responsive Letter Grid on Mobile, Full Pill Tabs on Desktop */}
+      <div className="space-y-2.5">
+        {/* Mobile View: 7 Color-Responsive Compact Pills (A to G) fitting 100% width */}
+        <div className="sm:hidden w-full px-0.5 pt-0.5 pb-1">
+          <div className="grid grid-cols-7 gap-1.5 w-full">
+            {STAGE_TABLE_CONFIG.map((conf) => {
+              const isSelected = normalizeSocietyName(activeSociety) === normalizeSocietyName(conf.society);
+              const isUserSoc = normalizeSocietyName(conf.society) === normalizedUserSociety;
+              const confTheme = getSocietyTheme(conf.society);
+
+              return (
+                <button
+                  key={conf.row}
+                  onClick={() => changeActiveSociety(conf.society)}
+                  style={{
+                    backgroundColor: isSelected ? confTheme.accentColor : confTheme.badge.bg,
+                    borderColor: isSelected ? confTheme.accentColor : confTheme.badge.border,
+                    color: isSelected ? '#ffffff' : confTheme.badge.text,
+                    borderWidth: isSelected ? '2px' : '1.5px',
+                    borderStyle: 'solid',
+                  }}
+                  className={`relative py-2.5 rounded-xl flex flex-col items-center justify-center transition-all duration-300 ease-out cursor-pointer ${
+                    isSelected
+                      ? 'neu-pressed shadow-md scale-105 z-10'
+                      : 'hover:scale-102 hover:shadow-sm active:scale-95 shadow-xs'
+                  }`}
+                  title={`${conf.society} • Row ${conf.row}`}
+                >
+                  <span className="font-heading font-black text-sm leading-tight transition-transform duration-300">
+                    {conf.row}
+                  </span>
+                  <span
+                    className="text-[9px] font-extrabold leading-none mt-0.5 transition-colors duration-300"
+                    style={{
+                      color: isSelected ? 'rgba(255, 255, 255, 0.95)' : confTheme.badge.text,
+                      opacity: isSelected ? 0.95 : 0.75,
+                    }}
+                  >
+                    Row {conf.row}
+                  </span>
+
+                  {/* Indicator for user's assigned society */}
+                  {isUserSoc && (
+                    <span 
+                      className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full ring-2 transition-all duration-300 ${
+                        isSelected ? 'bg-white ring-emerald-500' : 'bg-emerald-500 ring-white'
+                      }`}
+                      title="Your Assigned Society" 
+                    />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Clean Sub-Indicator for Selected Society */}
+          <div className="mt-2.5 text-center">
+            <span 
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border shadow-xs transition-all duration-300 ease-out"
+              style={{
+                backgroundColor: activeSocTheme.badge.bg,
+                color: activeSocTheme.badge.text,
+                borderColor: activeSocTheme.badge.border,
+              }}
+            >
+              Viewing <strong className="font-extrabold">{activeSociety} (Row {activeRowLetter})</strong>
+              {normalizeSocietyName(activeSociety) === normalizedUserSociety && (
+                <span className="text-[10px] text-emerald-600 font-extrabold">(Your Society)</span>
+              )}
+            </span>
           </div>
         </div>
 
-        {/* Society Navigation Pill Tabs with Dedicated Neumorphic Borders & Colors per Society */}
-        <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pt-2.5 pb-2.5 px-2 scrollbar-thin max-w-full">
+        {/* Desktop View: Full Pill Tabs */}
+        <div className="hidden sm:flex items-center justify-center gap-2 pt-1 pb-2 px-2 flex-wrap">
           {STAGE_TABLE_CONFIG.map((conf) => {
             const isSelected = normalizeSocietyName(activeSociety) === normalizeSocietyName(conf.society);
             const isUserSoc = normalizeSocietyName(conf.society) === normalizedUserSociety;
@@ -211,22 +329,23 @@ export function SeatMap({
                 key={conf.row}
                 onClick={() => changeActiveSociety(conf.society)}
                 style={{
+                  backgroundColor: isSelected ? confTheme.accentColor : confTheme.badge.bg,
                   borderColor: isSelected ? confTheme.accentColor : confTheme.badge.border,
-                  color: isSelected ? confTheme.accentColor : confTheme.textDark,
-                  borderWidth: isSelected ? '2.5px' : '1.5px',
+                  color: isSelected ? '#ffffff' : confTheme.badge.text,
+                  borderWidth: isSelected ? '2px' : '1.5px',
                   borderStyle: 'solid',
                 }}
-                className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all flex items-center gap-2 shrink-0 cursor-pointer ${
+                className={`px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all duration-300 ease-out flex items-center gap-2 shrink-0 cursor-pointer ${
                   isSelected
-                    ? 'neu-pressed'
-                    : 'neu-button hover:-translate-y-0.5'
+                    ? 'neu-pressed shadow-md scale-105'
+                    : 'hover:-translate-y-0.5 hover:shadow-sm active:scale-95 shadow-xs'
                 }`}
               >
                 <span>{conf.society}</span>
                 <span
-                  className="text-[10px] px-2 py-0.5 rounded-full font-extrabold shadow-xs"
+                  className="text-[10px] px-2 py-0.5 rounded-full font-extrabold shadow-xs transition-all duration-300"
                   style={{
-                    backgroundColor: isSelected ? confTheme.accentColor : confTheme.badge.bg,
+                    backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.25)' : '#ffffff',
                     color: isSelected ? '#ffffff' : confTheme.badge.text,
                   }}
                 >
@@ -241,45 +360,25 @@ export function SeatMap({
         </div>
       </div>
 
-      {/* Society Access Notification Banner - Redesigned Neumorphic Pill Card */}
-      {!isCurrentSocietyAllowed && (
-        <div className="neu-flat p-3.5 sm:p-4 rounded-2xl border border-[var(--neu-border)] max-w-xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left shadow-sm">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-100/90 border border-amber-200 flex items-center justify-center text-amber-700 shrink-0">
-              <Lock size={16} />
-            </div>
-            <div>
-              <p className="text-xs sm:text-sm font-extrabold text-[var(--neu-text)]">
-                Viewing {activeSociety} <span className="text-amber-700 font-bold">(Browse Only)</span>
-              </p>
-              <p className="text-[11px] text-[var(--neu-text)]/70 font-medium">
-                You belong to <strong className="text-[var(--neu-accent)]">{normalizedUserSociety}</strong>. You can only pick seats in your assigned tables.
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => changeActiveSociety(normalizedUserSociety)}
-            className="neu-button px-3.5 py-1.5 rounded-xl font-bold text-xs text-[var(--neu-text)] hover:text-[var(--neu-accent)] flex items-center gap-1.5 shrink-0 active:scale-95 shadow-sm border border-[var(--neu-border)] cursor-pointer"
-          >
-            <span>Back to {normalizedUserSociety}</span>
-            <ArrowRight size={13} />
-          </button>
-        </div>
-      )}
-
       {/* Click Restriction Toast Banner */}
       {restrictionNotice && (
-        <div className="p-3 bg-amber-100/90 border border-amber-300 text-amber-900 text-xs sm:text-sm rounded-xl flex items-center justify-center gap-2 animate-in fade-in shadow-md max-w-lg mx-auto text-center">
-          <Lock size={15} className="text-amber-700 shrink-0" />
-          <span className="font-semibold">{restrictionNotice}</span>
+        <div 
+          className="p-3 border rounded-xl flex items-center justify-center gap-2 animate-in fade-in slide-in-from-top-2 shadow-md max-w-lg mx-auto text-center transition-all duration-300 text-xs sm:text-sm font-semibold"
+          style={{
+            backgroundColor: userSocTheme.badge.bg,
+            borderColor: userSocTheme.badge.border,
+            color: userSocTheme.badge.text,
+          }}
+        >
+          <Lock size={15} style={{ color: userSocTheme.accentColor }} className="shrink-0" />
+          <span>{restrictionNotice}</span>
         </div>
       )}
 
-      {/* Filter & Pagination Control Bar */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 neu-flat p-3 rounded-2xl border border-[var(--neu-border)] w-full mx-auto">
-        {/* Table Search */}
-        <div className="relative w-full sm:w-64">
-          <Search size={15} className="absolute left-3 top-2.5 text-[var(--neu-accent)]" />
+      {/* Table Search Bar - Clean on Top of Tables List */}
+      <div className="w-full max-w-md mx-auto px-1">
+        <div className="relative transition-all duration-300">
+          <Search size={15} className="absolute left-3.5 top-3 text-[var(--neu-accent)]" />
           <input
             type="text"
             value={searchTable}
@@ -287,36 +386,21 @@ export function SeatMap({
               setSearchTable(e.target.value);
               setPage(1);
             }}
-            placeholder={`Filter ${activeSociety} tables (e.g. ${activeSociety.replace('Society ', '')}-01)...`}
-            className="w-full pl-8 pr-3 py-1.5 bg-[var(--neu-bg)] border border-[var(--neu-border)] rounded-xl text-xs font-semibold text-[var(--neu-text)] placeholder:text-[var(--neu-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--neu-accent)]"
+            placeholder={`Filter ${activeSociety} tables (e.g. ${activeRowLetter}-01)...`}
+            className="w-full pl-9 pr-8 py-2 bg-[var(--neu-bg)] border border-[var(--neu-border)] rounded-2xl text-xs sm:text-sm font-semibold text-[var(--neu-text)] placeholder:text-[var(--neu-text)]/40 focus:outline-none focus:ring-2 focus:ring-[var(--neu-accent)] transition-all duration-300 shadow-inner"
           />
-        </div>
-
-        {/* Page Switcher */}
-        <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto text-xs font-bold text-[var(--neu-text)]">
-          <span>
-            Tables {filteredTables.length > 0 ? (page - 1) * TABLES_PER_PAGE + 1 : 0} -{' '}
-            {Math.min(page * TABLES_PER_PAGE, filteredTables.length)} of {filteredTables.length}
-          </span>
-          <div className="flex items-center gap-1.5 py-1">
+          {searchTable && (
             <button
-              onClick={() => setPage((p) => Math.max(p - 1, 1))}
-              disabled={page <= 1}
-              className="p-1.5 neu-button rounded-xl text-[var(--neu-text)] border border-[var(--neu-border)] hover:border-[var(--neu-accent)] disabled:opacity-40 disabled:hover:border-[var(--neu-border)] cursor-pointer"
-              title="Previous tables"
+              onClick={() => {
+                setSearchTable('');
+                setPage(1);
+              }}
+              className="absolute right-3 top-2 text-xs font-bold text-[var(--neu-text)]/50 hover:text-[var(--neu-text)] transition-colors p-1"
+              title="Clear search"
             >
-              <ChevronLeft size={16} />
+              &times;
             </button>
-            <span className="px-2 font-mono text-[var(--neu-text)]">{page}/{totalPages}</span>
-            <button
-              onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-              disabled={page >= totalPages}
-              className="p-1.5 neu-button rounded-xl text-[var(--neu-text)] border border-[var(--neu-border)] hover:border-[var(--neu-accent)] disabled:opacity-40 disabled:hover:border-[var(--neu-border)] cursor-pointer"
-              title="Next tables"
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
+          )}
         </div>
       </div>
 
@@ -340,21 +424,24 @@ export function SeatMap({
         </div>
       </div>
 
-      {/* Tables Grid */}
+      {/* Tables Grid with Smooth Page/Society Transition Animation */}
       {paginatedTables.length === 0 ? (
-        <div className="text-center py-12 neu-flat rounded-3xl p-6 max-w-lg mx-auto border border-[var(--neu-border)]">
+        <div className="text-center py-12 neu-flat rounded-3xl p-6 max-w-lg mx-auto border border-[var(--neu-border)] animate-in fade-in duration-300">
           <p className="text-base font-bold text-[var(--neu-text)]">No tables found matching "{searchTable}"</p>
           <p className="text-xs text-[var(--neu-text)]/60 mt-1">Try clearing your search query or selecting a different Society tab.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 max-w-7xl mx-auto px-1 sm:px-2 justify-items-center">
+        <div 
+          key={`${activeSociety}-${page}`} 
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12 max-w-7xl mx-auto px-1 sm:px-2 justify-items-center animate-in fade-in duration-300"
+        >
           {paginatedTables.map((table) => {
             const confirmedCount = table.seats.filter((s) => s.status === 'confirmed' || s.attendee_id).length;
             const isTableRestricted = !isCurrentSocietyAllowed;
             const tableTheme = getSocietyTheme(table.society);
 
             return (
-              <div key={table.code} className="flex flex-col items-center justify-center w-full max-w-[340px] mx-auto">
+              <div key={table.code} className="flex flex-col items-center justify-center w-full max-w-[340px] mx-auto transition-transform duration-300 hover:scale-[1.01]">
                 {/* Table Round Neumorphic Container */}
                 <div className="relative w-[280px] xs:w-[300px] sm:w-[320px] md:w-[340px] h-[280px] xs:h-[300px] sm:h-[320px] md:h-[340px] flex items-center justify-center rounded-full transition-all mx-auto">
                   
@@ -402,6 +489,39 @@ export function SeatMap({
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Pagination Controls - Moved to the BOTTOM of the Tables List */}
+      {filteredTables.length > 0 && totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 neu-flat p-3 sm:p-3.5 rounded-2xl border border-[var(--neu-border)] max-w-lg mx-auto shadow-sm transition-all duration-300">
+          <div className="text-xs font-bold text-[var(--neu-text)]/80 text-center sm:text-left">
+            Showing tables <strong className="text-[var(--neu-text)]">{(page - 1) * TABLES_PER_PAGE + 1} - {Math.min(page * TABLES_PER_PAGE, filteredTables.length)}</strong> of <strong className="text-[var(--neu-text)]">{filteredTables.length}</strong>
+          </div>
+
+          <div className="flex items-center gap-1.5 py-0.5">
+            <button
+              onClick={() => setPage((p) => Math.max(p - 1, 1))}
+              disabled={page <= 1}
+              className="p-1.5 sm:px-3 sm:py-1.5 neu-button rounded-xl text-xs font-bold text-[var(--neu-text)] border border-[var(--neu-border)] hover:border-[var(--neu-accent)] disabled:opacity-35 disabled:hover:border-[var(--neu-border)] transition-all duration-300 ease-out active:scale-95 cursor-pointer flex items-center gap-1 shadow-xs"
+              title="Previous tables"
+            >
+              <ChevronLeft size={16} />
+              <span className="hidden sm:inline">Prev</span>
+            </button>
+            <span className="px-2.5 py-1 rounded-xl bg-white/70 border border-[var(--neu-border)] font-mono text-xs font-bold text-[var(--neu-text)] shadow-inner">
+              {page} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+              disabled={page >= totalPages}
+              className="p-1.5 sm:px-3 sm:py-1.5 neu-button rounded-xl text-xs font-bold text-[var(--neu-text)] border border-[var(--neu-border)] hover:border-[var(--neu-accent)] disabled:opacity-35 disabled:hover:border-[var(--neu-border)] transition-all duration-300 ease-out active:scale-95 cursor-pointer flex items-center gap-1 shadow-xs"
+              title="Next tables"
+            >
+              <span className="hidden sm:inline">Next</span>
+              <ChevronRight size={16} />
+            </button>
+          </div>
         </div>
       )}
 

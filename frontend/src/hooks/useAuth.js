@@ -37,6 +37,7 @@ export function useAuth() {
       console.log('🔐 Attempting login:', { email, code });
       
       const { data, error } = await supabase
+        .from('attendees')
         .select('*')
         .eq('email', email)
         .eq('unique_code', code)

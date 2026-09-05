@@ -146,7 +146,7 @@ app.post('/api/send-access-code', async (req, res) => {
                         Venue: Mactan Expo Center &bull; Date: September 26, 2026 (Saturday)
                       </p>
                       <p style="margin: 0; color: #64748b; font-size: 11.5px; font-weight: 500;">
-                        Time: 5:00 PM – 10:00 PM &bull; Theme: Celestial Garden: A night of Wonder and Grace
+                        Time: 5:00 PM – 10:00 PM &bull; Theme: Celestial Garden: A Night of Wonder and Grace
                       </p>
                     </div>
                   </td>
@@ -315,7 +315,7 @@ app.post('/api/send-seat-confirmation', async (req, res) => {
                       BSN Acquaintance Party 2026
                     </h1>
                     <p style="margin: 6px 0 0 0; color: #ffffff; font-size: 11px; font-weight: 600; opacity: 0.95; font-style: italic;">
-                      Theme: Celestial Garden: A night of Wonder and Grace
+                      Theme: Celestial Garden: A Night of Wonder and Grace
                     </p>
                   </td>
                 </tr>
