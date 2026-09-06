@@ -11,8 +11,14 @@ export function LandingPage({ isAuthenticated = false, isAdmin = false }) {
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
+    document.documentElement.setAttribute('data-theme', 'celestial');
+    document.body.setAttribute('data-theme', 'celestial');
     document.documentElement.removeAttribute('data-society');
     document.body.removeAttribute('data-society');
+    return () => {
+      document.documentElement.removeAttribute('data-theme');
+      document.body.removeAttribute('data-theme');
+    };
   }, []);
 
   useEffect(() => {

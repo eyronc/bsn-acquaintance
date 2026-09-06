@@ -32,8 +32,11 @@ function App() {
   // URL — so hold off rendering any route until the real auth state is known.
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f7e5ee] flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-rose-500 border-t-transparent rounded-full animate-spin" />
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: 'linear-gradient(135deg, #0A1A33 0%, #10314A 55%, #0C2036 100%)' }}
+      >
+        <div className="w-10 h-10 border-4 border-[#E7C15A] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }

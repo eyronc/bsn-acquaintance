@@ -4,6 +4,7 @@ import { LogOut, Plus, Copy, Check, User, Mail, Key, Armchair, Calendar, Trash2,
 import * as XLSX from 'xlsx';
 import { supabase } from '../../supabase/client';
 import { Toast } from '../UI/Toast';
+import { LogoutModal } from '../UI/LogoutModal';
 import { sendAccessCodeEmail } from '../../services/emailService';
 import { EditAttendeeModal, PRESET_SOCIETIES } from './EditAttendeeModal';
 import { FloorPlanModal } from '../Dashboard/FloorPlanModal';
@@ -56,6 +57,7 @@ export function AdminPanel({ onLogout }) {
   const [attendeeToDelete, setAttendeeToDelete] = useState(null);
   const [attendeeToEdit, setAttendeeToEdit] = useState(null);
   const [showFloorPlanModal, setShowFloorPlanModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // Search, Filter & Sort State
   const [searchQuery, setSearchQuery] = useState('');
@@ -506,8 +508,8 @@ export function AdminPanel({ onLogout }) {
             </button>
 
             <button
-              onClick={onLogout}
-              className="neu-button px-3 sm:px-5 py-2 text-[#E7C15A] hover:text-[#F5DE9B] font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 shrink-0 border border-[#E7C15A]/30 active:scale-95 transition-transform"
+              onClick={() => setShowLogoutModal(true)}
+              className="neu-button px-3 sm:px-5 py-2 text-[#E7C15A] hover:text-[#F5DE9B] font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 shrink-0 border border-[#E7C15A]/30 active:scale-95 transition-transform cursor-pointer"
               aria-label="Logout"
             >
               <LogOut size={16} className="text-[#E7C15A]" />
@@ -662,11 +664,11 @@ export function AdminPanel({ onLogout }) {
             <div className="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-end">
               <button
                 onClick={handleExportCSV}
-                className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:from-emerald-700 active:to-teal-700 text-white font-extrabold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5 border border-emerald-400/40 active:scale-95 cursor-pointer"
+                className="neu-button-primary px-4 py-2 rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 font-extrabold active:scale-95 transition-all shadow-md cursor-pointer"
                 title="Export attendees & liquidation to Excel workbook (.xlsx)"
               >
-                <Download size={16} className="text-white shrink-0" />
-                <span className="text-white font-extrabold tracking-wide">Export Excel</span>
+                <Download size={16} className="shrink-0" />
+                <span className="font-extrabold tracking-wide">Export Excel</span>
               </button>
 
               <span className="px-3.5 py-1.5 bg-[#E7C15A]/15 text-[#F5DE9B] font-extrabold text-xs sm:text-sm rounded-full neu-flat shrink-0">
@@ -1066,6 +1068,14 @@ export function AdminPanel({ onLogout }) {
           </div>
         </div>
       )}
+
+      {/* Logout Confirmation Modal */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={onLogout}
+        isAdmin={true}
+      />
 
       {toast && <Toast {...toast} onClose={() => setToast(null)} />}
     </div>
