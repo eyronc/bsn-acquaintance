@@ -73,12 +73,12 @@ export default async function handler(req, res) {
                       <img src="https://bsn-acquaintance.online/uclmnsbo.jpg" width="70" height="70" alt="UCLM NSBO Logo" style="display: inline-block; width: 70px; height: 70px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 14px rgba(0,0,0,0.25); border: 2px solid ${socTheme.logoBorder};" />
                     </div>
                     <div style="display: inline-block; background: ${socTheme.badgeBg}; border: 1px solid ${socTheme.badgeBorder}; border-radius: 50px; padding: 6px 16px; margin-bottom: 16px;">
-                      <span style="color: ${socTheme.badgeText}; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;">OFFICIAL EVENT PASS • ${socTheme.name}</span>
+                      <span style="color: ${socTheme.badgeText}; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;">OFFICIAL EVENT PASS • ${socTheme.name}</span>
                     </div>
-                    <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">
+                    <h1 style="margin: 0; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 26px; font-weight: 600; letter-spacing: -0.5px; color: #ffffff; line-height: 1.2;">
                       BSN Acquaintance Party 2026
                     </h1>
-                    <p style="margin: 8px 0 0 0; color: ${socTheme.subtext}; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;">
+                    <p style="margin: 8px 0 0 0; color: ${socTheme.subtext}; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">
                       UCLM College of Nursing
                     </p>
                   </td>
@@ -88,21 +88,21 @@ export default async function handler(req, res) {
                 <tr>
                   <td style="padding: 36px 30px 20px 30px;">
                     <div style="text-align: center; margin-bottom: 28px;">
-                      <p style="margin: 0 0 6px 0; color: ${socTheme.accentDark}; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Welcome Registered Attendee</p>
-                      <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; color: ${socTheme.highlightText}; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">${fullname}</h2>
-                      ${classBadge ? `<p style="margin: 6px 0 0 0; color: #475569; font-size: 13px; font-weight: 700;">${classBadge}</p>` : ''}
+                      <p style="margin: 0 0 6px 0; color: #64748b; font-size: 13px; font-weight: 600;">Welcome,</p>
+                      <h2 style="margin: 0; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; color: ${socTheme.highlightText}; font-size: 24px; font-weight: 600; letter-spacing: -0.5px;">${fullname}</h2>
+                      ${classBadge ? `<p style="margin: 6px 0 0 0; color: #475569; font-size: 13px; font-weight: 600;">${classBadge}</p>` : ''}
                     </div>
 
                     <!-- Ticket Code Container -->
                     <div style="background: ${socTheme.ticketCardBg}; border: 2px dashed ${socTheme.ticketBorder}; border-radius: 20px; padding: 28px 20px; text-align: center; margin-bottom: 30px;">
-                      <p style="margin: 0 0 10px 0; color: ${socTheme.highlightText}; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Your Unique Access Code (${socTheme.name})</p>
+                      <p style="margin: 0 0 10px 0; color: ${socTheme.highlightText}; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Your Unique Access Code (${socTheme.name})</p>
                       
                       <div style="background: #ffffff; border-radius: 14px; padding: 14px 24px; display: inline-block; box-shadow: 0 4px 14px ${socTheme.accentShadow}; border: 1px solid ${socTheme.cardBorder}; margin-bottom: 16px;">
-                        <code style="font-family: 'Plus Jakarta Sans', 'Inter', monospace; font-size: 28px; font-weight: 800; color: ${socTheme.accentDark}; letter-spacing: 2px; display: block;">${unique_code}</code>
+                        <code style="font-family: 'Plus Jakarta Sans', 'Inter', monospace; font-size: 28px; font-weight: 600; color: ${socTheme.accentDark}; letter-spacing: 2px; display: block;">${unique_code}</code>
                       </div>
 
                       <div>
-                        <a href="${eventUrl}" target="_blank" style="display: inline-block; background: ${socTheme.accentColor}; color: #0A1A33; text-decoration: none; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 12px; box-shadow: 0 6px 18px ${socTheme.accentShadow};">
+                        <a href="${eventUrl}" target="_blank" style="display: inline-block; background: ${socTheme.accentColor}; color: #0A1A33; text-decoration: none; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 14px; font-weight: 600; padding: 12px 28px; border-radius: 12px; box-shadow: 0 6px 18px ${socTheme.accentShadow};">
                           Access Portal & Choose Seat
                         </a>
                       </div>
@@ -110,38 +110,38 @@ export default async function handler(req, res) {
 
                     <!-- Instructions Card -->
                     <div style="background: ${socTheme.bodyBg}; border-radius: 18px; padding: 24px; border: 1px solid ${socTheme.cardBorder}; margin-bottom: 24px;">
-                      <h3 style="margin: 0 0 16px 0; color: ${socTheme.highlightText}; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 15px; font-weight: 700;">
+                      <h3 style="margin: 0 0 16px 0; color: ${socTheme.highlightText}; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 15px; font-weight: 600;">
                         How to Complete Registration:
                       </h3>
                       
                       <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                           <td width="28" valign="top" style="padding-bottom: 12px;">
-                            <span style="background: ${socTheme.accentColor}; color: #0A1A33; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">1</span>
+                            <span style="background: ${socTheme.accentColor}; color: #0A1A33; font-size: 11px; font-weight: 600; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">1</span>
                           </td>
                           <td style="padding-bottom: 12px; color: #334155; font-size: 13px; line-height: 1.5;">
-                            Go to event portal: <a href="${eventUrl}" style="color: ${socTheme.accentDark}; font-weight: 700; text-decoration: underline;">${eventUrl}</a>
+                            Go to event portal: <a href="${eventUrl}" style="color: ${socTheme.accentDark}; font-weight: 600; text-decoration: underline;">${eventUrl}</a>
                           </td>
                         </tr>
                         <tr>
                           <td width="28" valign="top" style="padding-bottom: 12px;">
-                            <span style="background: ${socTheme.accentColor}; color: #0A1A33; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">2</span>
+                            <span style="background: ${socTheme.accentColor}; color: #0A1A33; font-size: 11px; font-weight: 600; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">2</span>
                           </td>
                           <td style="padding-bottom: 12px; color: #334155; font-size: 13px; line-height: 1.5;">
-                            Enter your email: <code style="background: #ffffff; border: 1px solid ${socTheme.cardBorder}; padding: 2px 8px; border-radius: 6px; color: ${socTheme.highlightText}; font-weight: 700;">${email}</code>
+                            Enter your email: <code style="background: #ffffff; border: 1px solid ${socTheme.cardBorder}; padding: 2px 8px; border-radius: 6px; color: ${socTheme.highlightText}; font-weight: 600;">${email}</code>
                           </td>
                         </tr>
                         <tr>
                           <td width="28" valign="top" style="padding-bottom: 12px;">
-                            <span style="background: ${socTheme.accentColor}; color: #0A1A33; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">3</span>
+                            <span style="background: ${socTheme.accentColor}; color: #0A1A33; font-size: 11px; font-weight: 600; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">3</span>
                           </td>
                           <td style="padding-bottom: 12px; color: #334155; font-size: 13px; line-height: 1.5;">
-                            Enter Access Code: <code style="background: #ffffff; border: 1px solid ${socTheme.cardBorder}; padding: 2px 8px; border-radius: 6px; color: ${socTheme.highlightText}; font-weight: 700;">${unique_code}</code>
+                            Enter Access Code: <code style="background: #ffffff; border: 1px solid ${socTheme.cardBorder}; padding: 2px 8px; border-radius: 6px; color: ${socTheme.highlightText}; font-weight: 600;">${unique_code}</code>
                           </td>
                         </tr>
                         <tr>
                           <td width="28" valign="top">
-                            <span style="background: ${socTheme.accentColor}; color: #0A1A33; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">4</span>
+                            <span style="background: ${socTheme.accentColor}; color: #0A1A33; font-size: 11px; font-weight: 600; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">4</span>
                           </td>
                           <td style="color: #334155; font-size: 13px; line-height: 1.5;">
                             Select your reserved seat in <strong>${socTheme.name} (Row ${socTheme.row})</strong>!
@@ -152,7 +152,7 @@ export default async function handler(req, res) {
 
                     <!-- Event Details -->
                     <div style="background: #ffffff; border-radius: 16px; padding: 18px 20px; border: 1px solid ${socTheme.cardBorder}; margin-bottom: 20px;">
-                      <p style="margin: 0 0 6px 0; color: #0f172a; font-size: 12px; font-weight: 700;">
+                      <p style="margin: 0 0 6px 0; color: #0f172a; font-size: 12px; font-weight: 600;">
                         Venue: Mactan Expo Center &bull; Date: September 26, 2026 (Saturday)
                       </p>
                       <p style="margin: 0; color: #64748b; font-size: 11.5px; font-weight: 500;">
@@ -166,7 +166,7 @@ export default async function handler(req, res) {
                 <!-- Footer -->
                 <tr>
                   <td style="background: ${socTheme.bodyBg}; padding: 24px 30px; text-align: center; border-top: 1px solid ${socTheme.cardBorder};">
-                    <p style="margin: 0 0 6px 0; color: ${socTheme.highlightText}; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 700;">See You at the Event!</p>
+                    <p style="margin: 0 0 6px 0; color: ${socTheme.highlightText}; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 600;">See You at the Event!</p>
                     <p style="margin: 0; color: #64748b; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 500;">UCLM College of Nursing • BSN Acquaintance Party 2026</p>
                   </td>
                 </tr>
