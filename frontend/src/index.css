@@ -20,8 +20,32 @@
 .animate-celestial-twinkle {
   animation: celestial-twinkle 3s ease-in-out infinite;
 }
+
+/* Fireflies: warm glowing motes drifting top -> bottom with a gentle wobble */
+@keyframes celestial-firefly {
+  0%   { transform: translate3d(0, -8vh, 0);   opacity: 0; }
+  8%   { opacity: 1; }
+  25%  { transform: translate3d(16px, 22vh, 0); }
+  50%  { transform: translate3d(-12px, 50vh, 0); }
+  75%  { transform: translate3d(14px, 78vh, 0); }
+  92%  { opacity: 1; }
+  100% { transform: translate3d(-8px, 112vh, 0); opacity: 0; }
+}
+.celestial-firefly {
+  position: absolute;
+  top: 0;
+  border-radius: 9999px;
+  background: #FCE9B8;
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation-name: celestial-firefly;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-celestial-twinkle { animation: none; opacity: 0.5; }
+  .celestial-firefly { animation: none; opacity: 0.35; top: 40%; }
 }
 
 /* ==========================================================================
