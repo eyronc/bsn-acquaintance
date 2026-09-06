@@ -17,13 +17,17 @@ const SPARKLES = [
 
 // Fireflies drift from top to bottom with a gentle side-to-side wobble. Each is
 // seeded deterministically so the field is stable across renders. Negative delays
-// stagger them so the screen is already full on first paint.
-const FIREFLIES = Array.from({ length: 22 }, (_, i) => ({
+// stagger them so the screen is already full on first paint. The first
+// MOBILE_FIREFLIES render everywhere; the rest are desktop-only (sm+) so phones
+// keep a lighter field.
+const MOBILE_FIREFLIES = 22;
+const FIREFLIES = Array.from({ length: 46 }, (_, i) => ({
   left: `${(i * 37 + 7) % 100}%`,
   size: 2 + (i % 3),
   duration: `${12 + (i % 8) * 2.5}s`,
   delay: `-${(i * 2.3) % 18}s`,
   bright: i % 4 === 0,
+  desktopOnly: i >= MOBILE_FIREFLIES,
 }));
 
 function Butterfly({ className }) {
@@ -64,7 +68,7 @@ export function CelestialShell({ children, className = '' }) {
         {FIREFLIES.map((f, i) => (
           <span
             key={i}
-            className="celestial-firefly"
+            className={`celestial-firefly${f.desktopOnly ? ' hidden sm:block' : ''}`}
             style={{
               left: f.left,
               width: `${f.size}px`,
