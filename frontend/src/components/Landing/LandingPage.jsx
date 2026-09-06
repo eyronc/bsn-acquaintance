@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowRight, CalendarDays, Clock, MapPin, LogIn, LayoutDashboard } from 'lucide-react';
 import { EVENT_START, getCountdownParts } from '../../utils/eventDate';
@@ -12,21 +12,19 @@ export function LandingPage({ isAuthenticated = false, isAdmin = false }) {
   const location = useLocation();
   const [now, setNow] = useState(() => Date.now());
 
-  // Easter egg: tap the NSBO emblem 3x to jump to the admin login. Resets on route change.
-  const [emblemTaps, setEmblemTaps] = useState(0);
+  // Easter egg: tap the NSBO emblem 3x to jump to the admin login. Resets on
+  // route change. A ref (not state) keeps the count off the render path.
+  const emblemTaps = useRef(0);
   useEffect(() => {
-    setEmblemTaps(0);
+    emblemTaps.current = 0;
   }, [location.pathname]);
 
   const handleEmblemTap = () => {
-    setEmblemTaps((n) => {
-      const next = n + 1;
-      if (next >= EMBLEM_TAPS_TO_ADMIN) {
-        navigate('/admin');
-        return 0;
-      }
-      return next;
-    });
+    emblemTaps.current += 1;
+    if (emblemTaps.current >= EMBLEM_TAPS_TO_ADMIN) {
+      emblemTaps.current = 0;
+      navigate('/admin');
+    }
   };
 
   useEffect(() => {
