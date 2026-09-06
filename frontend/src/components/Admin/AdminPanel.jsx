@@ -1039,7 +1039,7 @@ export function AdminPanel({ onLogout }) {
                 Are you sure you want to delete <strong className="text-[#F3ECDF] font-bold">{attendeeToDelete.fullname}</strong> (<span className="font-mono text-[#E7C15A] font-semibold">{attendeeToDelete.email}</span>)?
               </p>
               <div className="flex items-center gap-2 pt-1 border-t border-white/10 text-xs text-[#E7C15A] font-semibold">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#E7C15A] shrink-0" />
                 <span>Their reserved seat will be automatically freed and available for other guests.</span>
               </div>
             </div>
@@ -1055,10 +1055,10 @@ export function AdminPanel({ onLogout }) {
               <button
                 onClick={confirmDelete}
                 disabled={deleteLoading === attendeeToDelete.id}
-                className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-pink-600 text-white font-bold text-xs sm:text-sm hover:from-rose-700 hover:to-pink-700 active:scale-[0.98] transition-all shadow-md flex items-center justify-center gap-2"
+                className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#F5DE9B] to-[#C99A3C] text-[#0A1A33] font-bold text-xs sm:text-sm hover:from-[#F5DE9B] hover:to-[#E7C15A] active:scale-[0.98] transition-all shadow-md flex items-center justify-center gap-2"
               >
                 {deleteLoading === attendeeToDelete.id ? (
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-[#0A1A33] border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <Trash2 size={16} />
                 )}

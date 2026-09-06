@@ -136,7 +136,13 @@ export function StudentDashboard({ user, onLogout }) {
       await reserveSeat(seat.id, user.id);
       setToast({ message: 'Seat reserved! Click "Choose this seat" to confirm.', type: 'info' });
     } catch (err) {
-      setToast({ message: 'Failed to reserve seat', type: 'error' });
+      // Reservation lost the race (or failed) — undo the selection so the UI
+      // doesn't show a seat the student doesn't actually hold.
+      setSelectedSeat(null);
+      setToast({
+        message: err?.message || 'Could not reserve that seat. Please try another.',
+        type: 'error',
+      });
     }
   };
 
@@ -158,7 +164,8 @@ export function StudentDashboard({ user, onLogout }) {
       }, 600);
     } catch (err) {
       console.error('Error confirming seat:', err);
-      setToast({ message: 'Failed to confirm seat: ' + err.message, type: 'error' });
+      setShowConfirmModal(false);
+      setToast({ message: err?.message || 'Failed to confirm seat. Please try again.', type: 'error' });
     } finally {
       setConfirmLoading(false);
     }
