@@ -66,6 +66,11 @@ function saveMockSeats(seatsData) {
   } catch (e) {}
 }
 
+// How long a 'reserved' (selected-but-not-confirmed) hold survives before it is
+// treated as abandoned and released. For a reserved seat the seats.confirmed_at
+// column is used as the "reserved at" timestamp.
+const RESERVATION_TTL_MS = 20 * 60 * 1000;
+
 export function useSeats() {
   const [seats, setSeats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -137,7 +142,9 @@ export function useSeats() {
         });
       } catch (e) {}
 
-      // Synchronize baseSeats strictly with actual confirmed attendees
+      // Synchronize baseSeats with confirmed attendees, but preserve in-progress
+      // reservations (another student mid-selection) so they aren't destroyed by
+      // an unrelated realtime refresh.
       const orphanedSeatsToReset = [];
       baseSeats = baseSeats.map((s) => {
         const key = `${s.table_code}-S${s.seat_number}`;
@@ -149,17 +156,28 @@ export function useSeats() {
             status: 'confirmed',
             confirmed_at: att.seat_confirmed_at || s.confirmed_at,
           };
-        } else {
-          if (s.status === 'confirmed' || s.attendee_id) {
-            orphanedSeatsToReset.push(s);
-          }
-          return {
-            ...s,
-            attendee_id: null,
-            status: 'available',
-            confirmed_at: null,
-          };
         }
+        // Held reservation (not yet confirmed). Keep it if it's fresh; release it
+        // if it's stale/abandoned (or predates reservation timestamping).
+        if (s.status === 'reserved' && s.attendee_id) {
+          const reservedAt = s.confirmed_at ? new Date(s.confirmed_at).getTime() : 0;
+          if (reservedAt && Date.now() - reservedAt < RESERVATION_TTL_MS) {
+            return s;
+          }
+          orphanedSeatsToReset.push(s);
+          return { ...s, attendee_id: null, status: 'available', confirmed_at: null };
+        }
+        // Claims 'confirmed' / has an attendee_id but no confirmed attendee backs
+        // it — a genuine orphan. Reset locally and in the DB.
+        if (s.status === 'confirmed' || s.attendee_id) {
+          orphanedSeatsToReset.push(s);
+        }
+        return {
+          ...s,
+          attendee_id: null,
+          status: 'available',
+          confirmed_at: null,
+        };
       });
 
       // Async cleanup orphaned seats in Supabase if any found
@@ -221,7 +239,7 @@ export function useSeats() {
         .from('attendees')
         .select('*')
         .eq('id', attendeeId)
-        .single();
+        .maybeSingle();
 
       if (attendeeData && attendeeData.seat_confirmed) {
         const tableCode = getEffectiveTableCode(attendeeData);
@@ -261,6 +279,9 @@ export function useSeats() {
   }, []);
 
   const reserveSeat = useCallback(async (seatId, attendeeId) => {
+    const seatRecord = seats.find((s) => s.id === seatId);
+
+    // Optimistic local update
     setSeats((prev) => {
       const updated = prev.map((s) =>
         s.id === seatId ? { ...s, attendee_id: attendeeId, status: 'reserved' } : s
@@ -269,15 +290,41 @@ export function useSeats() {
       return updated;
     });
 
-    const seatRecord = seats.find((s) => s.id === seatId);
-    if (seatRecord) {
-      try {
-        await supabase
-          .from('seats')
-          .update({ attendee_id: attendeeId, status: 'reserved' })
-          .eq('table_code', seatRecord.table_code)
-          .eq('seat_number', seatRecord.seat_number);
-      } catch (err) {}
+    if (!seatRecord) return true; // not in the loaded list (offline mock) — optimistic only
+
+    const revert = () => {
+      setSeats((prev) => {
+        const reverted = prev.map((s) =>
+          s.id === seatId ? { ...s, attendee_id: null, status: 'available' } : s
+        );
+        saveMockSeats(reverted);
+        return reverted;
+      });
+    };
+
+    try {
+      // Only claim the seat if it is still 'available' in the DB — this closes
+      // the race where two students click the same seat at once.
+      const { data, error } = await supabase
+        .from('seats')
+        // confirmed_at doubles as "reserved at" while status is 'reserved' — used
+        // by fetchSeats to expire abandoned holds.
+        .update({ attendee_id: attendeeId, status: 'reserved', confirmed_at: new Date().toISOString() })
+        .eq('table_code', seatRecord.table_code)
+        .eq('seat_number', seatRecord.seat_number)
+        .eq('status', 'available')
+        .select();
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        revert();
+        throw new Error('That seat was just taken. Please choose another.');
+      }
+    } catch (err) {
+      if (err?.message?.includes('just taken')) throw err;
+      // Supabase unreachable / not configured (offline dev) — keep the optimistic hold.
+      console.warn('[reserveSeat] could not verify with DB, kept optimistic hold:', err?.message);
     }
     return true;
   }, [seats]);
@@ -304,9 +351,28 @@ export function useSeats() {
 
       const nowIso = new Date().toISOString();
 
-      // 1. UPDATE attendees table in Supabase
+      // 0. Guard: has another attendee already confirmed this exact seat?
       try {
-        await supabase
+        const { data: clash } = await supabase
+          .from('attendees')
+          .select('id')
+          .eq('seat_confirmed', true)
+          .eq('table_code', tableCode)
+          .eq('seat_number', seatNumber)
+          .neq('id', attendeeId)
+          .limit(1);
+        if (clash && clash.length > 0) {
+          throw new Error('That seat was just confirmed by someone else. Please choose another.');
+        }
+      } catch (err) {
+        if (err?.message?.includes('just confirmed')) throw err;
+        // clash-check unreachable — fall through and rely on the write below
+      }
+
+      // 1. UPDATE attendees table in Supabase (authoritative record)
+      let dbConfirmed = false;
+      try {
+        const { error: attErr } = await supabase
           .from('attendees')
           .update({
             seat_confirmed: true,
@@ -316,13 +382,15 @@ export function useSeats() {
             seat_confirmed_at: nowIso,
           })
           .eq('id', attendeeId);
+        if (attErr) throw new Error(attErr.message);
+        dbConfirmed = true;
       } catch (err) {
-        console.error('[Supabase Attendees Exception]:', err.message);
+        console.error('[confirm] attendees update failed:', err?.message);
       }
 
-      // 2. UPDATE seats table in Supabase
+      // 2. UPDATE seats table in Supabase (mirror; fetchSeats reconciles from attendees)
       try {
-        await supabase
+        const { error: seatErr } = await supabase
           .from('seats')
           .update({
             attendee_id: attendeeId,
@@ -331,8 +399,9 @@ export function useSeats() {
           })
           .eq('table_code', tableCode)
           .eq('seat_number', seatNumber);
+        if (seatErr) console.warn('[confirm] seats mirror update failed:', seatErr.message);
       } catch (err) {
-        console.error('[Supabase Seats Exception]:', err.message);
+        console.warn('[confirm] seats mirror update threw:', err?.message);
       }
 
       // 3. Update localStorage fallback
@@ -355,6 +424,22 @@ export function useSeats() {
       } catch (e) {}
 
       await fetchSeats();
+
+      // If the authoritative DB write failed, only treat it as success when the
+      // localStorage fallback actually recorded the confirmation (offline dev).
+      // Otherwise fail loudly so the UI doesn't tell the student they have a seat
+      // they don't.
+      if (!dbConfirmed) {
+        let localConfirmed = false;
+        try {
+          const local = JSON.parse(localStorage.getItem('bsn_mock_attendees') || '[]');
+          localConfirmed = local.some((a) => a.id === attendeeId && a.seat_confirmed);
+        } catch (e) {}
+        if (!localConfirmed) {
+          throw new Error('We could not save your seat. Please check your connection and try again.');
+        }
+      }
+
       return true;
     },
     [seats, fetchSeats]
