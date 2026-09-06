@@ -1,14 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowRight, CalendarDays, Clock, MapPin, LogIn, LayoutDashboard } from 'lucide-react';
 import { EVENT_START, getCountdownParts } from '../../utils/eventDate';
 import { CelestialShell } from './CelestialShell';
 
 const pad = (n) => String(n).padStart(2, '0');
+const EMBLEM_TAPS_TO_ADMIN = 3;
 
 export function LandingPage({ isAuthenticated = false, isAdmin = false }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [now, setNow] = useState(() => Date.now());
+
+  // Easter egg: tap the NSBO emblem 3x to jump to the admin login. Resets on route change.
+  const [emblemTaps, setEmblemTaps] = useState(0);
+  useEffect(() => {
+    setEmblemTaps(0);
+  }, [location.pathname]);
+
+  const handleEmblemTap = () => {
+    setEmblemTaps((n) => {
+      const next = n + 1;
+      if (next >= EMBLEM_TAPS_TO_ADMIN) {
+        navigate('/admin');
+        return 0;
+      }
+      return next;
+    });
+  };
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', 'celestial');
@@ -51,7 +70,9 @@ export function LandingPage({ isAuthenticated = false, isAdmin = false }) {
           <img
             src="/uclmnsbo.jpg"
             alt="UCLM Nursing Student Body Organization emblem"
-            className="w-11 h-11 sm:w-12 sm:h-12 rounded-full object-cover border border-[#E7C15A]/40 p-0.5 bg-white/5 backdrop-blur shrink-0"
+            onClick={handleEmblemTap}
+            draggable={false}
+            className="w-11 h-11 sm:w-12 sm:h-12 rounded-full object-cover border border-[#E7C15A]/40 p-0.5 bg-white/5 backdrop-blur shrink-0 cursor-pointer select-none"
           />
           <div className="flex flex-col">
             <span className="text-[#E7C15A] font-bold tracking-[0.12em] text-[11px] sm:text-xs uppercase leading-tight">
