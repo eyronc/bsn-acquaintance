@@ -33,7 +33,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { email, fullname, unique_code, society, year_level, year, section, eventUrl: providedUrl } = req.body;
+    const { email, fullname, unique_code, society, year_level, year, section } = req.body;
 
     if (!email || !fullname || !unique_code) {
       return res.status(400).json({
@@ -42,7 +42,8 @@ export default async function handler(req, res) {
       });
     }
 
-    const eventUrl = providedUrl || process.env.EVENT_URL || 'https://bsn-acquaintance.online';
+    // Always point students at the live domain, regardless of where the admin created them
+    const eventUrl = process.env.EVENT_URL || 'https://bsn-acquaintance.online';
     const socTheme = getSocietyEmailTheme(society);
     const classBadge = formatStudentClass(year || year_level, section);
     const subject = `Your Access Code - BSN Acquaintance Party 2026 (${socTheme.name})`;
@@ -67,7 +68,7 @@ export default async function handler(req, res) {
                 
                 <!-- Hero Header -->
                 <tr>
-                  <td style="background: ${socTheme.headerBg}; padding: 40px 30px; text-align: center; color: #ffffff;">
+                  <td style="background-color: #0f2f4a; background: ${socTheme.headerBg}; padding: 40px 30px; text-align: center; color: #ffffff;">
                     <div style="text-align: center; margin-bottom: 16px;">
                       <img src="https://bsn-acquaintance.online/uclmnsbo.jpg" width="70" height="70" alt="UCLM NSBO Logo" style="display: inline-block; width: 70px; height: 70px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 14px rgba(0,0,0,0.25); border: 2px solid ${socTheme.logoBorder};" />
                     </div>
@@ -101,7 +102,7 @@ export default async function handler(req, res) {
                       </div>
 
                       <div>
-                        <a href="${eventUrl}" target="_blank" style="display: inline-block; background: ${socTheme.accentColor}; color: #ffffff; text-decoration: none; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 12px; box-shadow: 0 6px 18px ${socTheme.accentShadow};">
+                        <a href="${eventUrl}" target="_blank" style="display: inline-block; background: ${socTheme.accentColor}; color: #0A1A33; text-decoration: none; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 12px; box-shadow: 0 6px 18px ${socTheme.accentShadow};">
                           Access Portal & Choose Seat
                         </a>
                       </div>
@@ -116,7 +117,7 @@ export default async function handler(req, res) {
                       <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
                         <tr>
                           <td width="28" valign="top" style="padding-bottom: 12px;">
-                            <span style="background: ${socTheme.accentColor}; color: #ffffff; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">1</span>
+                            <span style="background: ${socTheme.accentColor}; color: #0A1A33; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">1</span>
                           </td>
                           <td style="padding-bottom: 12px; color: #334155; font-size: 13px; line-height: 1.5;">
                             Go to event portal: <a href="${eventUrl}" style="color: ${socTheme.accentDark}; font-weight: 700; text-decoration: underline;">${eventUrl}</a>
@@ -124,7 +125,7 @@ export default async function handler(req, res) {
                         </tr>
                         <tr>
                           <td width="28" valign="top" style="padding-bottom: 12px;">
-                            <span style="background: ${socTheme.accentColor}; color: #ffffff; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">2</span>
+                            <span style="background: ${socTheme.accentColor}; color: #0A1A33; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">2</span>
                           </td>
                           <td style="padding-bottom: 12px; color: #334155; font-size: 13px; line-height: 1.5;">
                             Enter your email: <code style="background: #ffffff; border: 1px solid ${socTheme.cardBorder}; padding: 2px 8px; border-radius: 6px; color: ${socTheme.highlightText}; font-weight: 700;">${email}</code>
@@ -132,7 +133,7 @@ export default async function handler(req, res) {
                         </tr>
                         <tr>
                           <td width="28" valign="top" style="padding-bottom: 12px;">
-                            <span style="background: ${socTheme.accentColor}; color: #ffffff; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">3</span>
+                            <span style="background: ${socTheme.accentColor}; color: #0A1A33; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">3</span>
                           </td>
                           <td style="padding-bottom: 12px; color: #334155; font-size: 13px; line-height: 1.5;">
                             Enter Access Code: <code style="background: #ffffff; border: 1px solid ${socTheme.cardBorder}; padding: 2px 8px; border-radius: 6px; color: ${socTheme.highlightText}; font-weight: 700;">${unique_code}</code>
@@ -140,7 +141,7 @@ export default async function handler(req, res) {
                         </tr>
                         <tr>
                           <td width="28" valign="top">
-                            <span style="background: ${socTheme.accentColor}; color: #ffffff; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">4</span>
+                            <span style="background: ${socTheme.accentColor}; color: #0A1A33; font-size: 11px; font-weight: 800; width: 20px; height: 20px; border-radius: 50%; display: inline-block; text-align: center; line-height: 20px;">4</span>
                           </td>
                           <td style="color: #334155; font-size: 13px; line-height: 1.5;">
                             Select your reserved seat in <strong>${socTheme.name} (Row ${socTheme.row})</strong>!
