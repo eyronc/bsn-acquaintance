@@ -183,8 +183,8 @@ export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, on
   };
 
   return (
-    <div data-theme="celestial" className="fixed inset-0 bg-[#050f1f]/70 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-      <div className="bg-[#0F2A44] border border-[#E7C15A]/25 rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+    <div data-theme="celestial" className="fixed inset-0 bg-[#050f1f]/70 backdrop-blur-md z-50 flex items-center justify-center p-3 sm:p-4 animate-backdrop-enter">
+      <div className="bg-[#0F2A44] border border-[#E7C15A]/25 rounded-3xl max-w-lg w-full max-h-[90vh] flex flex-col overflow-hidden shadow-2xl animate-modal-enter">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#E7C15A]/20 px-5 sm:px-7 py-4 shrink-0">
           <div className="flex items-center gap-3">

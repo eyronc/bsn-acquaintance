@@ -5,7 +5,7 @@ export function Modal({ isOpen, title, children, onClose, actions, sticky = fals
   if (!isOpen) return null;
 
   return (
-    <div className="no-print fixed inset-0 bg-slate-900/40 flex items-center justify-center z-50 backdrop-blur-sm transition-all duration-300 p-4">
+    <div className="no-print fixed inset-0 bg-slate-900/50 flex items-center justify-center z-50 backdrop-blur-sm p-4 animate-backdrop-enter">
       <div className="neu-flat-lg rounded-3xl max-w-md w-full overflow-hidden transform transition-all duration-300 ease-out animate-modal-enter shadow-2xl border border-[var(--neu-border)]">
         {/* Header */}
         <div className="neu-flat p-6 flex justify-between items-center border-b border-[var(--neu-border)]">

@@ -10,8 +10,14 @@ export function AdminLogin({ onLogin, onBackToStudent }) {
 
   // Admin login always uses the celestial theme, never a society palette
   useEffect(() => {
+    document.documentElement.setAttribute('data-theme', 'celestial');
+    document.body.setAttribute('data-theme', 'celestial');
     document.documentElement.removeAttribute('data-society');
     document.body.removeAttribute('data-society');
+    return () => {
+      document.documentElement.removeAttribute('data-theme');
+      document.body.removeAttribute('data-theme');
+    };
   }, []);
 
   const handleSubmit = async (e) => {

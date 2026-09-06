@@ -50,27 +50,6 @@ export function DigitalTicketView({
     };
   }, [studentName, ticketFileName]);
 
-  // Automatically trigger download/print dialog when student lands here after confirming
-  React.useEffect(() => {
-    if (isConfirmed) {
-      const autoPrintTimer = setTimeout(() => {
-        const hasAutoPrompted = sessionStorage.getItem('has_auto_prompted_pass');
-        if (!hasAutoPrompted) {
-          sessionStorage.setItem('has_auto_prompted_pass', 'true');
-          const currentName = (
-            profile?.fullname ||
-            user?.fullname ||
-            profile?.name ||
-            user?.name ||
-            'Student'
-          ).trim();
-          document.title = `${currentName} - BSN Acquaintance Party Ticket`;
-          window.print();
-        }
-      }, 700);
-      return () => clearTimeout(autoPrintTimer);
-    }
-  }, [isConfirmed, profile, user]);
 
   if (!isConfirmed) {
     return (

@@ -9,6 +9,7 @@ import { DigitalTicketView } from './DigitalTicketView';
 import { ConfirmModal } from './ConfirmModal';
 import { FloorPlanModal } from './FloorPlanModal';
 import { Toast } from '../UI/Toast';
+import { LogoutModal } from '../UI/LogoutModal';
 import { getSocietyTheme, normalizeSocietyName, societyToSlug } from '../../utils/societyTheme';
 
 function formatStudentClass(year, section) {
@@ -28,6 +29,7 @@ export function StudentDashboard({ user, onLogout }) {
   const [selectedSeat, setSelectedSeat] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showFloorPlanModal, setShowFloorPlanModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [toast, setToast] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
 
@@ -295,7 +297,7 @@ export function StudentDashboard({ user, onLogout }) {
             </button>
 
             <button
-              onClick={onLogout}
+              onClick={() => setShowLogoutModal(true)}
               className={`neu-button px-2.5 sm:px-4 py-2 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 border ${currentTheme.border} active:scale-95 transition-transform cursor-pointer shadow-sm`}
               aria-label="Logout"
               title="Logout"
@@ -308,8 +310,8 @@ export function StudentDashboard({ user, onLogout }) {
         </div>
       </header>
 
-      {/* Main Content Area Based on Current Route */}
-      <main className="max-w-7xl mx-auto px-2 sm:px-6 pt-1 pb-20 md:pt-2 md:pb-8">
+      {/* Main Content Area Based on Current Route — Smooth animated tab transitions */}
+      <main key={currentTab} className="max-w-7xl mx-auto px-2 sm:px-6 pt-1 pb-20 md:pt-2 md:pb-8 page-transition">
         {error && (
           <div className="mb-4 p-4 neu-pressed rounded-2xl text-red-500 text-sm font-semibold text-center max-w-lg mx-auto">
             Error: {error}
@@ -415,6 +417,14 @@ export function StudentDashboard({ user, onLogout }) {
         onConfirm={handleConfirmSeat}
         onCancel={() => setShowConfirmModal(false)}
         loading={confirmLoading}
+      />
+
+      {/* Logout Confirmation Modal */}
+      <LogoutModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={onLogout}
+        society={effectiveUserSociety}
       />
 
       {/* Toast Notification — raised above the sticky "Choose this seat" bar so they don't overlap */}

@@ -111,10 +111,10 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="no-print fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[9999] flex items-center justify-center p-2.5 sm:p-6 animate-in fade-in duration-200"
+      className="no-print fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[9999] flex items-center justify-center p-2.5 sm:p-6 animate-backdrop-enter"
     >
       <div
-        className={`rounded-3xl p-4 sm:p-6 max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden gap-3 sm:gap-4 border ${
+        className={`rounded-3xl p-4 sm:p-6 max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden gap-3 sm:gap-4 border animate-modal-enter ${
           isAdmin
             ? 'bg-[#0F2A44] border-[#E7C15A]/25'
             : `${socTheme.cardBg} ${socTheme.border}`
@@ -166,7 +166,11 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             <button
               onClick={handleDownload}
-              className="px-2.5 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
+              style={{
+                backgroundColor: isAdmin ? '#E7C15A' : socTheme?.accentColor,
+                color: isAdmin ? '#0A1A33' : '#FFFFFF',
+              }}
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 hover:opacity-90 font-bold rounded-xl text-xs sm:text-sm flex items-center gap-1.5 shadow-md active:scale-95 transition-all cursor-pointer"
               title="Download full floor plan image"
             >
               <Download size={14} className="sm:w-[15px] sm:h-[15px]" />

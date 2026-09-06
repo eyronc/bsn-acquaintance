@@ -29,13 +29,13 @@
    ========================================================================== */
 
 :root {
-  --neu-bg: #f7e5ee;
-  --neu-shadow-dark: #dcaec4;
-  --neu-shadow-light: rgba(255, 255, 255, 0.5);
-  --neu-text: #3b1427;
-  --neu-accent: #e11d48;
-  --neu-accent-hover: #be123c;
-  --neu-border: #f2c7d9;
+  --neu-bg: #0F2A44;
+  --neu-shadow-dark: #071829;
+  --neu-shadow-light: rgba(231, 193, 90, 0.06);
+  --neu-text: #F3ECDF;
+  --neu-accent: #E7C15A;
+  --neu-accent-hover: #F5DE9B;
+  --neu-border: rgba(231, 193, 90, 0.28);
 }
 
 [data-society="Society A"] {
@@ -240,20 +240,73 @@ select {
   box-shadow: inset 3px 3px 6px var(--neu-shadow-dark), inset -1px -1px 4px var(--neu-shadow-light);
 }
 
-/* SMOOTH 60FPS PAGE TRANSITION */
+/* ==========================================================================
+   SMOOTH 60FPS PAGE, MODAL & NOTIFICATION TRANSITIONS
+   ========================================================================== */
+
+/* Page Route Transition */
 .page-transition {
-  animation: pageFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: pageFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   will-change: opacity, transform;
 }
 
 @keyframes pageFadeIn {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px) scale(0.995);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Modal Backdrop Enter Animation */
+.animate-backdrop-enter {
+  animation: backdropFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity;
+}
+
+@keyframes backdropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal Card Scale-in with Fluid Easing */
+.animate-modal-enter {
+  animation: modalEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Toast Pop-up Transition */
+.animate-toast-enter {
+  animation: toastEnter 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+@keyframes toastEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -442,8 +495,8 @@ select {
 
 /* SLIM IN-CONTAINER SCROLLBAR */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 
 ::-webkit-scrollbar-track {
@@ -451,10 +504,16 @@ select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--neu-shadow-dark);
+  background: var(--neu-accent);
   border-radius: 9999px;
+  opacity: 0.85;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--neu-accent);
+  background: var(--neu-accent-hover);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--neu-accent) transparent;
 }
