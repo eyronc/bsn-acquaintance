@@ -541,3 +541,58 @@ select {
   scrollbar-width: thin;
   scrollbar-color: var(--neu-accent) transparent;
 }
+
+/* CELESTIAL BUTTON SHIMMER */
+@keyframes buttonShimmer {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  35%, 100% {
+    transform: translateX(260%) skewX(-20deg);
+  }
+}
+
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.45) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-150%) skewX(-20deg);
+  animation: buttonShimmer 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+
+/* HIDE SCROLLBAR TRACK VISUALLY WHILE RETAINING SCROLLING */
+html.landing-page-active,
+body.landing-page-active,
+.no-scrollbar,
+.no-scrollbar * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html.landing-page-active::-webkit-scrollbar,
+body.landing-page-active::-webkit-scrollbar,
+html.landing-page-active *::-webkit-scrollbar,
+body.landing-page-active *::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar,
+.no-scrollbar *::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
+}
