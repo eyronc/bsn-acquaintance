@@ -83,26 +83,26 @@ export function LandingPage({ isAuthenticated = false, isAdmin = false }) {
         </div>
 
         <div
-          className="self-start rounded-2xl px-4 py-3 sm:px-5 sm:py-4 flex flex-col items-center backdrop-blur-md"
+          className="self-start rounded-2xl px-4 py-3 sm:px-6 sm:py-4 md:px-7 md:py-5 flex flex-col items-center backdrop-blur-md"
           style={{
             background: 'rgba(255,255,255,0.04)',
             border: '1px solid rgba(231,193,90,0.25)',
             boxShadow: '0 4px 30px rgba(0,0,0,0.2), 0 0 18px rgba(231,193,90,0.08)',
           }}
         >
-          <span className="text-[#7FB6C9] text-[9px] sm:text-[10px] tracking-[0.2em] uppercase mb-2.5">
+          <span className="text-[#7FB6C9] text-[9px] sm:text-[11px] tracking-[0.2em] uppercase mb-2.5 sm:mb-3">
             {started ? 'The celebration is here' : 'The celebration begins in'}
           </span>
           {started ? (
-            <span className="font-celestial text-[#E7C15A] text-2xl sm:text-3xl font-semibold">Happening now</span>
+            <span className="font-celestial text-[#E7C15A] text-2xl sm:text-4xl font-semibold">Happening now</span>
           ) : (
-            <div className="flex gap-4 sm:gap-6">
+            <div className="flex gap-4 sm:gap-7 md:gap-8">
               {units.map(({ value, label }) => (
                 <div key={label} className="flex flex-col items-center">
-                  <span className="font-celestial text-[#E7C15A] text-2xl sm:text-3xl font-semibold leading-none tabular-nums">
+                  <span className="font-celestial text-[#E7C15A] text-2xl sm:text-4xl font-semibold leading-none tabular-nums">
                     {value}
                   </span>
-                  <span className="text-[#7FB6C9] text-[8px] sm:text-[9px] tracking-[0.16em] uppercase mt-1.5">
+                  <span className="text-[#7FB6C9] text-[8px] sm:text-[10px] tracking-[0.16em] uppercase mt-1.5">
                     {label}
                   </span>
                 </div>
@@ -113,16 +113,16 @@ export function LandingPage({ isAuthenticated = false, isAdmin = false }) {
       </header>
 
       {/* Hero — left-aligned, single-view stack mirroring the event poster */}
-      <main className="flex-grow flex flex-col justify-center px-6 sm:px-12 py-4 sm:py-6 w-full max-w-5xl">
+      <main className="flex-grow flex flex-col justify-center px-6 sm:px-12 py-3 sm:py-4 w-full max-w-5xl">
         <div className="w-full max-w-2xl flex flex-col items-start text-left">
           {/* Ornate gold lettering — single composed poster PNG (transparent, in
               /public). Height is clamped to viewport height so it always fits one
               screen; alt text carries the headline for screen readers. */}
           <img
-            src="/CELESTIAL%20GARDEN.png"
+            src="/CELESTIALGARDEN.svg"
             alt="Nursing Acquaintance 2026 — Celestial Garden: A Night of Wonder and Grace"
             draggable={false}
-            className="select-none w-auto max-w-full h-[clamp(13rem,44vh,32rem)] object-contain object-left mb-3 sm:mb-5 drop-shadow-[0_6px_30px_rgba(231,193,90,0.3)]"
+            className="select-none w-auto max-w-full h-[clamp(12rem,40vh,30rem)] object-contain object-left mb-3 sm:mb-4 drop-shadow-[0_6px_30px_rgba(231,193,90,0.3)]"
           />
 
           <button
