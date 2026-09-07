@@ -46,8 +46,8 @@ function Butterfly({ className }) {
 export function CelestialShell({ children, className = '' }) {
   return (
     <div
-      className={`relative min-h-screen w-full overflow-hidden text-[#F3ECDF] ${className}`}
-      style={{ background: 'linear-gradient(135deg, #0A1A33 0%, #10314A 55%, #0C2036 100%)' }}
+      className={`relative min-h-screen w-full overflow-x-hidden text-[#F3ECDF] no-scrollbar ${className}`}
+      style={{ background: 'linear-gradient(135deg, #0A1A33 0%, #10314A 50%, #0A1A33 100%)' }}
     >
       <div
         className="pointer-events-none absolute inset-0"

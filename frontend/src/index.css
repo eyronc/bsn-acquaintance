@@ -51,85 +51,158 @@
 /* ==========================================================================
    DYNAMIC SOCIETY NEUMORPHIC THEME SYSTEM (ALL LIGHT PALETTES)
    ========================================================================== */
-
 :root {
-  --neu-bg: #0F2A44;
-  --neu-shadow-dark: #071829;
-  --neu-shadow-light: rgba(231, 193, 90, 0.06);
-  --neu-text: #F3ECDF;
-  --neu-accent: #E7C15A;
-  --neu-accent-hover: #F5DE9B;
-  --neu-border: rgba(231, 193, 90, 0.28);
+  --neu-bg: #f8fafc;
+  --neu-shadow-dark: #cbd5e1;
+  --neu-shadow-light: rgba(255, 255, 255, 0.85);
+  --neu-text: #0f172a;
+  --neu-accent: #0284c7;
+  --neu-accent-hover: #0369a1;
+  --neu-border: #e2e8f0;
 }
 
-[data-society="Society A"] {
-  --neu-bg: #e8f5ed;
-  --neu-shadow-dark: #c2e2cc;
-  --neu-shadow-light: rgba(255, 255, 255, 0.45);
-  --neu-text: #064e3b;
-  --neu-accent: #10b981;
-  --neu-accent-hover: #059669;
-  --neu-border: #a7f3d0;
+/* 1. Traditional Hilot Society — Brown */
+[data-society="Traditional Hilot Society"],
+[data-society="TH"] {
+  --neu-bg: #fcf9f5;
+  --neu-shadow-dark: #dfcebc;
+  --neu-shadow-light: rgba(255, 255, 255, 0.85);
+  --neu-text: #451a03;
+  --neu-accent: #78350f;
+  --neu-accent-hover: #92400e;
+  --neu-border: #d6c7b2;
 }
 
-[data-society="Society B"] {
-  --neu-bg: #f0f7fc;
-  --neu-shadow-dark: #c5ddf3;
-  --neu-shadow-light: rgba(255, 255, 255, 0.45);
-  --neu-text: #0c4a6e;
-  --neu-accent: #0ea5e9;
-  --neu-accent-hover: #0284c7;
-  --neu-border: #bae6fd;
+/* 2. Public Health Nursing Society — Yellow */
+[data-society="Public Health Nursing Society"],
+[data-society="PH"] {
+  --neu-bg: #fefdf0;
+  --neu-shadow-dark: #fef08a;
+  --neu-shadow-light: rgba(255, 255, 255, 0.95);
+  --neu-text: #713f12;
+  --neu-accent: #ca8a04;
+  --neu-accent-hover: #eab308;
+  --neu-border: #fef08a;
 }
 
-[data-society="Society C"] {
-  --neu-bg: #f3ecfb;
-  --neu-shadow-dark: #d6c4f3;
-  --neu-shadow-light: rgba(255, 255, 255, 0.45);
-  --neu-text: #4c1d95;
-  --neu-accent: #8b5cf6;
-  --neu-accent-hover: #7c3aed;
-  --neu-border: #ddd6fe;
+/* 3. Nursing Informatics Society — Baby Blue */
+[data-society="Nursing Informatics Society"],
+[data-society="I"] {
+  --neu-bg: #f0f9ff;
+  --neu-shadow-dark: #bae6fd;
+  --neu-shadow-light: rgba(255, 255, 255, 0.95);
+  --neu-text: #0369a1;
+  --neu-accent: #0284c7;
+  --neu-accent-hover: #38bdf8;
+  --neu-border: #7dd3fc;
 }
 
-[data-society="Society D"] {
-  --neu-bg: #faf4e4;
-  --neu-shadow-dark: #e8d9b8;
-  --neu-shadow-light: rgba(255, 255, 255, 0.45);
-  --neu-text: #78350f;
-  --neu-accent: #d97706;
-  --neu-accent-hover: #b45309;
-  --neu-border: #fde68a;
+/* 4. Nurses Against Hypertension Society — Maroon */
+[data-society="Nurses Against Hypertension Society"],
+[data-society="H"] {
+  --neu-bg: #fdf2f4;
+  --neu-shadow-dark: #fecdd3;
+  --neu-shadow-light: rgba(255, 255, 255, 0.9);
+  --neu-text: #500724;
+  --neu-accent: #881337;
+  --neu-accent-hover: #9f1239;
+  --neu-border: #f43f5e;
 }
 
-[data-society="Society E"] {
-  --neu-bg: #fae9f0;
-  --neu-shadow-dark: #e2c0d1;
-  --neu-shadow-light: rgba(255, 255, 255, 0.45);
-  --neu-text: #881337;
-  --neu-accent: #e11d48;
-  --neu-accent-hover: #be123c;
-  --neu-border: #fecdd3;
+/* 5. Oncology Nursing Society — Lavender */
+[data-society="Oncology Nursing Society"],
+[data-society="O"] {
+  --neu-bg: #faf5ff;
+  --neu-shadow-dark: #e9d5ff;
+  --neu-shadow-light: rgba(255, 255, 255, 0.95);
+  --neu-text: #581c87;
+  --neu-accent: #7e22ce;
+  --neu-accent-hover: #a855f7;
+  --neu-border: #d8b4fe;
 }
 
-[data-society="Society F"] {
-  --neu-bg: #e8f8f5;
-  --neu-shadow-dark: #bee7df;
-  --neu-shadow-light: rgba(255, 255, 255, 0.45);
-  --neu-text: #134e4a;
-  --neu-accent: #0d9488;
-  --neu-accent-hover: #0f766e;
-  --neu-border: #99f6e4;
-}
-
-[data-society="Society G"] {
-  --neu-bg: #fbf0e6;
-  --neu-shadow-dark: #ebd0be;
-  --neu-shadow-light: rgba(255, 255, 255, 0.45);
+/* 6. Renal Nursing Society — Orange */
+[data-society="Renal Nursing Society"],
+[data-society="R"] {
+  --neu-bg: #fff7ed;
+  --neu-shadow-dark: #fed7aa;
+  --neu-shadow-light: rgba(255, 255, 255, 0.95);
   --neu-text: #7c2d12;
   --neu-accent: #ea580c;
-  --neu-accent-hover: #c2410c;
-  --neu-border: #fed7aa;
+  --neu-accent-hover: #f97316;
+  --neu-border: #fdba74;
+}
+
+/* 7. Mental Health Society — Green */
+[data-society="Mental Health Society"],
+[data-society="MH"] {
+  --neu-bg: #f0fdf4;
+  --neu-shadow-dark: #bbf7d0;
+  --neu-shadow-light: rgba(255, 255, 255, 0.95);
+  --neu-text: #14532d;
+  --neu-accent: #16a34a;
+  --neu-accent-hover: #22c55e;
+  --neu-border: #86efac;
+}
+
+/* 8. Maternal and Child Society — Pink */
+[data-society="Maternal and Child Society"],
+[data-society="MC"] {
+  --neu-bg: #fdf2f8;
+  --neu-shadow-dark: #fbcfe8;
+  --neu-shadow-light: rgba(255, 255, 255, 0.95);
+  --neu-text: #831843;
+  --neu-accent: #db2777;
+  --neu-accent-hover: #ec4899;
+  --neu-border: #f472b6;
+}
+
+/* 9. Healthy Lung Society — Emerald Green */
+[data-society="Healthy Lung Society"],
+[data-society="HL"] {
+  --neu-bg: #ecfdf5;
+  --neu-shadow-dark: #a7f3d0;
+  --neu-shadow-light: rgba(255, 255, 255, 0.95);
+  --neu-text: #064e3b;
+  --neu-accent: #059669;
+  --neu-accent-hover: #10b981;
+  --neu-border: #6ee7b7;
+}
+
+/* 10. Gerontology Society — Gold */
+[data-society="Gerontology Society"],
+[data-society="G"] {
+  --neu-bg: #fffbeb;
+  --neu-shadow-dark: #fde68a;
+  --neu-shadow-light: rgba(255, 255, 255, 0.95);
+  --neu-text: #78350f;
+  --neu-accent: #d97706;
+  --neu-accent-hover: #e7c15a;
+  --neu-border: #fcd34d;
+}
+
+/* 11. Disaster Nursing Society — Red */
+[data-society="Disaster Nursing Society"],
+[data-society="DN"] {
+  --neu-bg: #fef2f2;
+  --neu-shadow-dark: #fecaca;
+  --neu-shadow-light: rgba(255, 255, 255, 0.9);
+  --neu-text: #7f1d1d;
+  --neu-accent: #dc2626;
+  --neu-accent-hover: #ef4444;
+  --neu-border: #fca5a5;
+}
+
+/* 12. Diabetology Society — Blue */
+[data-society="Diabetology Society"],
+[data-society="D"] {
+  --neu-bg: #eff6ff;
+  --neu-shadow-dark: #bfdbfe;
+  --neu-shadow-light: rgba(255, 255, 255, 0.95);
+  --neu-text: #1e3a8a;
+  --neu-accent: #2563eb;
+  --neu-accent-hover: #3b82f6;
+  --neu-border: #93c5fd;
 }
 
 /* Celestial Garden dark theme — used by the admin panel. Redefines the neu
@@ -340,7 +413,7 @@ select {
 @media print {
   @page {
     size: portrait;
-    margin: 0 !important; /* Strips browser headers (date/title) and footers (URL/page numbers) */
+    margin: 0 !important;
   }
 
   html,
@@ -374,7 +447,6 @@ select {
     overflow: hidden !important;
   }
 
-  /* Completely hide all extraneous web interface elements */
   header,
   nav,
   button,
@@ -421,9 +493,8 @@ select {
   }
 
   #digital-ticket-card {
-    width: 520px !important;
-    max-width: 520px !important;
-    min-width: 520px !important;
+    width: 100% !important;
+    max-width: 500px !important;
     box-sizing: border-box !important;
     margin: auto !important;
     box-shadow: 10px 10px 30px var(--neu-shadow-dark), -6px -6px 18px var(--neu-shadow-light) !important;
@@ -434,11 +505,7 @@ select {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     page-break-inside: avoid !important;
-    page-break-before: avoid !important;
-    page-break-after: avoid !important;
     break-inside: avoid !important;
-    break-before: avoid !important;
-    break-after: avoid !important;
     overflow: hidden !important;
     transform: none !important;
   }
@@ -449,7 +516,7 @@ select {
     box-sizing: border-box !important;
   }
 
-  /* Force desktop layout rules inside card during print on all devices (mobile, tablet, desktop) */
+  /* Force desktop layout rules inside card during print on all devices */
   #digital-ticket-card .ticket-attendee-row {
     display: flex !important;
     flex-direction: row !important;
@@ -460,7 +527,7 @@ select {
 
   #digital-ticket-card .ticket-seats-grid {
     display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-columns: repeat(2, 1fr) !important;
     gap: 12px !important;
   }
 
@@ -540,4 +607,59 @@ select {
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--neu-accent) transparent;
+}
+
+/* CELESTIAL BUTTON SHIMMER */
+@keyframes buttonShimmer {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  35%, 100% {
+    transform: translateX(260%) skewX(-20deg);
+  }
+}
+
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.45) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: translateX(-150%) skewX(-20deg);
+  animation: buttonShimmer 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+
+/* HIDE SCROLLBAR TRACK VISUALLY WHILE RETAINING SCROLLING */
+html.landing-page-active,
+body.landing-page-active,
+.no-scrollbar,
+.no-scrollbar * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+html.landing-page-active::-webkit-scrollbar,
+body.landing-page-active::-webkit-scrollbar,
+html.landing-page-active *::-webkit-scrollbar,
+body.landing-page-active *::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar,
+.no-scrollbar *::-webkit-scrollbar {
+  display: none !important;
+  width: 0px !important;
+  height: 0px !important;
+  background: transparent !important;
 }

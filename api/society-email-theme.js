@@ -32,17 +32,35 @@ const CELESTIAL_EMAIL = {
   accentShadow: 'rgba(231,193,90,0.38)',
 };
 
+const SOCIETY_CODE_MAP = {
+  'traditional hilot society': 'TH',
+  'public health nursing society': 'PH',
+  'nursing informatics society': 'I',
+  'nurses against hypertension society': 'H',
+  'oncology nursing society': 'O',
+  'renal nursing society': 'R',
+  'mental health society': 'MH',
+  'maternal and child society': 'MC',
+  'healthy lung society': 'HL',
+  'gerontology society': 'G',
+  'disaster nursing society': 'DN',
+  'diabetology society': 'D',
+};
+
 function normalizeSocietyName(soc) {
-  if (!soc) return 'Society A';
+  if (!soc) return 'Nursing Informatics Society';
   const trimmed = String(soc).trim();
-  const match = trimmed.match(/^(?:society\s*)?([A-G])$/i);
-  if (match) return `Society ${match[1].toUpperCase()}`;
+  const lower = trimmed.toLowerCase();
+  for (const name of Object.keys(SOCIETY_CODE_MAP)) {
+    if (lower === name || lower === SOCIETY_CODE_MAP[name].toLowerCase()) {
+      return name.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    }
+  }
   return trimmed;
 }
 
 export function getSocietyEmailTheme(soc) {
   const name = normalizeSocietyName(soc);
-  const rowMatch = name.match(/([A-G])\s*$/i);
-  const row = rowMatch ? rowMatch[1].toUpperCase() : 'A';
-  return { ...CELESTIAL_EMAIL, name, row };
+  const code = SOCIETY_CODE_MAP[name.toLowerCase()] || 'I';
+  return { ...CELESTIAL_EMAIL, name, row: code, code };
 }

@@ -37,7 +37,7 @@ export async function sendAccessCodeEmail(attendee) {
         email: attendee.email,
         fullname: attendee.fullname,
         unique_code: attendee.unique_code,
-        society: attendee.society || 'Society A',
+        society: attendee.society || 'Nursing Informatics Society',
         year_level: attendee.year || attendee.year_level,
         section: attendee.section,
         eventUrl: eventUrl,
