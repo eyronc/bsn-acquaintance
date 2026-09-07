@@ -63,7 +63,7 @@ export function StudentDashboard({ user, onLogout }) {
     fetchFreshProfile();
   }, [user?.id]);
 
-  const effectiveUserSociety = profile?.society || user?.society || 'Society A';
+  const effectiveUserSociety = profile?.society || user?.society || 'Nursing Informatics Society';
   const currentTheme = getSocietyTheme(effectiveUserSociety);
 
   // Fetch user's current seat on mount

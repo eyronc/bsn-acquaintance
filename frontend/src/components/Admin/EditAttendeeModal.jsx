@@ -14,13 +14,20 @@ const SECTIONS_BY_YEAR = {
 import { getSocietyTheme } from '../../utils/societyTheme';
 
 export const PRESET_SOCIETIES = [
-  'Society A',
-  'Society B',
-  'Society C',
-  'Society D',
-  'Society E',
-  'Society F',
-  'Society G',
+  // Right Side
+  'Traditional Hilot Society',
+  'Public Health Nursing Society',
+  'Nursing Informatics Society',
+  'Nurses Against Hypertension Society',
+  'Oncology Nursing Society',
+  'Renal Nursing Society',
+  // Left Side
+  'Mental Health Society',
+  'Maternal and Child Society',
+  'Healthy Lung Society',
+  'Gerontology Society',
+  'Disaster Nursing Society',
+  'Diabetology Society',
 ];
 
 export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, onUpdated, setToast }) {
@@ -28,7 +35,7 @@ export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, on
   const [email, setEmail] = useState('');
   const [year, setYear] = useState('1st Year');
   const [section, setSection] = useState('A');
-  const [society, setSociety] = useState('Society A');
+  const [society, setSociety] = useState('Nursing Informatics Society');
   const [customSociety, setCustomSociety] = useState('');
   const [isCustomSociety, setIsCustomSociety] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState(950);
@@ -44,7 +51,7 @@ export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, on
       setPaymentAmount(attendee.payment_amount || 950);
       setClearSeatChecked(false);
 
-      const soc = attendee.society || 'Society A';
+      const soc = attendee.society || 'Nursing Informatics Society';
       if (PRESET_SOCIETIES.includes(soc)) {
         setSociety(soc);
         setIsCustomSociety(false);
@@ -78,7 +85,7 @@ export function EditAttendeeModal({ isOpen = true, attendee, onClose, onSave, on
   };
 
   const currentSections = SECTIONS_BY_YEAR[year] || ['A'];
-  const finalSociety = isCustomSociety ? (customSociety.trim() || 'Society A') : society;
+  const finalSociety = isCustomSociety ? (customSociety.trim() || 'Nursing Informatics Society') : society;
 
   const handleSubmit = async (e) => {
     e.preventDefault();

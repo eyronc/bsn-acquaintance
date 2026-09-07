@@ -99,8 +99,8 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
 
   const handleDownload = () => {
     const link = document.createElement('a');
-    link.href = '/STAGE.png';
-    link.download = 'UCLM-BSN-2026-Stage-Floor-Plan.png';
+    link.href = '/stage-final-layout.png';
+    link.download = 'UCLM-BSN-2026-Official-Stage-Floor-Plan.png';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -282,7 +282,7 @@ export function FloorPlanModal({ isOpen, onClose, society = 'admin' }) {
             className="w-full h-full flex items-center justify-center pointer-events-none p-4"
           >
             <img
-              src="/STAGE.png"
+              src="/stage-final-layout.png"
               alt="Official Event Stage Floor Plan"
               draggable={false}
               className={`rounded-xl shadow-xl max-w-[95%] max-h-[90%] object-contain select-none block pointer-events-none border ${

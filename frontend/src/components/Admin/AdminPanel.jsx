@@ -42,7 +42,7 @@ export function AdminPanel({ onLogout }) {
   const [fullname, setFullname] = useState('');
   const [year, setYear] = useState('1st Year');
   const [section, setSection] = useState('A');
-  const [society, setSociety] = useState('Society A');
+  const [society, setSociety] = useState('Nursing Informatics Society');
   const [customSociety, setCustomSociety] = useState('');
   const [isCustomSociety, setIsCustomSociety] = useState(false);
   const [email, setEmail] = useState('');
@@ -119,7 +119,7 @@ export function AdminPanel({ onLogout }) {
 
     try {
       const uniqueCode = generateUniqueCode();
-      const finalSociety = isCustomSociety ? (customSociety.trim() || 'Society A') : society;
+      const finalSociety = isCustomSociety ? (customSociety.trim() || 'Nursing Informatics Society') : society;
 
       const { data, error } = await supabase
         .from('attendees')
@@ -142,7 +142,7 @@ export function AdminPanel({ onLogout }) {
       setFullname('');
       setYear('1st Year');
       setSection('A');
-      setSociety('Society A');
+      setSociety('Nursing Informatics Society');
       setCustomSociety('');
       setIsCustomSociety(false);
 
@@ -164,7 +164,7 @@ export function AdminPanel({ onLogout }) {
     } catch (error) {
       // Local fallback
       const uniqueCode = generateUniqueCode();
-      const finalSociety = isCustomSociety ? (customSociety.trim() || 'Society A') : society;
+      const finalSociety = isCustomSociety ? (customSociety.trim() || 'Nursing Informatics Society') : society;
       const newAttendee = {
         id: `mock-${Date.now()}`,
         email,
@@ -183,7 +183,7 @@ export function AdminPanel({ onLogout }) {
       setFullname('');
       setYear('1st Year');
       setSection('A');
-      setSociety('Society A');
+      setSociety('Nursing Informatics Society');
       setCustomSociety('');
       setIsCustomSociety(false);
 
@@ -341,15 +341,8 @@ export function AdminPanel({ onLogout }) {
       return;
     }
 
-    // Automatically sort list by Class (Year & Section) then Full Name for a neat, organized sheet
-    const sortedExportData = [...filteredAttendees].sort((a, b) => {
-      const classA = formatClassBadge(a.year, a.section);
-      const classB = formatClassBadge(b.year, b.section);
-      if (classA !== classB) {
-        return classA.localeCompare(classB);
-      }
-      return (a.fullname || '').localeCompare(b.fullname || '');
-    });
+    // Preserve the exact on-screen registration order (most recent first, so newest attendee is #1)
+    const sortedExportData = [...filteredAttendees];
 
     // ==========================================
     // SHEET 1: "Attendee List"
@@ -385,7 +378,7 @@ export function AdminPanel({ onLogout }) {
         index + 1,
         att.fullname || '',
         formatClassBadge(att.year, att.section),
-        att.society || 'Society A',
+        att.society || 'Nursing Informatics Society',
         att.year || '',
         att.section || '',
         att.email || '',
@@ -402,22 +395,22 @@ export function AdminPanel({ onLogout }) {
     const ws1Data = [attendeeHeaders, ...attendeeRows];
     const ws1 = XLSX.utils.aoa_to_sheet(ws1Data);
 
-    // Set column widths for Sheet 1
+    // Set generous column widths for Sheet 1 so all text is readable and untruncated
     ws1['!cols'] = [
       { wch: 6 },   // No.
-      { wch: 25 },  // Full Name
+      { wch: 28 },  // Full Name
       { wch: 18 },  // Class & Section
-      { wch: 16 },  // Society
+      { wch: 38 },  // Society (wide enough for full names like "Nurses Against Hypertension Society")
       { wch: 14 },  // Year Level
-      { wch: 10 },  // Section
-      { wch: 30 },  // Email Address
-      { wch: 16 },  // Access Code
+      { wch: 12 },  // Section
+      { wch: 34 },  // Email Address
+      { wch: 18 },  // Access Code
       { wch: 14 },  // Payment Fee
       { wch: 14 },  // Status
       { wch: 14 },  // Table Code
       { wch: 14 },  // Seat Number
-      { wch: 24 },  // Seat Details
-      { wch: 22 }   // Registration Date
+      { wch: 26 },  // Seat Details
+      { wch: 24 }   // Registration Date
     ];
 
     // ==========================================
@@ -641,10 +634,13 @@ export function AdminPanel({ onLogout }) {
             <button
               type="submit"
               disabled={loading}
-              className="neu-button-primary w-full py-3 sm:py-3.5 rounded-xl font-bold text-white flex items-center justify-center gap-2 text-sm sm:text-base disabled:opacity-50 active:scale-[0.99] transition-transform shadow-md cursor-pointer"
+              className="neu-button-primary w-full py-3 sm:py-3.5 px-4 rounded-xl font-bold text-white flex items-center justify-center gap-2 text-sm sm:text-base disabled:opacity-50 active:scale-[0.99] transition-transform shadow-md cursor-pointer"
             >
-              <Plus size={18} />
-              {loading ? 'Creating Attendee...' : `Create Attendee (${formatClassBadge(year, section)} • ${isCustomSociety ? (customSociety || 'Custom') : society})`}
+              <Plus size={18} className="shrink-0" />
+              <span>{loading ? 'Creating Attendee...' : 'Create Attendee'}</span>
+              <span className="hidden sm:inline-block opacity-85 text-xs font-semibold">
+                ({formatClassBadge(year, section)} • {isCustomSociety ? (customSociety || 'Custom') : society})
+              </span>
             </button>
           </form>
         </div>
@@ -762,21 +758,21 @@ export function AdminPanel({ onLogout }) {
             </div>
           ) : (
             <>
-              {/* Desktop Table View (md and up) - Clean & Balanced Spacing */}
-              <div className="hidden md:block w-full overflow-hidden rounded-2xl border border-[#E7C15A]/25">
-                <table className="w-full text-xs lg:text-sm table-fixed border-collapse">
+              {/* Desktop Table View (md and up) - Clean & Balanced Spacing with no column overlap */}
+              <div className="hidden md:block w-full overflow-x-auto rounded-2xl border border-[#E7C15A]/25">
+                <table className="w-full text-xs lg:text-sm min-w-[980px] border-collapse">
                   <thead>
                     <tr className="border-b border-[#E7C15A]/25 bg-white/[0.04]">
                       <th className="w-[14%] text-left py-3.5 px-4 font-extrabold text-[#F3ECDF]">Name</th>
                       <th className="w-[8%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Class</th>
-                      <th className="w-[10%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Society</th>
-                      <th className="w-[17%] text-left py-3.5 px-3 font-extrabold text-[#F3ECDF]">Email</th>
-                      <th className="w-[10%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Code</th>
-                      <th className="w-[8%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Payment</th>
-                      <th className="w-[11%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Seat</th>
-                      <th className="w-[8%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Status</th>
-                      <th className="w-[7%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Registered</th>
-                      <th className="w-[7%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Actions</th>
+                      <th className="w-[18%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Society</th>
+                      <th className="w-[18%] text-left py-3.5 px-3 font-extrabold text-[#F3ECDF]">Email</th>
+                      <th className="w-[9%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Code</th>
+                      <th className="w-[7%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Payment</th>
+                      <th className="w-[8%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Seat</th>
+                      <th className="w-[6%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Status</th>
+                      <th className="w-[6%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Registered</th>
+                      <th className="w-[6%] text-center py-3.5 px-2 font-extrabold text-[#F3ECDF]">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/10 bg-white/[0.02]">
@@ -799,8 +795,8 @@ export function AdminPanel({ onLogout }) {
                           {(() => {
                             const socTheme = getSocietyTheme(attendee.society);
                             return (
-                              <span className={`font-mono font-bold text-[11px] px-2.5 py-0.5 rounded-md border inline-block whitespace-nowrap ${socTheme.bgLight} ${socTheme.text} ${socTheme.border}`}>
-                                {attendee.society || 'Society A'}
+                              <span className={`font-mono font-bold text-[11px] px-2.5 py-0.5 rounded-md border inline-block max-w-[190px] truncate ${socTheme.bgLight} ${socTheme.text} ${socTheme.border}`} title={attendee.society}>
+                                {attendee.society || 'Nursing Informatics Society'}
                               </span>
                             );
                           })()}
@@ -906,7 +902,7 @@ export function AdminPanel({ onLogout }) {
                             const socTheme = getSocietyTheme(attendee.society);
                             return (
                               <span className={`font-mono px-2 py-0.5 rounded text-[10px] uppercase font-bold border ${socTheme.bgLight} ${socTheme.text} ${socTheme.border}`}>
-                                {attendee.society || 'Society A'}
+                                {attendee.society || 'Nursing Informatics Society'}
                               </span>
                             );
                           })()}

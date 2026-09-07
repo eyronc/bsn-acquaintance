@@ -11,24 +11,20 @@ export function Toast({ message, type = 'success', onClose, duration = 3500, rai
 
   const typeConfig = {
     error: {
-      icon: <AlertCircle className="text-red-400 shrink-0 mt-0.5" size={18} />,
-      border: 'border-red-500/40',
-      glow: 'shadow-[0_8px_30px_rgba(239,68,68,0.25)]',
+      icon: <AlertCircle className="text-red-500 shrink-0" size={18} />,
+      border: 'border-red-400',
     },
     warning: {
-      icon: <AlertTriangle className="text-amber-400 shrink-0 mt-0.5" size={18} />,
-      border: 'border-amber-400/40',
-      glow: 'shadow-[0_8px_30px_rgba(245,158,11,0.25)]',
+      icon: <AlertTriangle className="text-amber-500 shrink-0" size={18} />,
+      border: 'border-amber-400',
     },
     success: {
-      icon: <Check className="text-emerald-400 shrink-0 mt-0.5" size={18} />,
-      border: 'border-emerald-500/40',
-      glow: 'shadow-[0_8px_30px_rgba(16,185,129,0.2)]',
+      icon: <Check className="text-emerald-500 shrink-0" size={18} />,
+      border: 'border-emerald-400',
     },
     info: {
-      icon: <Info className="text-sky-400 shrink-0 mt-0.5" size={18} />,
-      border: 'border-sky-500/40',
-      glow: 'shadow-[0_8px_30px_rgba(14,165,233,0.2)]',
+      icon: <Info className="text-blue-500 shrink-0" size={18} />,
+      border: 'border-blue-400',
     },
   };
 
@@ -37,19 +33,19 @@ export function Toast({ message, type = 'success', onClose, duration = 3500, rai
   return (
     <div
       role="alert"
-      className={`no-print fixed left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50 flex items-start gap-3 p-3.5 rounded-2xl bg-[#0F2A44]/95 backdrop-blur-md border ${config.border} ${config.glow} shadow-2xl animate-toast-enter text-[#F3ECDF] ${
-        raised ? 'bottom-24 sm:bottom-24' : 'bottom-4 sm:bottom-6'
+      className={`no-print fixed left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50 flex items-center gap-3 p-3.5 rounded-2xl overflow-hidden bg-white/95 backdrop-blur-md border ${config.border} shadow-2xl animate-toast-enter text-slate-800 ${
+        raised ? 'bottom-24 sm:bottom-24' : 'bottom-20 sm:bottom-6'
       }`}
     >
       {config.icon}
       <div className="flex-1 min-w-0 pr-1">
-        <span className="text-[#F3ECDF] font-semibold text-xs sm:text-sm leading-relaxed block break-words">
+        <span className="text-slate-800 font-bold text-xs sm:text-sm leading-snug block break-words">
           {message}
         </span>
       </div>
       <button 
         onClick={onClose} 
-        className="text-[#9DB4C7] hover:text-[#F3ECDF] hover:bg-white/10 transition-colors shrink-0 p-1 rounded-lg -mr-1 -mt-0.5 cursor-pointer"
+        className="text-slate-400 hover:text-slate-700 hover:bg-black/5 transition-colors shrink-0 p-1.5 rounded-lg cursor-pointer"
         aria-label="Close notification"
       >
         <X size={16} />

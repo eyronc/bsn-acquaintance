@@ -1,59 +1,394 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../supabase/client';
+import { normalizeSocietyName } from '../utils/societyTheme';
 
-// Table distribution matching STAGE.png
+// 12 Official Societies configuration matching stage-final-layout.png
 export const STAGE_TABLE_CONFIG = [
-  { row: 'A', maxTables: 19, society: 'Society A', label: 'Row A (Front Stage)' },
-  { row: 'B', maxTables: 22, society: 'Society B', label: 'Row B (Instructors & NSBO Front)' },
-  { row: 'C', maxTables: 22, society: 'Society C', label: 'Row C (Hall Mid-Front)' },
-  { row: 'D', maxTables: 22, society: 'Society D', label: 'Row D (Hall Center)' },
-  { row: 'E', maxTables: 24, society: 'Society E', label: 'Row E (Working Area Mid-Back)' },
-  { row: 'F', maxTables: 24, society: 'Society F', label: 'Row F (Hall Back)' },
-  { row: 'G', maxTables: 16, society: 'Society G', label: 'Row G (Near Food Stations)' },
+  // LEFT SIDE
+  { code: 'MH', row: 'MH', maxTables: 13, society: 'Mental Health Society', side: 'Left', label: 'Left Wing • Tables MH-01 to MH-13' },
+  { code: 'MC', row: 'MC', maxTables: 13, society: 'Maternal and Child Society', side: 'Left', label: 'Left Wing • Tables MC-01 to MC-13' },
+  { code: 'HL', row: 'HL', maxTables: 13, society: 'Healthy Lung Society', side: 'Left', label: 'Left Wing • Tables HL-01 to HL-13' },
+  { code: 'G',  row: 'G',  maxTables: 13, society: 'Gerontology Society', side: 'Left', label: 'Left Wing • Tables G-01 to G-13' },
+  { code: 'DN', row: 'DN', maxTables: 13, society: 'Disaster Nursing Society', side: 'Left', label: 'Left Wing • Tables DN-01 to DN-13' },
+  { code: 'D',  row: 'D',  maxTables: 12, society: 'Diabetology Society', side: 'Left', label: 'Left Wing • Tables D-01 to D-12' },
+
+  // RIGHT SIDE
+  { code: 'TH', row: 'TH', maxTables: 12, society: 'Traditional Hilot Society', side: 'Right', label: 'Right Wing • Tables TH-01 to TH-12' },
+  { code: 'PH', row: 'PH', maxTables: 12, society: 'Public Health Nursing Society', side: 'Right', label: 'Right Wing • Tables PH-01 to PH-12' },
+  { code: 'I',  row: 'I',  maxTables: 13, society: 'Nursing Informatics Society', side: 'Right', label: 'Right Wing • Tables I-01 to I-13' },
+  { code: 'H',  row: 'H',  maxTables: 13, society: 'Nurses Against Hypertension Society', side: 'Right', label: 'Right Wing • Tables H-01 to H-13' },
+  { code: 'O',  row: 'O',  maxTables: 13, society: 'Oncology Nursing Society', side: 'Right', label: 'Right Wing • Tables O-01 to O-13' },
+  { code: 'R',  row: 'R',  maxTables: 12, society: 'Renal Nursing Society', side: 'Right', label: 'Right Wing • Tables R-01 to R-12' },
 ];
 
-// Helper to format table code (e.g. "A-01", "B-12")
+// Shared decimal tables configuration: 8 shared physical tables (10 seats each)
+export const SHARED_TABLES_CONFIG = [
+  // Right Side Shared Tables
+  {
+    tableCode: 'I-13.1 / H-01.9',
+    soc1: 'Nursing Informatics Society',
+    tableNumber1: 13,
+    slots1: 1, // Seats 1..1
+    soc2: 'Nurses Against Hypertension Society',
+    tableNumber2: 1,
+    slots2: 9, // Seats 2..10
+  },
+  {
+    tableCode: 'H-13.2 / O-01.8',
+    soc1: 'Nurses Against Hypertension Society',
+    tableNumber1: 13,
+    slots1: 2, // Seats 1..2
+    soc2: 'Oncology Nursing Society',
+    tableNumber2: 1,
+    slots2: 8, // Seats 3..10
+  },
+  {
+    tableCode: 'O-13.3 / R-01.7',
+    soc1: 'Oncology Nursing Society',
+    tableNumber1: 13,
+    slots1: 3, // Seats 1..3
+    soc2: 'Renal Nursing Society',
+    tableNumber2: 1,
+    slots2: 7, // Seats 4..10
+  },
+
+  // Left Side Shared Tables
+  {
+    tableCode: 'MH-13.2 / MC-01.8',
+    soc1: 'Mental Health Society',
+    tableNumber1: 13,
+    slots1: 2, // Seats 1..2
+    soc2: 'Maternal and Child Society',
+    tableNumber2: 1,
+    slots2: 8, // Seats 3..10
+  },
+  {
+    tableCode: 'MC-13.4 / HL-01.6',
+    soc1: 'Maternal and Child Society',
+    tableNumber1: 13,
+    slots1: 4, // Seats 1..4
+    soc2: 'Healthy Lung Society',
+    tableNumber2: 1,
+    slots2: 6, // Seats 5..10
+  },
+  {
+    tableCode: 'HL-13.5 / G-01.5',
+    soc1: 'Healthy Lung Society',
+    tableNumber1: 13,
+    slots1: 5, // Seats 1..5
+    soc2: 'Gerontology Society',
+    tableNumber2: 1,
+    slots2: 5, // Seats 6..10
+  },
+  {
+    tableCode: 'G-13.6 / DN-01.4',
+    soc1: 'Gerontology Society',
+    tableNumber1: 13,
+    slots1: 6, // Seats 1..6
+    soc2: 'Disaster Nursing Society',
+    tableNumber2: 1,
+    slots2: 4, // Seats 7..10
+  },
+  {
+    tableCode: 'DN-13.7 / D-01.3',
+    soc1: 'Disaster Nursing Society',
+    tableNumber1: 13,
+    slots1: 7, // Seats 1..7
+    soc2: 'Diabetology Society',
+    tableNumber2: 1,
+    slots2: 3, // Seats 8..10
+  },
+];
+
+// Helper to format table code (e.g. "TH-01", "I-02")
 export function formatTableCode(rowLetter, number) {
   return `${rowLetter}-${String(number).padStart(2, '0')}`;
 }
 
-// Seat ID generator (e.g. "table-A-01-seat-01")
+// Seat ID generator (e.g. "table-I-02-seat-06" or "table-I-13.1 / H-01.9-seat-01")
 export const formatSeatId = (tableCode, seatNumber) => {
   const sPad = String(seatNumber).padStart(2, '0');
   return `table-${tableCode}-seat-${sPad}`;
 };
 
 export const getEffectiveTableCode = (att) => {
-  if (!att) return 'A-01';
+  if (!att) return 'I-01';
   if (att.table_code) return att.table_code;
-  const soc = att.society || 'Society A';
-  const match = String(soc).match(/[A-G]/i);
-  const rowLetter = match ? match[0].toUpperCase() : 'A';
-  return `${rowLetter}-${String(att.table_number || 1).padStart(2, '0')}`;
+  const socName = att.society || 'Nursing Informatics Society';
+  const conf = STAGE_TABLE_CONFIG.find(
+    (c) => normalizeSocietyName(c.society) === normalizeSocietyName(socName)
+  );
+  const prefix = conf ? conf.code : 'I';
+  return `${prefix}-${String(att.table_number || 1).padStart(2, '0')}`;
 };
 
-// Generate base seats for all tables defined in STAGE.png (10 seats per table)
+// Generate base seats for all 144 tables (1,440 seats) matching stage-final-layout.png
 export function createFreshBaseSeats() {
   const mockSeats = [];
-  
-  STAGE_TABLE_CONFIG.forEach(({ row, maxTables, society }) => {
-    for (let t = 1; t <= maxTables; t++) {
-      const tableCode = formatTableCode(row, t);
-      for (let s = 1; s <= 10; s++) {
-        mockSeats.push({
-          id: formatSeatId(tableCode, s),
-          table_code: tableCode,
-          table_number: t,
-          seat_number: s,
-          society,
-          row_letter: row,
-          attendee_id: null,
-          status: 'available',
-          confirmed_at: null,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-      }
+  const sharedTableCodes = new Set(SHARED_TABLES_CONFIG.map((s) => s.tableCode));
+
+  // 1. Generate standalone non-shared tables
+  // TH: 1 to 12
+  for (let t = 1; t <= 12; t++) {
+    const code = formatTableCode('TH', t);
+    for (let s = 1; s <= 10; s++) {
+      mockSeats.push({
+        id: formatSeatId(code, s),
+        table_code: code,
+        table_number: t,
+        seat_number: s,
+        society: 'Traditional Hilot Society',
+        row_letter: 'TH',
+        attendee_id: null,
+        status: 'available',
+        confirmed_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  // PH: 1 to 12
+  for (let t = 1; t <= 12; t++) {
+    const code = formatTableCode('PH', t);
+    for (let s = 1; s <= 10; s++) {
+      mockSeats.push({
+        id: formatSeatId(code, s),
+        table_code: code,
+        table_number: t,
+        seat_number: s,
+        society: 'Public Health Nursing Society',
+        row_letter: 'PH',
+        attendee_id: null,
+        status: 'available',
+        confirmed_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  // I: 1 to 12 (Table 13 is shared)
+  for (let t = 1; t <= 12; t++) {
+    const code = formatTableCode('I', t);
+    for (let s = 1; s <= 10; s++) {
+      mockSeats.push({
+        id: formatSeatId(code, s),
+        table_code: code,
+        table_number: t,
+        seat_number: s,
+        society: 'Nursing Informatics Society',
+        row_letter: 'I',
+        attendee_id: null,
+        status: 'available',
+        confirmed_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  // H: 2 to 12 (Table 1 & Table 13 are shared)
+  for (let t = 2; t <= 12; t++) {
+    const code = formatTableCode('H', t);
+    for (let s = 1; s <= 10; s++) {
+      mockSeats.push({
+        id: formatSeatId(code, s),
+        table_code: code,
+        table_number: t,
+        seat_number: s,
+        society: 'Nurses Against Hypertension Society',
+        row_letter: 'H',
+        attendee_id: null,
+        status: 'available',
+        confirmed_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  // O: 2 to 12 (Table 1 & Table 13 are shared)
+  for (let t = 2; t <= 12; t++) {
+    const code = formatTableCode('O', t);
+    for (let s = 1; s <= 10; s++) {
+      mockSeats.push({
+        id: formatSeatId(code, s),
+        table_code: code,
+        table_number: t,
+        seat_number: s,
+        society: 'Oncology Nursing Society',
+        row_letter: 'O',
+        attendee_id: null,
+        status: 'available',
+        confirmed_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  // R: 2 to 12 (Table 1 is shared)
+  for (let t = 2; t <= 12; t++) {
+    const code = formatTableCode('R', t);
+    for (let s = 1; s <= 10; s++) {
+      mockSeats.push({
+        id: formatSeatId(code, s),
+        table_code: code,
+        table_number: t,
+        seat_number: s,
+        society: 'Renal Nursing Society',
+        row_letter: 'R',
+        attendee_id: null,
+        status: 'available',
+        confirmed_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  // MH: 1 to 12 (Table 13 is shared)
+  for (let t = 1; t <= 12; t++) {
+    const code = formatTableCode('MH', t);
+    for (let s = 1; s <= 10; s++) {
+      mockSeats.push({
+        id: formatSeatId(code, s),
+        table_code: code,
+        table_number: t,
+        seat_number: s,
+        society: 'Mental Health Society',
+        row_letter: 'MH',
+        attendee_id: null,
+        status: 'available',
+        confirmed_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  // MC: 2 to 12 (Table 1 & Table 13 are shared)
+  for (let t = 2; t <= 12; t++) {
+    const code = formatTableCode('MC', t);
+    for (let s = 1; s <= 10; s++) {
+      mockSeats.push({
+        id: formatSeatId(code, s),
+        table_code: code,
+        table_number: t,
+        seat_number: s,
+        society: 'Maternal and Child Society',
+        row_letter: 'MC',
+        attendee_id: null,
+        status: 'available',
+        confirmed_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  // HL: 2 to 12 (Table 1 & Table 13 are shared)
+  for (let t = 2; t <= 12; t++) {
+    const code = formatTableCode('HL', t);
+    for (let s = 1; s <= 10; s++) {
+      mockSeats.push({
+        id: formatSeatId(code, s),
+        table_code: code,
+        table_number: t,
+        seat_number: s,
+        society: 'Healthy Lung Society',
+        row_letter: 'HL',
+        attendee_id: null,
+        status: 'available',
+        confirmed_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  // G: 2 to 12 (Table 1 & Table 13 are shared)
+  for (let t = 2; t <= 12; t++) {
+    const code = formatTableCode('G', t);
+    for (let s = 1; s <= 10; s++) {
+      mockSeats.push({
+        id: formatSeatId(code, s),
+        table_code: code,
+        table_number: t,
+        seat_number: s,
+        society: 'Gerontology Society',
+        row_letter: 'G',
+        attendee_id: null,
+        status: 'available',
+        confirmed_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  // DN: 2 to 12 (Table 1 & Table 13 are shared)
+  for (let t = 2; t <= 12; t++) {
+    const code = formatTableCode('DN', t);
+    for (let s = 1; s <= 10; s++) {
+      mockSeats.push({
+        id: formatSeatId(code, s),
+        table_code: code,
+        table_number: t,
+        seat_number: s,
+        society: 'Disaster Nursing Society',
+        row_letter: 'DN',
+        attendee_id: null,
+        status: 'available',
+        confirmed_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  // D: 2 to 12 (Table 1 is shared)
+  for (let t = 2; t <= 12; t++) {
+    const code = formatTableCode('D', t);
+    for (let s = 1; s <= 10; s++) {
+      mockSeats.push({
+        id: formatSeatId(code, s),
+        table_code: code,
+        table_number: t,
+        seat_number: s,
+        society: 'Diabetology Society',
+        row_letter: 'D',
+        attendee_id: null,
+        status: 'available',
+        confirmed_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+    }
+  }
+
+  // 2. Generate the 8 Shared Decimal Tables (10 seats each)
+  SHARED_TABLES_CONFIG.forEach((cfg) => {
+    for (let s = 1; s <= 10; s++) {
+      const isSoc1 = s <= cfg.slots1;
+      const soc = isSoc1 ? cfg.soc1 : cfg.soc2;
+      const tNum = isSoc1 ? cfg.tableNumber1 : cfg.tableNumber2;
+      const row = isSoc1 ? cfg.tableCode.split('-')[0] : cfg.tableCode.split('/ ')[1].split('-')[0];
+
+      mockSeats.push({
+        id: formatSeatId(cfg.tableCode, s),
+        table_code: cfg.tableCode,
+        table_number: tNum,
+        seat_number: s,
+        society: soc,
+        row_letter: row,
+        attendee_id: null,
+        status: 'available',
+        confirmed_at: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
     }
   });
 
@@ -62,13 +397,10 @@ export function createFreshBaseSeats() {
 
 function saveMockSeats(seatsData) {
   try {
-    localStorage.setItem('bsn_mock_seats_stage_v1', JSON.stringify(seatsData));
+    localStorage.setItem('bsn_mock_seats_stage_v2', JSON.stringify(seatsData));
   } catch (e) {}
 }
 
-// How long a 'reserved' (selected-but-not-confirmed) hold survives before it is
-// treated as abandoned and released. For a reserved seat the seats.confirmed_at
-// column is used as the "reserved at" timestamp.
 const RESERVATION_TTL_MS = 20 * 60 * 1000;
 
 export function useSeats() {
@@ -81,17 +413,28 @@ export function useSeats() {
       setError(null);
       let baseSeats = createFreshBaseSeats();
 
-      // 1. Fetch from seats table in Supabase
-      const { data: seatsData, error: seatsErr } = await supabase
-        .from('seats')
-        .select('*')
-        .order('table_code', { ascending: true })
-        .order('seat_number', { ascending: true });
+      // 1. Fetch from seats table in Supabase in 2 parallel batches (bypassing the 1000 postgrest limit)
+      const [batch1, batch2] = await Promise.all([
+        supabase
+          .from('seats')
+          .select('*')
+          .range(0, 999)
+          .order('table_code', { ascending: true })
+          .order('seat_number', { ascending: true }),
+        supabase
+          .from('seats')
+          .select('*')
+          .range(1000, 1999)
+          .order('table_code', { ascending: true })
+          .order('seat_number', { ascending: true }),
+      ]);
 
-      if (!seatsErr && seatsData && seatsData.length > 0) {
+      const seatsData = [...(batch1.data || []), ...(batch2.data || [])];
+
+      if (seatsData && seatsData.length > 0) {
         const dbSeatsMap = new Map();
         seatsData.forEach((s) => {
-          const key = `${s.table_code || ('T-' + s.table_number)}-S${s.seat_number}`;
+          const key = `${s.table_code}-S${s.seat_number}`;
           dbSeatsMap.set(key, s);
         });
 
@@ -142,9 +485,7 @@ export function useSeats() {
         });
       } catch (e) {}
 
-      // Synchronize baseSeats with confirmed attendees, but preserve in-progress
-      // reservations (another student mid-selection) so they aren't destroyed by
-      // an unrelated realtime refresh.
+      // Synchronize baseSeats with confirmed attendees
       const orphanedSeatsToReset = [];
       baseSeats = baseSeats.map((s) => {
         const key = `${s.table_code}-S${s.seat_number}`;
@@ -157,8 +498,7 @@ export function useSeats() {
             confirmed_at: att.seat_confirmed_at || s.confirmed_at,
           };
         }
-        // Held reservation (not yet confirmed). Keep it if it's fresh; release it
-        // if it's stale/abandoned (or predates reservation timestamping).
+        // Held reservation (not yet confirmed)
         if (s.status === 'reserved' && s.attendee_id) {
           const reservedAt = s.confirmed_at ? new Date(s.confirmed_at).getTime() : 0;
           if (reservedAt && Date.now() - reservedAt < RESERVATION_TTL_MS) {
@@ -167,8 +507,7 @@ export function useSeats() {
           orphanedSeatsToReset.push(s);
           return { ...s, attendee_id: null, status: 'available', confirmed_at: null };
         }
-        // Claims 'confirmed' / has an attendee_id but no confirmed attendee backs
-        // it — a genuine orphan. Reset locally and in the DB.
+        // Genuine orphan: status says confirmed or has attendee_id but no matching attendee
         if (s.status === 'confirmed' || s.attendee_id) {
           orphanedSeatsToReset.push(s);
         }
@@ -211,14 +550,14 @@ export function useSeats() {
 
     try {
       attendeesChannel = supabase
-        .channel('realtime_attendees_sync_v2')
+        .channel('realtime_attendees_sync_v3')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'attendees' }, () => {
           fetchSeats();
         })
         .subscribe();
 
       seatsChannel = supabase
-        .channel('realtime_seats_sync_v2')
+        .channel('realtime_seats_sync_v3')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'seats' }, () => {
           fetchSeats();
         })
@@ -290,7 +629,7 @@ export function useSeats() {
       return updated;
     });
 
-    if (!seatRecord) return true; // not in the loaded list (offline mock) — optimistic only
+    if (!seatRecord) return true;
 
     const revert = () => {
       setSeats((prev) => {
@@ -303,12 +642,8 @@ export function useSeats() {
     };
 
     try {
-      // Only claim the seat if it is still 'available' in the DB — this closes
-      // the race where two students click the same seat at once.
       const { data, error } = await supabase
         .from('seats')
-        // confirmed_at doubles as "reserved at" while status is 'reserved' — used
-        // by fetchSeats to expire abandoned holds.
         .update({ attendee_id: attendeeId, status: 'reserved', confirmed_at: new Date().toISOString() })
         .eq('table_code', seatRecord.table_code)
         .eq('seat_number', seatRecord.seat_number)
@@ -323,7 +658,6 @@ export function useSeats() {
       }
     } catch (err) {
       if (err?.message?.includes('just taken')) throw err;
-      // Supabase unreachable / not configured (offline dev) — keep the optimistic hold.
       console.warn('[reserveSeat] could not verify with DB, kept optimistic hold:', err?.message);
     }
     return true;
@@ -343,10 +677,10 @@ export function useSeats() {
 
       if (!tableCode || !seatNumber) {
         const parts = String(seatId).split('-');
-        // table-A-01-seat-01
-        tableCode = `${parts[1]}-${parts[2]}`;
-        seatNumber = parseInt(parts[4]) || 1;
-        tableNumber = parseInt(parts[2]) || 1;
+        // table-CODE-seat-NUM
+        tableCode = parts.slice(1, -2).join('-');
+        seatNumber = parseInt(parts[parts.length - 1], 10) || 1;
+        tableNumber = 1;
       }
 
       const nowIso = new Date().toISOString();
@@ -366,10 +700,9 @@ export function useSeats() {
         }
       } catch (err) {
         if (err?.message?.includes('just confirmed')) throw err;
-        // clash-check unreachable — fall through and rely on the write below
       }
 
-      // 1. UPDATE attendees table in Supabase (authoritative record)
+      // 1. UPDATE attendees table in Supabase
       let dbConfirmed = false;
       try {
         const { error: attErr } = await supabase
@@ -388,7 +721,7 @@ export function useSeats() {
         console.error('[confirm] attendees update failed:', err?.message);
       }
 
-      // 2. UPDATE seats table in Supabase (mirror; fetchSeats reconciles from attendees)
+      // 2. UPDATE seats table in Supabase
       try {
         const { error: seatErr } = await supabase
           .from('seats')
@@ -425,10 +758,6 @@ export function useSeats() {
 
       await fetchSeats();
 
-      // If the authoritative DB write failed, only treat it as success when the
-      // localStorage fallback actually recorded the confirmation (offline dev).
-      // Otherwise fail loudly so the UI doesn't tell the student they have a seat
-      // they don't.
       if (!dbConfirmed) {
         let localConfirmed = false;
         try {

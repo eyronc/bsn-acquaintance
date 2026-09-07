@@ -60,7 +60,7 @@ export function AdminLogin({ onLogin, onBackToStudent }) {
                 alt="UCLM Nursing Emblem"
                 className="w-full h-full rounded-full object-contain p-2 border border-[#E7C15A]/40 bg-white/5"
               />
-              <div className="absolute -bottom-1 right-1/4 bg-gradient-to-br from-[#F5DE9B] to-[#C99A3C] text-[#0A1A33] p-1.5 rounded-full border border-[#0A1A33]/20 shadow-md flex items-center justify-center">
+              <div className="absolute bottom-0 right-0 bg-gradient-to-br from-[#F5DE9B] to-[#C99A3C] text-[#0A1A33] p-1.5 rounded-full border border-[#0A1A33]/20 shadow-md flex items-center justify-center">
                 <Lock size={14} className="stroke-[2.5]" />
               </div>
             </div>

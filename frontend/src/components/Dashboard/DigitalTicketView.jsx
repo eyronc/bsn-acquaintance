@@ -141,57 +141,64 @@ export function DigitalTicketView({
             </div>
           </div>
 
-          {/* Reserved Seat Highlight */}
-          <div className="ticket-seats-grid grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {/* Reserved Seat Highlight - Full Width Society Zone + 2-Column Table & Seat */}
+          <div className="ticket-seats-container space-y-3">
+            {/* Society Zone (Full Width - completely readable, never cut off) */}
             <div 
-              className="p-3.5 neu-pressed rounded-2xl border text-center"
+              className="p-3.5 sm:p-4 neu-pressed rounded-2xl border text-center"
               style={{
                 borderColor: currentTheme.badge.border,
+                backgroundColor: currentTheme.badge.bg,
               }}
             >
-              <p className="text-[10px] uppercase font-bold text-slate-500">Society Zone</p>
+              <p className="text-[10.5px] uppercase font-black tracking-wider text-slate-500">
+                Assigned Society Zone
+              </p>
               <p
-                className="text-lg sm:text-2xl font-black font-heading truncate"
+                className="text-lg sm:text-2xl font-black font-heading mt-0.5 leading-snug break-words px-2"
                 style={{ color: currentTheme.accentColor }}
               >
                 {effectiveUserSociety}
               </p>
             </div>
 
-            <div 
-              className="p-3.5 neu-pressed rounded-2xl border text-center"
-              style={{
-                borderColor: currentTheme.badge.border,
-                backgroundColor: currentTheme.badge.bg,
-              }}
-            >
-              <p 
-                className="text-[10px] uppercase font-bold"
-                style={{ color: currentTheme.accentColor }}
+            {/* Table Number & Seat Number (2 Balanced Columns) */}
+            <div className="ticket-seats-grid grid grid-cols-2 gap-3">
+              <div 
+                className="p-3.5 sm:p-4 neu-pressed rounded-2xl border text-center"
+                style={{
+                  borderColor: currentTheme.badge.border,
+                  backgroundColor: currentTheme.badge.bg,
+                }}
               >
-                Table Number
-              </p>
-              <p className={`text-lg sm:text-2xl font-black font-heading ${currentTheme.textDark}`}>
-                {userSeat?.table_code || userSeat?.table_number}
-              </p>
-            </div>
+                <p 
+                  className="text-[10.5px] uppercase font-black tracking-wider"
+                  style={{ color: currentTheme.accentColor }}
+                >
+                  Table Number
+                </p>
+                <p className={`text-xl sm:text-2xl font-black font-heading mt-0.5 ${currentTheme.textDark}`}>
+                  {userSeat?.table_code || userSeat?.table_number}
+                </p>
+              </div>
 
-            <div 
-              className="p-3.5 neu-pressed rounded-2xl border text-center col-span-2 sm:col-span-1"
-              style={{
-                borderColor: currentTheme.badge.border,
-                backgroundColor: currentTheme.badge.bg,
-              }}
-            >
-              <p 
-                className="text-[10px] uppercase font-bold"
-                style={{ color: currentTheme.accentColor }}
+              <div 
+                className="p-3.5 sm:p-4 neu-pressed rounded-2xl border text-center"
+                style={{
+                  borderColor: currentTheme.badge.border,
+                  backgroundColor: currentTheme.badge.bg,
+                }}
               >
-                Seat Number
-              </p>
-              <p className={`text-lg sm:text-2xl font-black font-heading ${currentTheme.textDark}`}>
-                Seat {userSeat?.seat_number}
-              </p>
+                <p 
+                  className="text-[10.5px] uppercase font-black tracking-wider"
+                  style={{ color: currentTheme.accentColor }}
+                >
+                  Seat Number
+                </p>
+                <p className={`text-xl sm:text-2xl font-black font-heading mt-0.5 ${currentTheme.textDark}`}>
+                  Seat {userSeat?.seat_number}
+                </p>
+              </div>
             </div>
           </div>
 
